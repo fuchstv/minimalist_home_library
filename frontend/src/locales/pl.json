@@ -1,0 +1,36 @@
+{
+    "nav": {
+        "catalog": "Katalog",
+        "profile": "Mój profil",
+        "loans": "Wypożyczenia",
+        "admin": "Admin",
+        "login": "Zaloguj się",
+        "logout": "Wyloguj się"
+    },
+    "catalog": {
+        "welcome_title": "Witamy w naszej domowej bibliotece – Odkryj radość z języka polskiego",
+        "welcome_desc": "Nasza biblioteka to coś więcej niż półka z książkami – to Twoja przytulna \"Trzecia Przestrzeń\" do animacji językowej, wymiany kulturowej i wspólnych doświadczeń. Rozgość się i przeglądaj naszą kolekcję.",
+        "search_placeholder": "Znajdź swoją następną ulubioną książkę lub słuchowisko...",
+        "genre": "Gatunek",
+        "status": "Status",
+        "all": "Wszystkie",
+        "available": "Dostępne",
+        "borrowed": "Wypożyczone",
+        "current_selection": "Aktualny wybór",
+        "borrow_btn": "Wypożycz",
+        "reserve_btn": "Zarezerwuj",
+        "details_btn": "Pokaż szczegóły",
+        "no_books": "Nie znaleziono książek."
+    },
+    "auth": {
+        "login_title": "Logowanie",
+        "register_title": "Rejestracja",
+        "email": "Adres e-mail",
+        "password": "Hasło",
+        "name": "Imię",
+        "submit_login": "Zaloguj się",
+        "submit_register": "Utwórz konto",
+        "no_account": "Nie masz jeszcze konta?",
+        "has_account": "Masz już konto?"
+    }
+}

@@ -1,0 +1,47 @@
+services:
+  backend:
+    image: php:8.4-apache
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=db
+      - DB_USER=library_user
+      - DB_PASS=library_pass
+      - DB_NAME=library_db
+    depends_on:
+      - db
+    # We will need PDO extension for MySQL.
+    # The default php:apache image doesn't have pdo_mysql enabled. 
+    # We will build a custom image or run docker-php-ext-install
+    command: >
+      bash -c "docker-php-ext-install pdo pdo_mysql && a2enmod rewrite && apache2-foreground"
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: library_db
+      MYSQL_USER: library_user
+      MYSQL_PASSWORD: library_pass
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - db
+
+volumes:
+  db_data:

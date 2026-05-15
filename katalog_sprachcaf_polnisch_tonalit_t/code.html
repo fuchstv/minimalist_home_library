@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Katalog - SprachCafé Polnisch</title>
+<!-- Google Fonts: Montserrat and Open Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Open+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config Injection -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary-fixed": "#ffdad4",
+                "secondary-fixed-dim": "#73dd71",
+                "on-background": "#1c1b1a",
+                "on-primary-fixed-variant": "#930000",
+                "surface-container-highest": "#e5e2df",
+                "surface-variant": "#e5e2df",
+                "on-surface-variant": "#5e3f3a",
+                "tertiary-container": "#0052f9",
+                "tertiary-fixed-dim": "#b7c4ff",
+                "surface-bright": "#fdf9f6",
+                "on-secondary": "#ffffff",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "outline": "#926e69",
+                "error": "#ba1a1a",
+                "surface-container": "#f1edea",
+                "on-primary-container": "#ffdad4",
+                "on-secondary-fixed": "#002203",
+                "error-container": "#ffdad6",
+                "on-primary-fixed": "#410000",
+                "on-secondary-fixed-variant": "#005312",
+                "secondary-container": "#8cf888",
+                "on-tertiary-container": "#dce1ff",
+                "outline-variant": "#e8bdb6",
+                "on-error": "#ffffff",
+                "surface-container-low": "#f7f3f0",
+                "primary-fixed-dim": "#ffb4a8",
+                "surface": "#fdf9f6",
+                "deep-black": "#000000",
+                "surface-container-high": "#ebe7e4",
+                "primary": "#9e0000",
+                "secondary-fixed": "#8ffa8a",
+                "inverse-on-surface": "#f4f0ed",
+                "surface-tint": "#c00000",
+                "tertiary": "#003ec2",
+                "secondary": "#006e1a",
+                "on-tertiary-fixed": "#001551",
+                "on-error-container": "#93000a",
+                "on-surface": "#1c1b1a",
+                "surface-dim": "#ddd9d6",
+                "primary-container": "#cc0000",
+                "inverse-surface": "#31302f",
+                "inverse-primary": "#ffb4a8",
+                "tertiary-fixed": "#dce1ff",
+                "background": "#fdf9f6",
+                "white": "#FFFFFF",
+                "on-secondary-container": "#00731c",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed-variant": "#0039b4"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-desktop": "32px",
+                "section-gap-md": "48px",
+                "section-gap-lg": "80px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "base": "8px",
+                "container-max-width": "1200px"
+        },
+        "fontFamily": {
+                "headline-md": [
+                        "Montserrat"
+                ],
+                "headline-lg": [
+                        "Montserrat"
+                ],
+                "body-md": [
+                        "Open Sans"
+                ],
+                "body-sm": [
+                        "Open Sans"
+                ],
+                "label-md": [
+                        "Open Sans"
+                ],
+                "label-lg": [
+                        "Open Sans"
+                ],
+                "body-lg": [
+                        "Open Sans"
+                ],
+                "headline-xl": [
+                        "Montserrat"
+                ],
+                "headline-lg-mobile": [
+                        "Montserrat"
+                ]
+        },
+        "fontSize": {
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-lg": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-sm": ["12px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600"}]
+        }
+},
+    },
+  }
+</script>
+<style>
+        /* Utility for Material Symbols */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for clean aesthetic */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d8dada; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c2c7ca; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Shared Component -->
+<nav class="bg-surface dark:bg-inverse-surface sticky top-0 w-full z-50 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto h-16">
+<!-- Brand Logo -->
+<a class="flex items-center gap-2" href="#">
+<img alt="SprachCafé Polnisch Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
+</a>
+<!-- Desktop Navigation -->
+<ul class="hidden md:flex items-center gap-8 h-full">
+<li class="h-full flex items-center">
+<!-- Active State: Katalog -->
+<a class="font-body-md text-body-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold h-full flex items-center opacity-80 transition-all duration-200" href="#">
+                        Katalog
+                    </a>
+</li>
+<li class="h-full flex items-center">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">
+                        Mein Profil
+                    </a>
+</li>
+<li class="h-full flex items-center">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">
+                        Ausleihen
+                    </a>
+</li>
+</ul>
+<!-- Search / Mobile Menu -->
+<div class="flex items-center gap-4">
+<button aria-label="Suchen" class="text-on-surface-variant hover:text-primary transition-colors hidden md:block">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button aria-label="Menü" class="md:hidden text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col w-full">
+<!-- Search & Filter Hero Section -->
+<section class="w-full bg-surface-container-low py-12 md:py-16 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-container-max-width mx-auto flex flex-col gap-8">
+<div class="max-w-2xl">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-4">Willkommen in unserer Hausbibliothek – Entdecke die Freude am Polnischen</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Unsere Bibliothek ist mehr als nur ein Bücherregal – sie ist dein gemütlicher 'Third Space' für Sprachanimation, kulturellen Austausch und gemeinsame Erlebnisse. Mach es dir bequem und stöbere durch unsere Sammlung.</p>
+</div>
+<!-- Prominent Search Bar -->
+<div class="relative w-full max-w-3xl">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-4 pl-12 pr-4 font-body-md text-body-md text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all shadow-sm" placeholder="Finde dein nächstes Lieblingsbuch oder Hörspiel..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-on-primary font-label-md text-label-md px-6 py-2 rounded-md hover:bg-primary/90 transition-colors">
+                        Suchen
+                    </button>
+</div>
+<!-- Filters -->
+<div class="flex flex-col md:flex-row gap-6 mt-4">
+<div class="flex flex-col gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Genre</span>
+<div class="flex flex-wrap gap-2">
+<button class="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-primary-container transition-colors">Alle</button>
+<button class="bg-surface-container-lowest text-on-surface px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-outline-variant hover:bg-surface-variant transition-colors">Sachbuch</button>
+<button class="bg-surface-container-lowest text-on-surface px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-outline-variant hover:bg-surface-variant transition-colors">Belletristik</button>
+<button class="bg-surface-container-lowest text-on-surface px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-outline-variant hover:bg-surface-variant transition-colors">Wissenschaft</button>
+<button class="bg-surface-container-lowest text-on-surface px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-outline-variant hover:bg-surface-variant transition-colors">Kunst</button>
+</div>
+</div>
+<div class="flex flex-col gap-2 md:ml-8">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</span>
+<div class="flex flex-wrap gap-2">
+<button class="bg-secondary-container text-on-secondary-container px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-secondary-container transition-colors">Verfügbar</button>
+<button class="bg-surface-container-lowest text-on-surface px-4 py-1.5 rounded-full font-label-sm text-label-sm border border-outline-variant hover:bg-surface-variant transition-colors">Ausgeliehen</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Catalog Grid Section -->
+<section class="w-full px-margin-mobile md:px-margin-desktop py-12 max-w-container-max-width mx-auto">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-md text-headline-md text-on-surface">Aktuelle Auswahl</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Zeige 1-8 von 124 Ergebnissen</span>
+</div>
+<!-- Bento-style Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Card 1 -->
+<article class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-outline transition-colors duration-300 h-full">
+<div class="relative w-full aspect-[2/3] bg-surface-container overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A highly structured, minimalist book cover featuring abstract architectural lines in muted greys and soft whites. The design is profoundly clean, utilizing generous negative space to evoke a sense of quiet intelligence and scholarly focus. High-key, diffused lighting softly illuminates the subtle texture of the paper stock, adhering to a refined, light-mode visual identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhaQidhYz7_pntoUEjxVBSci12guGH8zpddXYuoMuzoYjoAOtDAel1G8IRHnOaZXpeUv2sLEYdK0a7GFmwU3aOrYawEFe-uyg3nd2_iXyWCJ4GvcARpPvVkrDtcMShz8JFa3JLr2HopQzoIszvmZtqwPHQJxCubLj1cSkWnv-ZNk8UmBHoeBZDwkFgyDtj-kXsambr6UW3JcRbYYYDJUCRY8b5rHGJ7atEjpP0PQXYnUDBUq4gXlZJr8XsnEbwlw2xnMtXoZ8y5Ko"/>
+<div class="absolute top-3 right-3">
+<span class="inline-block bg-secondary-fixed text-on-secondary-fixed px-2 py-1 rounded-sm font-label-sm text-label-sm">Verfügbar</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<span class="font-label-sm text-label-sm text-tertiary-container mb-1">Architektur</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 line-clamp-2 leading-tight">Form und Struktur in der Moderne</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6">Dr. Helena Rostow</p>
+<div class="mt-auto flex flex-col gap-2">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                                Ausleihen
+                            </button>
+<button class="w-full bg-transparent border border-primary text-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/5 transition-colors">
+                                Details anzeigen
+                            </button>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-outline transition-colors duration-300 h-full">
+<div class="relative w-full aspect-[2/3] bg-surface-container overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An elegant, minimalist book cover depicting a solitary botanical illustration of a fern leaf centered on a pristine white background. The color palette is restricted to soft sage greens and stark paper white. The typography is a delicate, classic serif. The overall mood is calming and deeply focused, perfectly suited for a high-end, quiet academic environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJuav1ZJMFA4hxRfsBzIxdjt_q7rY7QaGV_z-MNFtNKnesi-AiLWCXTSI8TYNqqsjUmus4tPTiiywQZ30dDLRhd0xxF0T4StU6pO88qavBcOZqrprBT13zleP8ezTrHWWLPMnT0dL2WcOsctN54baymzQs-8aZY6a7FN57U7JVxZWBjArl2yPAiVgU_BVFUWxXFscw7gTEZON98NYN18B5yH5lEwh4DAGDZhEumW1UnSPudEN4gNhi6Mp8y2xorgVulqJtwjxG2Uo"/>
+<div class="absolute top-3 right-3">
+<span class="inline-block bg-surface-variant text-on-surface-variant px-2 py-1 rounded-sm font-label-sm text-label-sm">Ausgeliehen</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<span class="font-label-sm text-label-sm text-tertiary-container mb-1">Botanik</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 line-clamp-2 leading-tight">Die Stille der Pflanzenwelt</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6">Julian von Auen</p>
+<div class="mt-auto flex flex-col gap-2">
+<button class="w-full bg-surface-variant text-on-surface-variant font-label-md text-label-md py-2.5 rounded-md cursor-not-allowed flex items-center justify-center gap-2" disabled="">
+<span class="material-symbols-outlined text-[18px]">event</span>
+                                Vormerken
+                            </button>
+<button class="w-full bg-transparent border border-primary text-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/5 transition-colors">
+                                Details anzeigen
+                            </button>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-outline transition-colors duration-300 h-full">
+<div class="relative w-full aspect-[2/3] bg-surface-container overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 filter grayscale" data-alt="A sophisticated book cover design featuring a stark, monochromatic geometric pattern that creates a sense of deep optical illusion. The palette utilizes dark slate, deep charcoal, and pristine white. The layout is rigorously structured on a grid, conveying a sense of mathematical precision and scholarly rigor. Soft, diffused lighting enhances the premium, minimalist aesthetic of the catalog." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPpsBz6ivuQX_vN4JeyCqtXn8vONhVccIegytHvlgoKEkP_j-ld2szCxciTFOaZOpiEoHC9R-SVV_LObWpASL08M08mlcPsOT6VHPdjAP9NCquhuOIdkJV7K4xQ0MOgq2dFRkQhpeqW7_tIGgNPOt_eLmKfbuHYWhnOdffpaYCNrnXWPxuvAg8YD015D9UyCSntInwbFGAHwupbZ05btA5dN_DcKQTpHt0WEwjIfy1_zqJfDlC-7wgjDQw25lZIPAGyxux4FGwmfQ"/>
+<div class="absolute top-3 right-3">
+<span class="inline-block bg-secondary-fixed text-on-secondary-fixed px-2 py-1 rounded-sm font-label-sm text-label-sm">Verfügbar</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<span class="font-label-sm text-label-sm text-tertiary-container mb-1">Mathematik</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 line-clamp-2 leading-tight">Symmetrie und Chaos</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6">Prof. M. K. Larson</p>
+<div class="mt-auto flex flex-col gap-2">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                                Ausleihen
+                            </button>
+<button class="w-full bg-transparent border border-primary text-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/5 transition-colors">
+                                Details anzeigen
+                            </button>
+</div>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-outline transition-colors duration-300 h-full">
+<div class="relative w-full aspect-[2/3] bg-surface-container overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A beautifully minimal book cover showcasing a single, perfectly smooth, pale grey stone casting a soft shadow on a vast, off-white canvas. The typography is entirely sans-serif, small, and pushed to the absolute margins, allowing the central image and negative space to dominate. The visual tone is incredibly serene, embodying a 'Quiet Intelligence' and contemplative study environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHTT8IcUxHwogz1M-B2pT5DOPYaKFTqpcZMbgCTpOeDLAT6IteZViS79HXfTR9-Vh-HWdx-QlMoYq6C0tn7AdUlAtEVeWsYcu9piZkO26mYyWXmbGwuW905S67ZqEBlzqvEW6uYuw_8nTqLS4qcDC9OdFwc7sh5SsQ7-ev_FQMa7AlO4E2LNeomBLJI-pQKadAukpsQwYeuE_0dpjwoM2iWBDtaPVDmn5PHtq6dwWHY5Ybc7QyZ_U1IG_rqLXo7dRa8R9r7G7jM-g"/>
+<div class="absolute top-3 right-3">
+<span class="inline-block bg-secondary-fixed text-on-secondary-fixed px-2 py-1 rounded-sm font-label-sm text-label-sm">Verfügbar</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<span class="font-label-sm text-label-sm text-tertiary-container mb-1">Philosophie</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1 line-clamp-2 leading-tight">Meditationen über die Leere</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6">A. T. Kenji</p>
+<div class="mt-auto flex flex-col gap-2">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                                Ausleihen
+                            </button>
+<button class="w-full bg-transparent border border-primary text-primary font-label-md text-label-md py-2.5 rounded-md hover:bg-primary/5 transition-colors">
+                                Details anzeigen
+                            </button>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination (Minimalist) -->
+<div class="mt-12 flex justify-center items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-md text-on-surface-variant hover:border-primary hover:text-primary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-md bg-primary text-on-primary font-body-md text-body-md">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface hover:bg-surface-container font-body-md text-body-md transition-colors">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface hover:bg-surface-container font-body-md text-body-md transition-colors">3</button>
+<span class="text-on-surface-variant">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface hover:bg-surface-container font-body-md text-body-md transition-colors">16</button>
+</div>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-md text-on-surface-variant hover:border-primary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer Shared Component -->
+<footer class="bg-surface-container-low dark:bg-inverse-surface w-full mt-auto">
+<div class="w-full py-8 px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max-width mx-auto gap-gutter">
+<!-- Copyright & Brand -->
+<div class="flex flex-col items-center md:items-start gap-2">
+<img alt="SprachCafé Polnisch Logo" class="h-12 w-auto mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
+<p class="font-label-sm text-label-sm text-secondary dark:text-secondary-fixed-dim">© 2024 Modern Library Systems. Quiet Intelligence for Research.</p>
+</div>
+<!-- Footer Links -->
+<ul class="flex flex-wrap justify-center gap-6 mt-4 md:mt-0">
+<li>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">
+                        Datenschutz
+                    </a>
+</li>
+<li>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">
+                        Impressum
+                    </a>
+</li>
+<li>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">
+                        Kontakt
+                    </a>
+</li>
+<li>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">
+                        Öffnungszeiten
+                    </a>
+</li>
+</ul>
+</div>
+</footer>
+</body></html>

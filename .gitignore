@@ -1,0 +1,22 @@
+# Node modules and build output
+frontend/node_modules/
+frontend/dist/
+frontend/.DS_Store
+
+# Backend & Database
+backend/uploads/*
+!backend/uploads/.gitkeep
+database/db_data/
+*.log
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+
+# Environment variables (if used locally)
+.env
+.env.local
+
+# Docker cache
+.docker/

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mein Profil - SprachCafé Polnisch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;family=Open+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#ffdad4",
+                        "secondary-fixed-dim": "#73dd71",
+                        "on-background": "#1c1b1a",
+                        "on-primary-fixed-variant": "#930000",
+                        "surface-container-highest": "#e5e2df",
+                        "surface-variant": "#e5e2df",
+                        "on-surface-variant": "#5e3f3a",
+                        "tertiary-container": "#0052f9",
+                        "tertiary-fixed-dim": "#b7c4ff",
+                        "surface-bright": "#fdf9f6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#926e69",
+                        "error": "#ba1a1a",
+                        "surface-container": "#f1edea",
+                        "on-primary-container": "#ffdad4",
+                        "on-secondary-fixed": "#002203",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#410000",
+                        "on-secondary-fixed-variant": "#005312",
+                        "secondary-container": "#8cf888",
+                        "on-tertiary-container": "#dce1ff",
+                        "outline-variant": "#e8bdb6",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f7f3f0",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "surface": "#fdf9f6",
+                        "deep-black": "#000000",
+                        "surface-container-high": "#ebe7e4",
+                        "primary": "#9e0000",
+                        "secondary-fixed": "#8ffa8a",
+                        "inverse-on-surface": "#f4f0ed",
+                        "surface-tint": "#c00000",
+                        "tertiary": "#003ec2",
+                        "secondary": "#006e1a",
+                        "on-tertiary-fixed": "#001551",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#1c1b1a",
+                        "surface-dim": "#ddd9d6",
+                        "primary-container": "#cc0000",
+                        "inverse-surface": "#31302f",
+                        "inverse-primary": "#ffb4a8",
+                        "tertiary-fixed": "#dce1ff",
+                        "background": "#fdf9f6",
+                        "white": "#FFFFFF",
+                        "on-secondary-container": "#00731c",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#0039b4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "section-gap-md": "48px",
+                        "section-gap-lg": "80px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "base": "8px",
+                        "container-max-width": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Open Sans"],
+                        "body-sm": ["Open Sans"],
+                        "label-md": ["Open Sans"],
+                        "label-lg": ["Open Sans"],
+                        "body-lg": ["Open Sans"],
+                        "headline-xl": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Component -->
+<nav class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto h-16">
+<!-- Brand -->
+<a class="flex items-center" href="#">
+<img alt="SprachCafé Polnisch Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
+</a>
+<!-- Navigation Links -->
+<div class="hidden md:flex items-center gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Katalog</a>
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 font-bold opacity-80 transition-all duration-200" href="#">Mein Profil</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Ausleihen</a>
+</div>
+<!-- Search Bar / Action -->
+<div class="flex items-center text-primary hover:opacity-80 cursor-pointer transition-opacity">
+<span class="material-symbols-outlined text-[24px]">search</span>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-section-gap-lg space-y-section-gap-md">
+<!-- User Information Section (Bento Header) -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+<div class="col-span-1 md:col-span-8 flex flex-col md:flex-row gap-8 items-start md:items-center bg-surface-container-low p-8 rounded-xl border border-outline-variant">
+<div class="w-24 h-24 rounded-full bg-primary-fixed flex items-center justify-center shrink-0 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A minimalist black and white portrait photograph of an individual looking thoughtfully off-camera, set against a pristine, well-lit studio background. The lighting is high-key and soft, creating a bright, modern, and approachable scholarly mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiyEwbED1cs72bmGUn9RWuZ_gPiKISApIEGt5XnRqYgNIer7CJS9AZrvW9tdRWkC8N7vWZ-VzqgTKvc3b1mak8xlStcPb2_eluQOHTxs1BALUWzsKJm1SxQ4pwyQfPJ5rp0uqMsBYHOBFnLckKp3SSe-KdtJzJ2lOgViHh9174nRUTE9lYOokJUSs4gcnJd0jvLbvL2pWlOWy0eYwTAPPZOsU8z1DxWFbvYRby0Ml_-tK3g5Ms6jPVfk2dPPrCuuxQyg2zDcJPE_w"/>
+</div>
+<div>
+<h1 class="font-headline-xl text-headline-xl text-primary mb-2">Schön, dass du da bist, Dr. Clara Hoffmann</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-4">Wissenschaftliche Mitarbeiterin • Mitglied seit 2018</p>
+<div class="flex gap-4">
+<span class="inline-flex items-center gap-2 bg-primary-container text-on-primary-container px-3 py-1.5 rounded-full font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                        Konto Aktiv
+                    </span>
+<span class="inline-flex items-center gap-2 bg-surface-variant text-on-surface-variant px-3 py-1.5 rounded-full font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">account_balance_wallet</span>
+                        0,00 € Gebühren
+                    </span>
+</div>
+</div>
+</div>
+<div class="col-span-1 md:col-span-4 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant h-full flex flex-col justify-center">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant mb-2 uppercase tracking-wider">Dein Aktivitätsstatus</h3>
+<div class="font-headline-lg text-headline-lg text-primary mb-1">4 <span class="font-body-md text-body-md text-on-surface-variant">Medien entliehen</span></div>
+<div class="w-full bg-surface-container-highest h-2 mt-4 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 40%;"></div>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mt-2 text-right">Limit: 10 Medien</p>
+</div>
+</section>
+<!-- Currently Borrowed Section -->
+<section>
+<div class="flex justify-between items-end mb-8 border-b border-outline-variant pb-4">
+<h2 class="font-headline-lg text-headline-lg text-primary">Deine aktuellen Schätze</h2>
+<span class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                Filter <span class="material-symbols-outlined">filter_list</span>
+</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-gutter">
+<!-- Borrowed Item Card 1 -->
+<div class="flex flex-col sm:flex-row gap-6 p-6 border border-outline-variant bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-colors group">
+<div class="w-full sm:w-32 aspect-[2/3] shrink-0 bg-surface-container-high rounded overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover grayscale mix-blend-multiply opacity-90 group-hover:grayscale-0 transition-all duration-500" data-alt="A stark, minimalist photograph of a thick academic textbook resting on a pristine white marble surface. The lighting is diffused and high-key, casting very soft shadows to emphasize the clean lines and muted color palette of the scholarly setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD58HfNoCsDMDrBlL4UnvTf2smfwWd3yvbqoLhzxpmmHzT0LVnGoh7M4kyNHuYPPoAF33w5Rt-Rw7G9DIGt_HIm62UoGOM-T2UYCGz3rpP5yepp0KJWH9pAgJfu-Z_xSTjdmfdp5szIYMWhTB4D2_zEN2666UtifqjdnW45-m66lhkONlY6NbSyrJAQnuhZ7mM1rQ4nWY1i6RP0p5boqmYfd5Ws1F4CHZQyQD4XOMKc5mcRr2xF79RIMfVY3bG0tz1uAczuDZxe_aA"/>
+</div>
+<div class="flex flex-col flex-grow justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Polnisch für Anfänger</h3>
+<span class="material-symbols-outlined text-outline-variant hover:text-primary cursor-pointer transition-colors">more_vert</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Von Anna Kowalska</p>
+<div class="inline-flex items-center gap-1.5 bg-error-container text-on-error-container px-2.5 py-1 rounded font-label-md text-label-md mb-6">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                            Fällig in 2 Tagen (14. Nov)
+                        </div>
+</div>
+<div class="flex gap-3 mt-auto">
+<button class="flex-1 bg-transparent border border-primary text-primary font-label-lg text-label-lg py-2.5 px-4 rounded hover:bg-primary hover:text-white transition-colors duration-200">
+                            Rückgabe
+                        </button>
+<button class="flex-1 bg-surface-container-low text-on-surface font-label-lg text-label-lg py-2.5 px-4 rounded border border-transparent hover:border-outline-variant transition-colors duration-200">
+                            Verlängern
+                        </button>
+</div>
+</div>
+</div>
+<!-- Borrowed Item Card 2 -->
+<div class="flex flex-col sm:flex-row gap-6 p-6 border border-outline-variant bg-surface-container-lowest rounded-lg hover:bg-surface-container transition-colors group">
+<div class="w-full sm:w-32 aspect-[2/3] shrink-0 bg-surface-container-high rounded overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover grayscale mix-blend-multiply opacity-90 group-hover:grayscale-0 transition-all duration-500" data-alt="A minimalist composition featuring an abstract, geometric book cover design resting on a pale grey concrete floor. The lighting is highly directional yet soft, creating a serene, intellectual atmosphere characterized by generous whitespace and subtle tonal depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMYzNvOw49aqZJvMGQmv_6g4jbHIjRP53KidvipChZs6soUbJYLdxUjow-5x0ZdhED7idm5fBFxCMFbUfn9eTm8odauvieizKtwQNo5wctE-CwAK38bJEa5enPZUPW4k-hkFTNzlbOtaUEXCOB3se1Oiggp42qBVHbaEBUfH0dB5QSszGqOlq2mSHVWftQgpQ_kqZh9A713e-Dg3rz0uWEnJ1JxKWRwrkjH0ZXwh3uNkYtCBqVHIGHl_Wh_QGE0jsw3SSbYOYTB8Q"/>
+</div>
+<div class="flex flex-col flex-grow justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Grammatik der polnischen Sprache</h3>
+<span class="material-symbols-outlined text-outline-variant hover:text-primary cursor-pointer transition-colors">more_vert</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Von Piotr Nowak</p>
+<div class="inline-flex items-center gap-1.5 bg-primary-container text-on-primary-container px-2.5 py-1 rounded font-label-md text-label-md mb-6">
+<span class="material-symbols-outlined text-[14px]">event</span>
+                            Fällig am 28. Nov
+                        </div>
+</div>
+<div class="flex gap-3 mt-auto">
+<button class="flex-1 bg-transparent border border-primary text-primary font-label-lg text-label-lg py-2.5 px-4 rounded hover:bg-primary hover:text-white transition-colors duration-200">
+                            Rückgabe
+                        </button>
+<button class="flex-1 bg-surface-container-low text-on-surface font-label-lg text-label-lg py-2.5 px-4 rounded border border-transparent hover:border-outline-variant transition-colors duration-200">
+                            Verlängern
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- History Section -->
+<section class="pt-8">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-6">Deine Lesereise</h2>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<!-- List Item 1 -->
+<div class="flex items-center justify-between p-4 border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-16 bg-surface-dim rounded overflow-hidden shrink-0">
+<img alt="Book thumbnail" class="w-full h-full object-cover grayscale" data-alt="A small, cropped abstract close-up of a vintage book spine with faded typography. The image is rendered in stark black and white, emphasizing texture and a quiet, historical aesthetic typical of a scholarly archive." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh6R8yxXBns2YqcRxBbZ9_DDAGQ1fNEAbWzEa-so5tiVzdLfXPY1GrfdqtpqByZW_5Be6YzUD5DbLWomSLZIB24pUChqfBolfDM7ZHzja_iV5KSFMMFR2lQB9Cb9MH-wsRu2K1C8Y9JtvXMsCR60KT6_vTj4LLatt8kmXoZ09tED6_cflrqF4LVBv6xB70aW_6_7jrWjAFAEZibXYjUPSc1WkC65P38WVXmXtBBy6QSzr2NW-JH8LN_rQvL94qkCygzEX_BwjOMhw"/>
+</div>
+<div>
+<h4 class="font-headline-md text-body-lg text-on-surface">Polnische Literatur des 20. Jahrhunderts</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Miłosz, C.</p>
+</div>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Zurückgegeben</span>
+<span class="font-body-md text-body-md text-on-surface">12. Okt 2023</span>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="flex items-center justify-between p-4 border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-16 bg-surface-dim rounded overflow-hidden shrink-0">
+<img alt="Book thumbnail" class="w-full h-full object-cover grayscale" data-alt="A minimal, high-contrast black and white detail shot of open book pages creating geometric shadows. The lighting is pristine and bright, evoking a sense of calm, intellectual focus and modern editorial design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALsIgnBaFr4rTt3euusmWMbg-GU3n3t2-bJL2amZuFACTnV4lWVlkVYzAXMTIB0Dujsj3kYJROBTcmC9-gRRcODegTvSDvgPLyLRf0DzQq9LCSVEbmhaujSQshX4OIJ8AhQTT_jN4wfZDEMGWBPIotuPPgNlyVOyM-eDaFqLwMxBo0mHsGCSq3WuWU2lUH_5Q9nuElsTRzuwfSGkGzhqV43Qwt-VlVYjrWkl4BFt4JxUNpfdyUKYRT8MYh1oe7us9XT54E-ZXmiw8"/>
+</div>
+<div>
+<h4 class="font-headline-md text-body-lg text-on-surface">Kulturgeschichte Polens</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Davies, N.</p>
+</div>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Zurückgegeben</span>
+<span class="font-body-md text-body-md text-on-surface">05. Sep 2023</span>
+</div>
+</div>
+<!-- List Item 3 -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-16 bg-surface-dim rounded overflow-hidden shrink-0 flex items-center justify-center text-outline-variant">
+<span class="material-symbols-outlined text-[24px]">book</span>
+</div>
+<div>
+<h4 class="font-headline-md text-body-lg text-on-surface">Wörterbuch Deutsch-Polnisch</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Langenscheidt</p>
+</div>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wide">Zurückgegeben</span>
+<span class="font-body-md text-body-md text-on-surface">22. Aug 2023</span>
+</div>
+</div>
+</div>
+<div class="mt-6 text-center">
+<button class="bg-transparent border-none text-primary font-label-lg text-label-lg py-2 px-4 hover:underline underline-offset-4 transition-all">
+                Deine gesamte Historie anzeigen
+            </button>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-surface-container-low border-t border-outline-variant w-full py-8 px-margin-mobile md:px-margin-desktop mt-section-gap-lg">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-container-max-width mx-auto gap-gutter">
+<!-- Brand Logo -->
+<a class="flex items-center" href="#">
+<img alt="SprachCafé Polnisch Logo" class="h-12 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
+</a>
+<!-- Links -->
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Datenschutz</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Impressum</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Kontakt</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Öffnungszeiten</a>
+</div>
+<!-- Copyright -->
+<div class="font-label-md text-label-md text-on-surface-variant opacity-90 hover:opacity-100 mt-4 md:mt-0 text-center md:text-left">
+            © 2024 SprachCafé Polnisch.
+        </div>
+</div>
+</footer>
+</body></html>

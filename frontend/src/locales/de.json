@@ -1,0 +1,36 @@
+{
+    "nav": {
+        "catalog": "Katalog",
+        "profile": "Mein Profil",
+        "loans": "Ausleihen",
+        "admin": "Admin",
+        "login": "Anmelden",
+        "logout": "Abmelden"
+    },
+    "catalog": {
+        "welcome_title": "Willkommen in unserer Hausbibliothek – Entdecke die Freude am Polnischen",
+        "welcome_desc": "Unsere Bibliothek ist mehr als nur ein Bücherregal – sie ist dein gemütlicher 'Third Space' für Sprachanimation, kulturellen Austausch und gemeinsame Erlebnisse. Mach es dir bequem und stöbere durch unsere Sammlung.",
+        "search_placeholder": "Finde dein nächstes Lieblingsbuch oder Hörspiel...",
+        "genre": "Genre",
+        "status": "Status",
+        "all": "Alle",
+        "available": "Verfügbar",
+        "borrowed": "Ausgeliehen",
+        "current_selection": "Aktuelle Auswahl",
+        "borrow_btn": "Ausleihen",
+        "reserve_btn": "Vormerken",
+        "details_btn": "Details anzeigen",
+        "no_books": "Keine Bücher gefunden."
+    },
+    "auth": {
+        "login_title": "Anmelden",
+        "register_title": "Registrieren",
+        "email": "E-Mail Adresse",
+        "password": "Passwort",
+        "name": "Name",
+        "submit_login": "Einloggen",
+        "submit_register": "Konto erstellen",
+        "no_account": "Noch kein Konto?",
+        "has_account": "Bereits registriert?"
+    }
+}

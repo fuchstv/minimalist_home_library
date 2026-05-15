@@ -1,0 +1,62 @@
+# Digitale Hausbibliothek – SprachCafé Polnisch
+
+Dieses Projekt ist eine digitale Katalog- und Ausleihverwaltung für die Hausbibliothek des "SprachCafé Polnisch e.V.". Es dient als moderner, digitaler Dritter Ort ("Third Space") für Sprachanimation, kulturellen Austausch und interkulturelle Begegnungen.
+
+Die Anwendung ist als Progressive Web App (PWA) konzipiert, vollständig zweisprachig (Deutsch/Polnisch) und bietet ein nutzerfreundliches Self-Service-System.
+
+## Tech-Stack
+*   **Frontend:** React (TypeScript), Vite, Tailwind CSS v4
+*   **Backend:** PHP 8.4 REST-API
+*   **Datenbank:** MySQL 8.0
+*   **Infrastruktur:** Docker & Docker Compose
+
+## Features
+*   **Bilingualer Katalog:** Durchsuchbarer Buchbestand mit Filtern für Kategorien und Status. Umschaltbar zwischen Deutsch und Polnisch.
+*   **Nutzerbereich:** Registrierung, Login und eine Übersicht der aktuell ausgeliehenen Bücher inklusive Fälligkeitsdatum.
+*   **Ausleihe-Logik:** Self-Service Ausleihe und Rückgabe von Büchern.
+*   **Admin-Dashboard:** Verwaltungsoberfläche für den Buchbestand, inkl. Anlage neuer Bücher und Upload von Cover-Bildern.
+*   **PWA Ready:** Kann auf mobilen Endgeräten wie eine native App installiert werden.
+
+## Projektstruktur
+*   `/backend` - Die PHP REST-API (`index.php`, `books.php`, `loans.php`, `auth.php`, `admin.php`).
+*   `/database` - SQL-Scripte (`01_schema.sql`, `02_import.sql`) für die Initialisierung.
+*   `/frontend` - Die React-Anwendung (Vite).
+*   `docker-compose.yml` - Konfiguration der lokalen Umgebung.
+
+## Lokale Entwicklung
+
+### Voraussetzungen
+*   Docker & Docker Compose
+*   Node.js (für die Frontend-Entwicklung)
+
+### 1. Backend & Datenbank starten
+```bash
+# Startet Apache/PHP, MySQL und phpMyAdmin
+docker compose up -d
+```
+*Die Datenbank initialisiert sich beim ersten Start automatisch durch die Skripte im `/database`-Ordner.*
+
+### 2. Frontend starten
+Das Frontend läuft über einen lokalen Vite-Dev-Server:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 3. Zugriff
+*   **Frontend:** `http://localhost:5173`
+*   **Backend API:** `http://localhost:8080/api/`
+*   **phpMyAdmin:** `http://localhost:8081`
+
+### Erste Schritte (Admin-Rechte vergeben)
+1. Registriere einen normalen Nutzer über das Frontend (`/register`).
+2. Öffne phpMyAdmin (`http://localhost:8081`, User: `root`, Password: `root`).
+3. Gehe in die Datenbank `library_db` -> Tabelle `users` und ändere die `role` deines neuen Nutzers von `member` auf `admin`.
+4. Logge dich im Frontend ein und navigiere zum `/admin`-Dashboard.
+
+## Daten-Import
+Der initiale Buchbestand wurde aus einer CSV-Datei importiert. Das zugehörige Skript `generate_sql.js` (Root-Verzeichnis) kann genutzt werden, um aus CSV-Dateien neue SQL-Insert-Befehle zu generieren.
+
+## Lizenz
+Dieses Projekt wurde für den internen Gebrauch des SprachCafé Polnisch e.V. entwickelt.

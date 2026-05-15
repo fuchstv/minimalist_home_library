@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buchdetails - SprachCafé Polnisch</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;family=Open+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary-fixed": "#ffdad4",
+                "secondary-fixed-dim": "#73dd71",
+                "on-background": "#1c1b1a",
+                "on-primary-fixed-variant": "#930000",
+                "surface-container-highest": "#e5e2df",
+                "surface-variant": "#e5e2df",
+                "on-surface-variant": "#5e3f3a",
+                "tertiary-container": "#0052f9",
+                "tertiary-fixed-dim": "#b7c4ff",
+                "surface-bright": "#fdf9f6",
+                "on-secondary": "#ffffff",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "outline": "#926e69",
+                "error": "#ba1a1a",
+                "surface-container": "#f1edea",
+                "on-primary-container": "#ffdad4",
+                "on-secondary-fixed": "#002203",
+                "error-container": "#ffdad6",
+                "on-primary-fixed": "#410000",
+                "on-secondary-fixed-variant": "#005312",
+                "secondary-container": "#8cf888",
+                "on-tertiary-container": "#dce1ff",
+                "outline-variant": "#e8bdb6",
+                "on-error": "#ffffff",
+                "surface-container-low": "#f7f3f0",
+                "primary-fixed-dim": "#ffb4a8",
+                "surface": "#fdf9f6",
+                "deep-black": "#000000",
+                "surface-container-high": "#ebe7e4",
+                "primary": "#9e0000",
+                "secondary-fixed": "#8ffa8a",
+                "inverse-on-surface": "#f4f0ed",
+                "surface-tint": "#c00000",
+                "tertiary": "#003ec2",
+                "secondary": "#006e1a",
+                "on-tertiary-fixed": "#001551",
+                "on-error-container": "#93000a",
+                "on-surface": "#1c1b1a",
+                "surface-dim": "#ddd9d6",
+                "primary-container": "#cc0000",
+                "inverse-surface": "#31302f",
+                "inverse-primary": "#ffb4a8",
+                "tertiary-fixed": "#dce1ff",
+                "background": "#fdf9f6",
+                "white": "#FFFFFF",
+                "on-secondary-container": "#00731c",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed-variant": "#0039b4"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-desktop": "32px",
+                "section-gap-md": "48px",
+                "section-gap-lg": "80px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "container-max-width": "1200px",
+                "base": "8px"
+        },
+        "fontFamily": {
+                "headline-md": [
+                        "Montserrat"
+                ],
+                "headline-lg": [
+                        "Montserrat"
+                ],
+                "body-md": [
+                        "Open Sans"
+                ],
+                "body-sm": [
+                        "Open Sans"
+                ],
+                "label-md": [
+                        "Open Sans"
+                ],
+                "label-lg": [
+                        "Open Sans"
+                ],
+                "body-lg": [
+                        "Open Sans"
+                ],
+                "headline-xl": [
+                        "Montserrat"
+                ],
+                "headline-lg-mobile": [
+                        "Montserrat"
+                ]
+        },
+        "fontSize": {
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-lg": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        [data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container-lowest docked full-width top-0 border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max-width mx-auto h-16">
+<!-- Brand -->
+<div class="flex items-center">
+<img alt="SprachCafé Polnisch Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
+</div>
+<!-- Desktop Navigation -->
+<nav class="hidden md:flex gap-8 items-center h-full">
+<!-- Katalog (Active State applied via intent logic) -->
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 font-bold flex items-center h-full hover:opacity-80 transition-all duration-200" href="#">
+                    Katalog
+                </a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center h-full" href="#">
+                    Mein Profil
+                </a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 flex items-center h-full" href="#">
+                    Ausleihen
+                </a>
+</nav>
+<!-- Mobile Menu Icon (Placeholder for layout) -->
+<div class="md:hidden flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-section-gap-lg">
+<!-- Back Navigation -->
+<a class="inline-flex items-center gap-2 mb-8 text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Zurück zur Suche</span>
+</a>
+<!-- Hero Detail Section -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-gutter items-start">
+<!-- Left Column: Cover Image Container -->
+<div class="md:col-span-4 lg:col-span-3 flex flex-col gap-6">
+<div class="relative w-full aspect-[2/3] bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden group">
+<img alt="Cover image" class="object-cover w-full h-full mix-blend-multiply opacity-90 transition-opacity duration-300 group-hover:opacity-100" data-alt="A striking, minimalist book cover featuring a stark geometric design of intersecting lines in deep slate blue and pale sage green on an off-white background. The cover exudes a scholarly, quiet intelligence. Soft, even studio lighting highlights the matte texture of the paper stock, creating a calm and sophisticated editorial aesthetic without harsh shadows. The image rests within a pristine, light-mode gallery setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsZA64i6qxWdFGDvUO4Rfj4ERUld5I15XZgeg6mHMNXtjP76mO2nrsqfCeCzYMWp7wjF7XKCbzmfpvQfjr9tPGni-gx_RBPsOx0gFwSkYbxAfAdFJVzY3HJFVKc_11nBGbQqU3GyqVFh5vnszWmCVZa6ru4YMMqC_0-zqHImkS6tcsWNN7OTzqHee9wH_bgQkS0FlE4sbU18F3YpC-fcIiad6SxN6qOkOhCglsWxdJw7EMobXWPmnt2oES8j8XJcYEIAbsH7AjN5E"/>
+</div>
+</div>
+<!-- Right Column: Meta & Actions -->
+<div class="md:col-span-8 lg:col-span-9 flex flex-col">
+<!-- Status & Title Area -->
+<div class="mb-8">
+<div class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-6">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+                        Verfügbar
+                    </div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-2 tracking-tight">
+                        Die Architektur der Stille
+                    </h1>
+<p class="font-headline-md text-headline-md text-outline">
+                        Von Prof. Dr. Elena Rostova
+                    </p>
+</div>
+<!-- Bento-style Metadata Grid -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+<div class="border border-outline-variant bg-surface-bright p-5 rounded-lg flex flex-col gap-1">
+<span class="font-label-md text-label-md text-outline uppercase tracking-widest">ISBN</span>
+<span class="font-body-md text-body-md text-on-surface">978-3-16-148410-0</span>
+</div>
+<div class="border border-outline-variant bg-surface-bright p-5 rounded-lg flex flex-col gap-1">
+<span class="font-label-md text-label-md text-outline uppercase tracking-widest">Erscheinungsjahr</span>
+<span class="font-body-md text-body-md text-on-surface">2023</span>
+</div>
+<div class="border border-outline-variant bg-surface-bright p-5 rounded-lg flex flex-col gap-1">
+<span class="font-label-md text-label-md text-outline uppercase tracking-widest">Verlag</span>
+<span class="font-body-md text-body-md text-on-surface">Akademischer Verlag</span>
+</div>
+<div class="border border-outline-variant bg-surface-bright p-5 rounded-lg flex flex-col gap-1 border-l-4 border-l-primary-container">
+<span class="font-label-md text-label-md text-outline uppercase tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+                            Standort
+                        </span>
+<span class="font-body-md text-body-md text-on-surface">Regal 4, Fach B</span>
+</div>
+</div>
+<!-- Call to Actions -->
+<div class="flex flex-col sm:flex-row gap-4 mb-12 pb-12 border-b border-surface-variant">
+<button class="bg-primary text-white font-label-md text-label-md px-8 py-4 rounded hover:bg-on-primary-fixed transition-colors duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="bookmark_add">bookmark_add</span>
+                        Ausleihen &amp; Schmökern
+                    </button>
+<button class="border border-primary text-primary font-label-md text-label-md px-8 py-4 rounded hover:bg-surface-container-low transition-colors duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="schedule">schedule</span>
+                        Für mich reservieren
+                    </button>
+</div>
+<!-- Description Block -->
+<div class="max-w-prose">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Beschreibung</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-6">
+                        Suchst du nach einem ruhigen Ort für deine Gedanken? Dieses faszinierende Werk lädt dich ein, die Bedeutung von Raum und Akustik neu zu entdecken. Prof. Dr. Elena Rostova präsentiert eine tiefgehende Analyse, wie minimalistische Architektur und gezielte Materialwahl unsere Konzentration und geistige Arbeit beflügeln können.
+                    </p>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8">
+                        Tauch ein in das Konzept der "Quiet Intelligence" – ob gemütlich bei einer Tasse Kaffee hier im SprachCafé, beim Lauschen an unseren Hörstationen oder entspannt bei dir zu Hause. Ein wunderbares Leseerlebnis für alle, die in einer lauten Welt kleine Oasen der Ruhe schaffen und tiefgründige Forschung hautnah erleben möchten.
+                    </p>
+<!-- Tags -->
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="border border-outline-variant text-on-surface-variant px-3 py-1 rounded font-label-md text-label-md">Architektur</span>
+<span class="border border-outline-variant text-on-surface-variant px-3 py-1 rounded font-label-md text-label-md">Raumplanung</span>
+<span class="border border-outline-variant text-on-surface-variant px-3 py-1 rounded font-label-md text-label-md">Minimalismus</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full bg-surface-container-low mt-auto">
+<div class="w-full py-8 px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max-width mx-auto gap-gutter">
+<!-- Brand / Copyright -->
+<div class="flex flex-col md:items-start items-center gap-2">
+<div class="flex items-center mb-2">
+<img alt="SprachCafé Polnisch Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
+</div>
+<div class="font-label-md text-label-md text-secondary">
+                    © 2024 SprachCafé Polnisch.
+                </div>
+</div>
+<!-- Footer Links -->
+<nav class="flex gap-6 mt-4 md:mt-0">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 opacity-90 hover:opacity-100" href="#">Datenschutz</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 opacity-90 hover:opacity-100" href="#">Impressum</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 opacity-90 hover:opacity-100" href="#">Kontakt</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 opacity-90 hover:opacity-100" href="#">Öffnungszeiten</a>
+</nav>
+</div>
+</footer>
+</body></html>
