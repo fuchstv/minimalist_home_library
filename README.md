@@ -17,15 +17,7 @@ Die Anwendung ist als Progressive Web App (PWA) konzipiert, vollständig zweispr
 *   **Admin-Dashboard:** Verwaltungsoberfläche für den Buchbestand, inkl. Anlage neuer Bücher und Upload von Cover-Bildern.
 *   **PWA Ready:** Kann auf mobilen Endgeräten wie eine native App installiert werden.
 
-## Screenshots
 
-| Login | Registrierung |
-|---|---|
-| ![Login](frontend/public/screenshots/login.png) | ![Registrierung](frontend/public/screenshots/register.png) |
-
-| Katalog | Mein Profil |
-|---|---|
-| ![Katalog](frontend/public/screenshots/katalog.png) | ![Profil](frontend/public/screenshots/profil.png) |
 
 ## Projektstruktur
 *   `/backend` - Die PHP REST-API (`index.php`, `books.php`, `loans.php`, `auth.php`, `admin.php`).
