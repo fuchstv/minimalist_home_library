@@ -13,11 +13,23 @@ interface Loan {
     status: string;
 }
 
+import { API_BASE_URL } from "../config";
+
 const Profil: React.FC = () => {
     const { t } = useTranslation();
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [loans, setLoans] = useState<Loan[]>([]);
+
+    const fetchLoans = async () => {
+        if (!user) return;
+        // Fetch loans for this user
+        const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`);
+        if (res.ok) {
+            const data = await res.json();
+            setLoans(data.data || []);
+        }
+    };
 
     useEffect(() => {
         if (!user) {
@@ -27,18 +39,8 @@ const Profil: React.FC = () => {
         }
     }, [user, navigate]);
 
-    const fetchLoans = async () => {
-        if (!user) return;
-        // Fetch loans for this user
-        const res = await fetch(`http://localhost:8080/api/loans?user_id=${user.id}`);
-        if (res.ok) {
-            const data = await res.json();
-            setLoans(data.data || []);
-        }
-    };
-
     const handleReturn = async (loanId: number) => {
-        const res = await fetch('http://localhost:8080/api/loans', {
+        const res = await fetch(`${API_BASE_URL}/api/loans`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'return', loan_id: loanId })

@@ -16,6 +16,8 @@ interface Book {
     cover_image?: string;
 }
 
+import { API_BASE_URL } from "../config";
+
 const Katalog: React.FC = () => {
     const { t } = useTranslation();
     const { user } = useContext(AuthContext);
@@ -27,7 +29,7 @@ const Katalog: React.FC = () => {
 
     const fetchBooks = async () => {
         try {
-            let url = 'http://localhost:8080/api/books?limit=12';
+            let url = `${API_BASE_URL}/api/books?limit=12`;
             if (search) url += `&search=${encodeURIComponent(search)}`;
             if (categoryFilter) url += `&category=${encodeURIComponent(categoryFilter)}`;
             if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
@@ -43,7 +45,23 @@ const Katalog: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchBooks();
+        const loadBooks = async () => {
+            try {
+                let url = `${API_BASE_URL}/api/books?limit=12`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (categoryFilter) url += `&category=${encodeURIComponent(categoryFilter)}`;
+                if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
+
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    setBooks(data.data || []);
+                }
+            } catch (error) {
+                console.error("Failed to fetch books", error);
+            }
+        };
+        loadBooks();
     }, [search, categoryFilter, statusFilter]);
 
     const handleBorrow = async (bookId: number) => {
@@ -52,7 +70,7 @@ const Katalog: React.FC = () => {
             return;
         }
         
-        const res = await fetch('http://localhost:8080/api/loans', {
+        const res = await fetch(`${API_BASE_URL}/api/loans`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ book_id: bookId, user_id: user.id })
@@ -134,7 +152,7 @@ const Katalog: React.FC = () => {
                             <div key={book.id} className="group flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                                 <div className="h-48 bg-surface-container flex items-center justify-center relative overflow-hidden">
                                     {book.cover_image ? (
-                                        <img src={`http://localhost:8080/${book.cover_image}`} alt="Cover" className="object-cover w-full h-full" />
+                                        <img src={`${API_BASE_URL}/${book.cover_image}`} alt="Cover" className="object-cover w-full h-full" />
                                     ) : (
                                         <span className="material-symbols-outlined text-[64px] text-surface-variant group-hover:scale-110 transition-transform duration-500">book_4</span>
                                     )}

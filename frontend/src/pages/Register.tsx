@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { API_BASE_URL } from '../config';
 
 const Register: React.FC = () => {
     const { t } = useTranslation();
@@ -17,7 +18,7 @@ const Register: React.FC = () => {
         setError('');
         
         try {
-            const response = await fetch('http://localhost:8080/api/auth/register', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password })
@@ -30,7 +31,7 @@ const Register: React.FC = () => {
                 const data = await response.json();
                 setError(data.message || 'Registrierung fehlgeschlagen');
             }
-        } catch (err) {
+        } catch {
             setError('Netzwerkfehler');
         }
     };

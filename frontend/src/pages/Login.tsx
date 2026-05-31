@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -17,7 +18,7 @@ const Login: React.FC = () => {
         setError('');
         
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -31,7 +32,7 @@ const Login: React.FC = () => {
             } else {
                 setError(data.message || 'Login fehlgeschlagen');
             }
-        } catch (err) {
+        } catch {
             setError('Netzwerkfehler');
         }
     };

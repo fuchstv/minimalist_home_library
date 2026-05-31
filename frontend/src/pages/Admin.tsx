@@ -9,6 +9,8 @@ interface Book {
     category: string;
 }
 
+import { API_BASE_URL } from "../config";
+
 const Admin: React.FC = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -24,6 +26,14 @@ const Admin: React.FC = () => {
     const [description, setDescription] = useState('');
     const [coverImage, setCoverImage] = useState<File | null>(null);
 
+    const fetchBooks = async () => {
+        const res = await fetch(`${API_BASE_URL}/api/books?limit=100`);
+        if (res.ok) {
+            const data = await res.json();
+            setBooks(data.data || []);
+        }
+    };
+
     useEffect(() => {
         if (!user || user.role !== 'admin') {
             navigate('/');
@@ -31,14 +41,6 @@ const Admin: React.FC = () => {
             fetchBooks();
         }
     }, [user, navigate]);
-
-    const fetchBooks = async () => {
-        const res = await fetch('http://localhost:8080/api/books?limit=100');
-        if (res.ok) {
-            const data = await res.json();
-            setBooks(data.data || []);
-        }
-    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -60,7 +62,7 @@ const Admin: React.FC = () => {
             formData.append('cover_image', coverImage);
         }
 
-        const res = await fetch('http://localhost:8080/api/admin/books', {
+        const res = await fetch(`${API_BASE_URL}/api/admin/books`, {
             method: 'POST',
             body: formData
         });
@@ -78,7 +80,7 @@ const Admin: React.FC = () => {
 
     const handleDelete = async (id: number) => {
         if (window.confirm('Buch wirklich löschen?')) {
-            const res = await fetch(`http://localhost:8080/api/admin/books/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, {
                 method: 'DELETE'
             });
             if (res.ok) {
