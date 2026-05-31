@@ -14,6 +14,8 @@ interface AuthContextType {
     logout: () => void;
 }
 
+import { API_BASE_URL } from "../config";
+
 export const AuthContext = createContext<AuthContextType>({
     user: null,
     setUser: () => {},
@@ -33,7 +35,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
     const logout = () => {
         setUser(null);
         localStorage.removeItem('user');
-        fetch('http://localhost:8080/api/auth/logout', { method: 'POST' });
+        fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST' });
     };
 
     return (

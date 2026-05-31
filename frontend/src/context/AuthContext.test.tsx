@@ -2,6 +2,7 @@ import { render, screen, act } from '@testing-library/react';
 import { useContext } from 'react';
 import { AuthContext, AuthProvider } from './AuthContext';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { API_BASE_URL } from '../config';
 import type { Mock } from 'vitest';
 
 // Create a test component to access the context
@@ -69,6 +70,6 @@ describe('AuthContext', () => {
         expect(removeItemSpy).toHaveBeenCalledWith('user');
 
         // 3. Verify fetch is called with correct parameters
-        expect(mockFetch).toHaveBeenCalledWith('http://localhost:8080/api/auth/logout', { method: 'POST' });
+        expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/auth/logout`, { method: 'POST' });
     });
 });
