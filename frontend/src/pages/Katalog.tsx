@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +27,7 @@ const Katalog: React.FC = () => {
     const [categoryFilter, setCategoryFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
 
-    const fetchBooks = async () => {
+    const fetchBooks = useCallback(async () => {
         try {
             let url = `${API_BASE_URL}/api/books?limit=12`;
             if (search) url += `&search=${encodeURIComponent(search)}`;
@@ -42,27 +42,11 @@ const Katalog: React.FC = () => {
         } catch (error) {
             console.error("Failed to fetch books", error);
         }
-    };
+    }, [search, categoryFilter, statusFilter]);
 
     useEffect(() => {
-        const loadBooks = async () => {
-            try {
-                let url = `${API_BASE_URL}/api/books?limit=12`;
-                if (search) url += `&search=${encodeURIComponent(search)}`;
-                if (categoryFilter) url += `&category=${encodeURIComponent(categoryFilter)}`;
-                if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
-
-                const response = await fetch(url);
-                if (response.ok) {
-                    const data = await response.json();
-                    setBooks(data.data || []);
-                }
-            } catch (error) {
-                console.error("Failed to fetch books", error);
-            }
-        };
-        loadBooks();
-    }, [search, categoryFilter, statusFilter]);
+        fetchBooks();
+    }, [fetchBooks]);
 
     const handleBorrow = async (bookId: number) => {
         if (!user) {
