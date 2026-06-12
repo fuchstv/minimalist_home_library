@@ -16,6 +16,49 @@ $method = $_SERVER['REQUEST_METHOD'];
 if (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
     
     if ($method == 'POST') {
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        if (strpos($path, '/api/admin/books/import') !== false) {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!isset($input['books']) || !is_array($input['books'])) {
+                http_response_code(400);
+                echo json_encode(["message" => "Invalid input format. Expected an array of books."]);
+                exit;
+            }
+
+            try {
+                $pdo->beginTransaction();
+                $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                
+                $importedCount = 0;
+                foreach ($input['books'] as $book) {
+                    $title = $book['title'] ?? '';
+                    $author = $book['author'] ?? '';
+                    $category = $book['category'] ?? '';
+                    $publication_year = $book['publication_year'] ?? '';
+                    $publisher = $book['publisher'] ?? '';
+                    $isbn = $book['isbn'] ?? '';
+                    $description = $book['description'] ?? '';
+
+                    if (empty(trim($title))) {
+                        throw new Exception("Title is required for all books.");
+                    }
+
+                    $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description]);
+                    $importedCount++;
+                }
+
+                $pdo->commit();
+                echo json_encode(["message" => "Imported $importedCount books successfully.", "count" => $importedCount]);
+            } catch (\Exception $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                http_response_code(400);
+                echo json_encode(["message" => "Failed to import books: " . $e->getMessage()]);
+            }
+            exit;
+        }
+
         // Create new book. We might receive form-data if uploading image
         $title = $_POST['title'] ?? '';
         $author = $_POST['author'] ?? '';
