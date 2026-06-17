@@ -31,6 +31,24 @@
         "submit_login": "Einloggen",
         "submit_register": "Konto erstellen",
         "no_account": "Noch kein Konto?",
-        "has_account": "Bereits registriert?"
+        "has_account": "Bereits registriert?",
+        "phone": "Telefonnummer",
+        "data_consent": "Ich bin damit einverstanden, dass die hier erhobenen Daten nur für die Zwecke der Anmeldung in der Bibliothek verwendet werden. Das SprachCafé Polnisch wird sie nicht an Dritte weitergeben.",
+        "rules_consent_1": "Ich habe die",
+        "rules_link": "Regeln der Bibliothek",
+        "rules_consent_2": "gelesen und akzeptiere diese.",
+        "accept_terms_error": "Bitte akzeptieren Sie die Datenschutzbestimmungen und Bibliotheksregeln."
+    },
+    "rules": {
+        "title": "Bibliotheksregeln",
+        "intro": "Herzlich willkommen in der Bibliothek des SprachCafé Polnisch. Um einen reibungslosen Ablauf und die Freude an unseren Büchern für alle zu gewährleisten, bitten wir um Beachtung der folgenden Regeln:",
+        "section1_title": "Anmeldung",
+        "section1_content": "Für die Nutzung der Bibliothek ist eine einmalige Registrierung erforderlich. Dabei wird eine Gebühr von 10 Euro erhoben.",
+        "section2_title": "Ausleihe",
+        "section2_content": "Die Leihfrist für Bücher beträgt in der Regel 4 Wochen. Eine Verlängerung ist nach Absprache möglich, sofern keine Vormerkung vorliegt.",
+        "section3_title": "Umgang mit Medien",
+        "section3_content": "Bitte gehen Sie sorgsam mit den ausgeliehenen Büchern um. Bei Beschädigung oder Verlust ist Ersatz zu leisten.",
+        "section4_title": "Rückgabe",
+        "section4_content": "Bücher sind fristgerecht während der Öffnungszeiten des SprachCafés zurückzugeben."
     }
 }

@@ -10,6 +10,9 @@ const Register: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [phone, setPhone] = useState('');
+    const [acceptData, setAcceptData] = useState(false);
+    const [acceptRules, setAcceptRules] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
@@ -17,11 +20,16 @@ const Register: React.FC = () => {
         e.preventDefault();
         setError('');
         
+        if (!acceptData || !acceptRules) {
+            setError(t('auth.accept_terms_error'));
+            return;
+        }
+
         try {
             const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+                body: JSON.stringify({ name, email, password, phone })
             });
             
             if (response.ok) {
@@ -66,6 +74,16 @@ const Register: React.FC = () => {
                         />
                     </div>
                     <div>
+                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.phone')}</label>
+                        <input
+                            type="tel"
+                            required
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
+                            className="w-full border border-outline-variant rounded p-3 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+                        />
+                    </div>
+                    <div>
                         <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.password')}</label>
                         <input 
                             type="password" 
@@ -75,6 +93,32 @@ const Register: React.FC = () => {
                             className="w-full border border-outline-variant rounded p-3 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                         />
                     </div>
+
+                    <div className="flex flex-col gap-3 mt-2">
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={acceptData}
+                                onChange={e => setAcceptData(e.target.checked)}
+                                className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary"
+                            />
+                            <span className="font-body-sm text-body-sm text-on-surface-variant">
+                                {t('auth.data_consent')}
+                            </span>
+                        </label>
+                        <label className="flex items-start gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={acceptRules}
+                                onChange={e => setAcceptRules(e.target.checked)}
+                                className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary"
+                            />
+                            <span className="font-body-sm text-body-sm text-on-surface-variant">
+                                {t('auth.rules_consent_1')} <Link to="/regeln" className="text-primary hover:underline">{t('auth.rules_link')}</Link> {t('auth.rules_consent_2')}
+                            </span>
+                        </label>
+                    </div>
+
                     <button type="submit" className="w-full bg-primary text-on-primary font-label-lg text-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors mt-2">
                         {t('auth.submit_register')}
                     </button>

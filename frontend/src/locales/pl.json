@@ -31,6 +31,24 @@
         "submit_login": "Zaloguj się",
         "submit_register": "Utwórz konto",
         "no_account": "Nie masz jeszcze konta?",
-        "has_account": "Masz już konto?"
+        "has_account": "Masz już konto?",
+        "phone": "Numer telefonu",
+        "data_consent": "Wyrażam zgodę na to, aby zebrane tutaj dane były wykorzystywane wyłącznie w celu rejestracji w bibliotece. SprachCafé Polnisch nie będzie ich przekazywać osobom trzecim.",
+        "rules_consent_1": "Przeczytałem i akceptuję",
+        "rules_link": "regulamin biblioteki",
+        "rules_consent_2": ".",
+        "accept_terms_error": "Proszę zaakceptować politykę prywatności i regulamin biblioteki."
+    },
+    "rules": {
+        "title": "Regulamin biblioteki",
+        "intro": "Witamy w bibliotece SprachCafé Polnisch. Aby zapewnić sprawne funkcjonowanie i radość z naszych książek dla wszystkich, prosimy o przestrzeganie następujących zasad:",
+        "section1_title": "Rejestracja",
+        "section1_content": "Korzystanie z biblioteki wymaga jednorazowej rejestracji. Pobierana jest przy tym opłata w wysokości 10 euro.",
+        "section2_title": "Wypożyczanie",
+        "section2_content": "Okres wypożyczenia książek wynosi zazwyczaj 4 tygodnie. Przedłużenie jest możliwe po uzgodnieniu, o ile nie ma rezerwacji.",
+        "section3_title": "Dbanie o media",
+        "section3_content": "Prosimy o staranne obchodzenie się z wypożyczonymi książkami. W przypadku uszkodzenia lub zgubienia należy dokonać wymiany lub zwrotu kosztów.",
+        "section4_title": "Zwrot",
+        "section4_content": "Książki należy zwracać terminowo w godzinach otwarcia SprachCafé."
     }
 }
