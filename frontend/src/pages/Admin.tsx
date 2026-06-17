@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { parseBibTeX } from '../utils/bibtexParser';
@@ -49,22 +49,23 @@ const Admin: React.FC = () => {
     const [previewBooks, setPreviewBooks] = useState<PreviewBook[]>([]);
     const [batchCategory, setBatchCategory] = useState('Belytrystyka polska');
 
-    useEffect(() => {
-        if (!user || user.role !== 'admin') {
-            navigate('/');
-        }
-        fetchBooks();
-    }, [user, navigate]);
-
-    const fetchBooks = async () => {
+    const fetchBooks = useCallback(async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/books`);
             const data = await response.json();
-            setBooks(data.slice(0, 100)); // Show last 100 for brevity
+            setBooks((data.data || []).slice(0, 100)); // Show last 100 for brevity
         } catch (error) {
             console.error('Error fetching books:', error);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!user || user.role !== 'admin') {
+            navigate('/');
+        } else {
+            fetchBooks();
+        }
+    }, [user, navigate, fetchBooks]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -131,7 +132,7 @@ const Admin: React.FC = () => {
                 selected: true
             }));
             setPreviewBooks(previewData);
-        } catch (err) {
+        } catch (_) {
             alert('Fehler beim Parsen der BibTeX-Daten. Bitte Format prüfen.');
         }
     };
@@ -166,7 +167,7 @@ const Admin: React.FC = () => {
         }
     };
 
-    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: any) => {
+    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: string | number | boolean) => {
         setPreviewBooks(prev => prev.map(b => b.tempId === tempId ? { ...b, [field]: value } : b));
     };
 
