@@ -38,26 +38,18 @@ if ($method == 'POST') {
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
         $phone = $data['phone'] ?? '';
-        $acceptData = $data['acceptData'] ?? false;
-        $acceptRules = $data['acceptRules'] ?? false;
 
-        if (!$name || !$email || !$password || !$phone) {
+        if (!$name || !$email || !$password) {
             http_response_code(400);
             echo json_encode(["message" => "All fields are required"]);
-            return;
-        }
-
-        if (!$acceptData || !$acceptRules) {
-            http_response_code(400);
-            echo json_encode(["message" => "Data and rules agreements are mandatory"]);
-            return;
+            exit;
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, phone, data_consent, rules_consent, role) VALUES (?, ?, ?, ?, ?, ?, 'member')");
-            $stmt->execute([$name, $email, $hash, $phone, $acceptData ? 1 : 0, $acceptRules ? 1 : 0]);
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, phone, role) VALUES (?, ?, ?, ?, 'member')");
+            $stmt->execute([$name, $email, $hash, $phone]);
             echo json_encode(["message" => "User registered successfully"]);
         } catch (\PDOException $e) {
             http_response_code(400);
