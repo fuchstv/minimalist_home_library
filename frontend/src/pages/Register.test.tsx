@@ -7,7 +7,7 @@ import i18n from '../i18n';
 import '@testing-library/jest-dom';
 
 // Mock fetch
-global.fetch = vi.fn();
+vi.stubGlobal('fetch', vi.fn());
 
 const renderRegister = () => {
   return render(
@@ -25,7 +25,7 @@ describe('Register Component', () => {
   });
 
   it('submits correctly when all fields are filled and checkboxes are checked', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    (fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ message: 'User registered successfully' }),
     });
@@ -45,7 +45,7 @@ describe('Register Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /Konto erstellen/i }));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/auth/register'),
         expect.objectContaining({
           method: 'POST',
@@ -76,6 +76,6 @@ describe('Register Component', () => {
     await waitFor(() => {
         expect(screen.getByText(/Bitte akzeptieren Sie die Datenschutzbestimmungen und Bibliotheksregeln/i)).toBeInTheDocument();
     });
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 });

@@ -14,7 +14,9 @@ $request_uri = $_SERVER['REQUEST_URI'];
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Route incoming requests
-if (preg_match('/^\/api\/books/', $request_uri)) {
+if (preg_match('/^\/api\/pages/', $request_uri)) {
+    require 'pages.php';
+} elseif (preg_match('/^\/api\/books/', $request_uri)) {
     require 'books.php';
 } elseif (preg_match('/^\/api\/loans/', $request_uri)) {
     require 'loans.php';

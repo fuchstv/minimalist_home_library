@@ -118,7 +118,7 @@ const Register: React.FC = () => {
                                 className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary"
                             />
                             <span className="font-body-sm text-body-sm text-on-surface-variant">
-                                {t('auth.rules_consent_1')} <Link to="/regeln" className="text-primary hover:underline">{t('auth.rules_link')}</Link> {t('auth.rules_consent_2')}
+                                {t('auth.rules_consent_1')} <Link to="/page/regeln" className="text-primary hover:underline">{t('auth.rules_link')}</Link> {t('auth.rules_consent_2')}
                             </span>
                         </label>
                     </div>
