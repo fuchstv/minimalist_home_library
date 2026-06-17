@@ -64,7 +64,8 @@ const Katalog: React.FC = () => {
             alert('Buch erfolgreich ausgeliehen!');
             fetchBooks();
         } else {
-            alert('Fehler beim Ausleihen.');
+            const errorData = await res.json();
+            alert(errorData.message || 'Fehler beim Ausleihen.');
         }
     };
 
