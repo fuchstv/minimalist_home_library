@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 interface PageData {
     slug: string;
@@ -22,7 +23,7 @@ const DynamicPage: React.FC = () => {
         const fetchPage = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL || '/api'}/pages/${slug}`);
+                const response = await axios.get(`${API_BASE_URL}/api/pages/${slug}`);
                 setPage(response.data);
                 setError(null);
             } catch (err) {

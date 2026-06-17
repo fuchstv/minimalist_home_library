@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 interface PageData {
     slug: string;
@@ -15,25 +16,25 @@ const AdminPages: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
 
-    useEffect(() => {
-        fetchPages();
-    }, []);
-
-    const fetchPages = async () => {
+    const fetchPages = useCallback(async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL || '/api'}/admin/pages`, { withCredentials: true });
+            const response = await axios.get(`${API_BASE_URL}/api/admin/pages`, { withCredentials: true });
             setPages(response.data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching pages:', error);
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchPages();
+    }, [fetchPages]);
 
     const handleSave = async () => {
         if (!selectedPage) return;
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || '/api'}/admin/pages/${selectedPage.slug}`, selectedPage, { withCredentials: true });
+            await axios.post(`${API_BASE_URL}/api/admin/pages/${selectedPage.slug}`, selectedPage, { withCredentials: true });
             setMessage('Seite erfolgreich gespeichert!');
             fetchPages();
             setTimeout(() => setMessage(''), 3000);
@@ -73,8 +74,9 @@ const AdminPages: React.FC = () => {
                         <div className="flex flex-col gap-4">
                             <h3 className="font-title-md border-b pb-1">Deutsch</h3>
                             <div>
-                                <label className="font-label-sm block mb-1">Titel (DE)</label>
+                                <label htmlFor="title_de" className="font-label-sm block mb-1">Titel (DE)</label>
                                 <input
+                                    id="title_de"
                                     type="text"
                                     value={selectedPage.title_de}
                                     onChange={e => setSelectedPage({ ...selectedPage, title_de: e.target.value })}
@@ -82,8 +84,9 @@ const AdminPages: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <label className="font-label-sm block mb-1">Inhalt (DE)</label>
+                                <label htmlFor="content_de" className="font-label-sm block mb-1">Inhalt (DE)</label>
                                 <textarea
+                                    id="content_de"
                                     value={selectedPage.content_de}
                                     onChange={e => setSelectedPage({ ...selectedPage, content_de: e.target.value })}
                                     className="w-full border border-outline-variant rounded p-2 text-body-md h-64 font-mono"
@@ -94,8 +97,9 @@ const AdminPages: React.FC = () => {
                         <div className="flex flex-col gap-4">
                             <h3 className="font-title-md border-b pb-1">Polnisch</h3>
                             <div>
-                                <label className="font-label-sm block mb-1">Titel (PL)</label>
+                                <label htmlFor="title_pl" className="font-label-sm block mb-1">Titel (PL)</label>
                                 <input
+                                    id="title_pl"
                                     type="text"
                                     value={selectedPage.title_pl}
                                     onChange={e => setSelectedPage({ ...selectedPage, title_pl: e.target.value })}
@@ -103,8 +107,9 @@ const AdminPages: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <label className="font-label-sm block mb-1">Inhalt (PL)</label>
+                                <label htmlFor="content_pl" className="font-label-sm block mb-1">Inhalt (PL)</label>
                                 <textarea
+                                    id="content_pl"
                                     value={selectedPage.content_pl}
                                     onChange={e => setSelectedPage({ ...selectedPage, content_pl: e.target.value })}
                                     className="w-full border border-outline-variant rounded p-2 text-body-md h-64 font-mono"
