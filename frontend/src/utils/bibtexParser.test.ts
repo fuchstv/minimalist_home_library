@@ -14,6 +14,22 @@ describe('cleanLatexEscapes', () => {
         expect(cleanLatexEscapes('pr{\\k{e}}s')).toBe('pręs');
         expect(cleanLatexEscapes("g{\\'o}ra")).toBe('góra');
         expect(cleanLatexEscapes("{\\'o}wczesny")).toBe('ówczesny');
+
+        // Test new cases
+        expect(cleanLatexEscapes("\\'Z")).toBe('Ź');
+        expect(cleanLatexEscapes("\\'z")).toBe('ź');
+        expect(cleanLatexEscapes("\\.Z")).toBe('Ż');
+        expect(cleanLatexEscapes("\\.z")).toBe('ż');
+        expect(cleanLatexEscapes("\\'C")).toBe('Ć');
+        expect(cleanLatexEscapes("\\'c")).toBe('ć');
+        expect(cleanLatexEscapes("\\'N")).toBe('Ń');
+        expect(cleanLatexEscapes("\\'n")).toBe('ń');
+        expect(cleanLatexEscapes("\\'S")).toBe('Ś');
+        expect(cleanLatexEscapes("\\'s")).toBe('ś');
+        expect(cleanLatexEscapes("\\'O")).toBe('Ó');
+        expect(cleanLatexEscapes("\\'o")).toBe('ó');
+        expect(cleanLatexEscapes("\\k{A}")).toBe('Ą');
+        expect(cleanLatexEscapes("\\k{E}")).toBe('Ę');
     });
 
     it('should clean special symbols and nested capitalisation brackets', () => {
