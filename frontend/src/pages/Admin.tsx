@@ -8,6 +8,7 @@ interface Book {
     title: string;
     author: string;
     category: string;
+    signature?: string;
 }
 
 interface PreviewBook {
@@ -15,6 +16,7 @@ interface PreviewBook {
     title: string;
     author: string;
     category: string;
+    signature?: string;
     publisher: string;
     publication_year: string;
     isbn: string;
@@ -269,7 +271,7 @@ const Admin: React.FC = () => {
                         </div>
                         <div>
                             <label className="font-label-sm block mb-1">Kategorie</label>
-                            <input value={category} onChange={e=>setCategory(e.target.value)} className="w-full border rounded p-2" />
+                            <select required value={category} onChange={e=>setCategory(e.target.value)} className="w-full border rounded p-2 bg-surface"><option value="">Kategorie wählen</option><option value="Auf Deutsch">Auf Deutsch</option><option value="Belytrystyka polska">Polnische Belletristik</option><option value="Belytrystyka zagraniczna">Internationale Belletristik</option><option value="Dziecięce">Kinder & Jugend</option><option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option><option value="Historyczne">Historische Romane</option><option value="Kryminał | Thriller">Krimi & Thriller</option><option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option><option value="Biografie">Biografien</option><option value="Poezja">Lyrik & Poesie</option><option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option><option value="Reportaże | Podróżnicze">Reportagen & Reisen</option></select>
                         </div>
                         <div>
                             <label className="font-label-sm block mb-1">Verlag</label>
@@ -369,10 +371,17 @@ const Admin: React.FC = () => {
                                         onChange={(e) => setBatchCategory(e.target.value)}
                                         className="border rounded p-2 bg-surface text-sm"
                                     >
+                                        <option value="Auf Deutsch">Auf Deutsch</option>
                                         <option value="Belytrystyka polska">Polnische Belletristik</option>
                                         <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
                                         <option value="Dziecięce">Kinder & Jugend</option>
+                                        <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
+                                        <option value="Historyczne">Historische Romane</option>
+                                        <option value="Kryminał | Thriller">Krimi & Thriller</option>
+                                        <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
                                         <option value="Biografie">Biografien</option>
+                                        <option value="Poezja">Lyrik & Poesie</option>
+                                        <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
                                         <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
                                     </select>
                                     <button
@@ -452,11 +461,18 @@ const Admin: React.FC = () => {
                                                             onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
                                                             className="w-full border border-outline-variant rounded p-1 text-sm bg-surface"
                                                         >
-                                                            <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                                            <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                                            <option value="Dziecięce">Kinder & Jugend</option>
-                                                            <option value="Biografie">Biografien</option>
-                                                            <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
+                                                            <option value="Auf Deutsch">Auf Deutsch</option>
+                                        <option value="Belytrystyka polska">Polnische Belletristik</option>
+                                        <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
+                                        <option value="Dziecięce">Kinder & Jugend</option>
+                                        <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
+                                        <option value="Historyczne">Historische Romane</option>
+                                        <option value="Kryminał | Thriller">Krimi & Thriller</option>
+                                        <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
+                                        <option value="Biografie">Biografien</option>
+                                        <option value="Poezja">Lyrik & Poesie</option>
+                                        <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
+                                        <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
                                                         </select>
                                                     </td>
                                                     <td className="p-2">
@@ -529,7 +545,7 @@ const Admin: React.FC = () => {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b">
-                                <th className="p-2 font-label-md">ID</th>
+                                <th className="p-2 font-label-md">Signatur</th>
                                 <th className="p-2 font-label-md">Titel</th>
                                 <th className="p-2 font-label-md">Autor</th>
                                 <th className="p-2 font-label-md">Aktionen</th>
@@ -538,7 +554,7 @@ const Admin: React.FC = () => {
                         <tbody>
                             {books.map(b => (
                                 <tr key={b.id} className="border-b hover:bg-surface-variant">
-                                    <td className="p-2 font-body-sm">{b.id}</td>
+                                    <td className="p-2 font-body-sm">{b.signature || b.id}</td>
                                     <td className="p-2 font-body-sm">{b.title}</td>
                                     <td className="p-2 font-body-sm">{b.author}</td>
                                     <td className="p-2 font-body-sm">

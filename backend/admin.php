@@ -1,13 +1,14 @@
 <?php
 // backend/admin.php
 require_once 'db.php';
+require_once 'admin_utils.php';
 session_start();
 
 // Ensure only admins can access
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     http_response_code(403);
     echo json_encode(["message" => "Forbidden: Admin access required"]);
-    exit;
+    return;
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -22,12 +23,12 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
             if (!isset($input['books']) || !is_array($input['books'])) {
                 http_response_code(400);
                 echo json_encode(["message" => "Invalid input format. Expected an array of books."]);
-                exit;
+                return;
             }
 
             try {
                 $pdo->beginTransaction();
-                $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 
                 $importedCount = 0;
                 foreach ($input['books'] as $book) {
@@ -43,7 +44,8 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
                         throw new Exception("Title is required for all books.");
                     }
 
-                    $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description]);
+                    $signature = generateSignature($pdo, $category);
+                    $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $signature]);
                     $importedCount++;
                 }
 
@@ -56,7 +58,7 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
                 http_response_code(400);
                 echo json_encode(["message" => "Failed to import books: " . $e->getMessage()]);
             }
-            exit;
+            return;
         }
 
         // Create new book. We might receive form-data if uploading image
@@ -82,10 +84,17 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, cover_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $cover_image]);
-            echo json_encode(["message" => "Book created successfully", "id" => $pdo->lastInsertId()]);
+            $pdo->beginTransaction();
+            $signature = generateSignature($pdo, $category);
+            $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, cover_image, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $cover_image, $signature]);
+            $newId = $pdo->lastInsertId();
+            $pdo->commit();
+            echo json_encode(["message" => "Book created successfully", "id" => $newId, "signature" => $signature]);
         } catch (\PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             http_response_code(400);
             echo json_encode(["message" => "Failed to create book: " . $e->getMessage()]);
         }
