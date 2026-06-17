@@ -26,7 +26,7 @@ describe('TopNavBar', () => {
     const renderNavBar = (user: any = null, logout = vi.fn()) => {
         render(
             <MemoryRouter>
-                <AuthContext.Provider value={{ user, setUser: vi.fn(), logout, login: vi.fn(), loading: false }}>
+                <AuthContext.Provider value={{ user, setUser: vi.fn(), logout }}>
                     <TopNavBar />
                 </AuthContext.Provider>
             </MemoryRouter>

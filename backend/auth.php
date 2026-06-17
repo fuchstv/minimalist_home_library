@@ -37,6 +37,7 @@ if ($method == 'POST') {
         $name = $data['name'] ?? '';
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
+        $phone = $data['phone'] ?? '';
 
         if (!$name || !$email || !$password) {
             http_response_code(400);
@@ -47,8 +48,8 @@ if ($method == 'POST') {
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, 'member')");
-            $stmt->execute([$name, $email, $hash]);
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, phone, role) VALUES (?, ?, ?, ?, 'member')");
+            $stmt->execute([$name, $email, $hash, $phone]);
             echo json_encode(["message" => "User registered successfully"]);
         } catch (\PDOException $e) {
             http_response_code(400);
