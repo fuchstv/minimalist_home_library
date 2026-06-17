@@ -29,7 +29,7 @@ const Register: React.FC = () => {
             const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, phone })
+                body: JSON.stringify({ name, email, password, phone, acceptData, acceptRules })
             });
             
             if (response.ok) {
@@ -54,8 +54,9 @@ const Register: React.FC = () => {
                 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div>
-                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.name')}</label>
+                        <label htmlFor="name" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.name')}</label>
                         <input 
+                            id="name"
                             type="text" 
                             required
                             value={name}
@@ -64,8 +65,9 @@ const Register: React.FC = () => {
                         />
                     </div>
                     <div>
-                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.email')}</label>
+                        <label htmlFor="email" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.email')}</label>
                         <input 
+                            id="email"
                             type="email" 
                             required
                             value={email}
@@ -74,8 +76,9 @@ const Register: React.FC = () => {
                         />
                     </div>
                     <div>
-                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.phone')}</label>
+                        <label htmlFor="phone" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.phone')}</label>
                         <input
+                            id="phone"
                             type="tel"
                             required
                             value={phone}
@@ -84,8 +87,9 @@ const Register: React.FC = () => {
                         />
                     </div>
                     <div>
-                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.password')}</label>
+                        <label htmlFor="password" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.password')}</label>
                         <input 
+                            id="password"
                             type="password" 
                             required
                             value={password}

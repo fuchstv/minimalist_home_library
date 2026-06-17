@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255),
     phone VARCHAR(20),
     fee_paid BOOLEAN DEFAULT FALSE,
+    data_consent BOOLEAN DEFAULT FALSE,
+    rules_consent BOOLEAN DEFAULT FALSE,
     role ENUM('member', 'admin') DEFAULT 'member',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
