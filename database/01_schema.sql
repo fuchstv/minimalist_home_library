@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS books (
     isbn VARCHAR(255),
     description TEXT,
     cover_image VARCHAR(255),
+    signature VARCHAR(100) UNIQUE,
     location VARCHAR(100) DEFAULT 'Katalog SprachCafé',
     availability_status ENUM('available', 'borrowed') DEFAULT 'available',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
