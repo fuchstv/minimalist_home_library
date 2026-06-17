@@ -3,7 +3,7 @@ import TopNavBar from './components/TopNavBar';
 import Katalog from './pages/Katalog';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Regeln from './pages/Regeln';
+import DynamicPage from './pages/DynamicPage';
 import Admin from './pages/Admin';
 import Profil from './pages/Profil';
 import { AuthProvider } from './context/AuthContext';
@@ -19,8 +19,9 @@ function App() {
             <Route path="/" element={<Katalog />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/regeln" element={<Regeln />} />
-            {/* Add more routes here later */}
+            <Route path="/page/:slug" element={<DynamicPage />} />
+            {/* Legacy route for regeln */}
+            <Route path="/regeln" element={<DynamicPage />} />
             <Route path="/profil" element={<Profil />} />
             <Route path="/ausleihen" element={<Profil />} />
             <Route path="/admin" element={<Admin />} />
@@ -34,10 +35,10 @@ function App() {
               <p className="font-label-sm text-label-sm text-secondary dark:text-secondary-fixed-dim">© 2024 SprachCafé Polnisch e.V. Digitale Hausbibliothek.</p>
             </div>
             <ul className="flex flex-wrap justify-center gap-6 mt-4 md:mt-0">
-              <li><Link className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" to="/regeln">Bibliotheksregeln</Link></li>
-              <li><a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Datenschutz</a></li>
-              <li><a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Impressum</a></li>
-              <li><a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Kontakt</a></li>
+              <li><Link className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" to="/page/regeln">Bibliotheksregeln</Link></li>
+              <li><Link className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" to="/page/datenschutz">Datenschutz</Link></li>
+              <li><Link className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" to="/page/impressum">Impressum</Link></li>
+              <li><a className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="mailto:kontakt@sprachcafe-polnisch.org">Kontakt</a></li>
             </ul>
           </div>
         </footer>

@@ -14,7 +14,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Handle Book operations
-if (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
+if (strpos($_SERVER['REQUEST_URI'], '/api/admin/pages') !== false) {
+    require 'admin_pages.php';
+} elseif (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
     
     if ($method == 'POST') {
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
