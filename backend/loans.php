@@ -33,6 +33,15 @@ if ($method == 'GET') {
 
     $pdo->beginTransaction();
     try {
+        // Check active loans count (max 3)
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM loans WHERE user_id = ? AND status != 'returned'");
+        $stmt->execute([$user_id]);
+        $active_loans_count = $stmt->fetchColumn();
+
+        if ($active_loans_count >= 3) {
+            throw new Exception("You have reached the maximum limit of 3 borrowed items.");
+        }
+
         // Check if available
         $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ? FOR UPDATE");
         $stmt->execute([$book_id]);
@@ -42,9 +51,9 @@ if ($method == 'GET') {
             throw new Exception("Book is not available for borrowing.");
         }
 
-        // Create loan (3 weeks default)
+        // Create loan (2 weeks default)
         $loan_date = date('Y-m-d');
-        $due_date = date('Y-m-d', strtotime('+3 weeks'));
+        $due_date = date('Y-m-d', strtotime('+2 weeks'));
 
         $stmt = $pdo->prepare("INSERT INTO loans (book_id, user_id, loan_date, due_date) VALUES (?, ?, ?, ?)");
         $stmt->execute([$book_id, $user_id, $loan_date, $due_date]);
@@ -75,7 +84,7 @@ if ($method == 'GET') {
 
     $pdo->beginTransaction();
     try {
-        $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? AND user_id = ? AND status = 'active' FOR UPDATE");
+        $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? AND user_id = ? AND status != 'returned' FOR UPDATE");
         $stmt->execute([$loan_id, $user_id]);
         $loan = $stmt->fetch();
 
