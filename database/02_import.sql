@@ -1,3 +1,5 @@
+SET NAMES 'utf8mb4';
+
 INSERT INTO books (category, author, title, publication_year, publisher, isbn) VALUES 
 ('Auf Deutsch', 'Legman G.', 'Intime Küsse', '1988', 'Carl Stephenson Verlag', ''),
 ('Belytrystyka polska', 'Andrzejewski Jerzy', 'Miazga', '1981', 'PULS', '907587712'),

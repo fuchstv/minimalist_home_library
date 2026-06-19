@@ -20,7 +20,21 @@
         "borrow_btn": "Wypożycz",
         "reserve_btn": "Zarezerwuj",
         "details_btn": "Pokaż szczegóły",
-        "no_books": "Nie znaleziono książek."
+        "no_books": "Nie znaleziono książek.",
+        "categories": {
+            "deutsch": "Auf Deutsch (Po niemiecku)",
+            "belytrystyka_polska": "Polska literatura piękna",
+            "belytrystyka_zagraniczna": "Literatura piękna zagraniczna",
+            "dzieciece": "Dla dzieci",
+            "fantasy_scifi": "Fantasy & Sci-Fi",
+            "historyczne": "Powieści historyczne",
+            "kryminał_thriller": "Kryminał & Thriller",
+            "młodziezowe_young_adult": "Dla młodzieży | Young Adult",
+            "biografie": "Biografie",
+            "poezja": "Poezja",
+            "poradniki_popularnonaukowe": "Poradniki & Popularnonaukowe",
+            "reportaze_podroznicze": "Reportaże & Podróże"
+        }
     },
     "auth": {
         "login_title": "Logowanie",

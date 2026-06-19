@@ -20,7 +20,21 @@
         "borrow_btn": "Ausleihen",
         "reserve_btn": "Vormerken",
         "details_btn": "Details anzeigen",
-        "no_books": "Keine Bücher gefunden."
+        "no_books": "Keine Bücher gefunden.",
+        "categories": {
+            "deutsch": "Auf Deutsch",
+            "belytrystyka_polska": "Polnische Belletristik",
+            "belytrystyka_zagraniczna": "Internationale Belletristik",
+            "dzieciece": "Kinder & Jugend",
+            "fantasy_scifi": "Fantasy & Sci-Fi",
+            "historyczne": "Historische Romane",
+            "kryminał_thriller": "Krimi & Thriller",
+            "młodziezowe_young_adult": "Młodzieżowe | Young Adult",
+            "biografie": "Biografien",
+            "poezja": "Lyrik & Poesie",
+            "poradniki_popularnonaukowe": "Ratgeber & Sachbücher",
+            "reportaze_podroznicze": "Reportagen & Reisen"
+        }
     },
     "auth": {
         "login_title": "Anmelden",

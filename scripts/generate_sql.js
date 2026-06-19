@@ -5,7 +5,7 @@ const filename = files.find(f => f.endsWith('.csv'));
 const csv = fs.readFileSync(`./csv/${filename}`, 'utf8');
 const lines = csv.split('\n');
 
-let sql = "INSERT INTO books (category, author, title, publication_year, publisher, isbn) VALUES \n";
+let sql = "SET NAMES 'utf8mb4';\n\nINSERT INTO books (category, author, title, publication_year, publisher, isbn) VALUES \n";
 let values = [];
 
 // Skip header

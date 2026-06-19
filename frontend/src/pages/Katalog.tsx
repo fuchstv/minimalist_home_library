@@ -103,11 +103,18 @@ const Katalog: React.FC = () => {
                             onChange={(e) => setCategoryFilter(e.target.value)}
                         >
                             <option value="">{t('catalog.genre')}</option>
-                            <option value="Belytrystyka polska">Polnische Belletristik</option>
-                            <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                            <option value="Dziecięce">Kinder & Jugend</option>
-                            <option value="Biografie">Biografien</option>
-                            <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
+                            <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
+                            <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
+                            <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_zagraniczna')}</option>
+                            <option value="Biografie">{t('catalog.categories.biografie')}</option>
+                            <option value="Dziecięce">{t('catalog.categories.dzieciece')}</option>
+                            <option value="Fantasy | Sci-fi">{t('catalog.categories.fantasy_scifi')}</option>
+                            <option value="Historyczne">{t('catalog.categories.historyczne')}</option>
+                            <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
+                            <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
+                            <option value="Poezja">{t('catalog.categories.poezja')}</option>
+                            <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
+                            <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
                         </select>
 
                         <select 
