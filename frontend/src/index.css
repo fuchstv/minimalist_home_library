@@ -18,3 +18,28 @@
 body {
     @apply bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container;
 }
+
+/* Interactive elements default to pointer cursor */
+a,
+button,
+select,
+summary,
+[role="button"],
+label,
+input[type="checkbox"],
+input[type="radio"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+    cursor: pointer;
+}
+
+/* Disabled interactive elements default to not-allowed cursor */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+}
+
