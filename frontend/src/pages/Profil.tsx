@@ -24,7 +24,7 @@ const Profil: React.FC = () => {
     const fetchLoans = async () => {
         if (!user) return;
         // Fetch loans for this user
-        const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`);
+        const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`, { credentials: 'include' });
         if (res.ok) {
             const data = await res.json();
             setLoans(data.data || []);
@@ -43,7 +43,8 @@ const Profil: React.FC = () => {
         const res = await fetch(`${API_BASE_URL}/api/loans`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'return', loan_id: loanId })
+            body: JSON.stringify({ action: 'return', loan_id: loanId }),
+            credentials: 'include'
         });
         
         if (res.ok) {

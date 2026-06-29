@@ -1,0 +1,524 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
+    fee_paid: number;
+    data_consent: number;
+    rules_consent: number;
+    created_at: string;
+}
+
+interface Loan {
+    id: number;
+    book_id: number;
+    book_title: string;
+    book_author: string;
+    book_signature: string;
+    loan_date: string;
+    due_date: string;
+    return_date: string | null;
+    status: 'active' | 'returned' | 'overdue';
+}
+
+interface Book {
+    id: number;
+    title: string;
+    author: string;
+    signature: string;
+    availability_status: string;
+}
+
+const AdminUsers: React.FC = () => {
+    const [users, setUsers] = useState<User[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [userLoans, setUserLoans] = useState<Loan[]>([]);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    
+    // Lending state
+    const [bookSearch, setBookSearch] = useState('');
+    const [foundBooks, setFoundBooks] = useState<Book[]>([]);
+    const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
+    const [customDueDate, setCustomDueDate] = useState('');
+    
+    // Status feedback
+    const [message, setMessage] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+
+    const fetchUsers = useCallback(async () => {
+        try {
+            const res = await axios.get(`${API_BASE_URL}/api/admin/users`, { withCredentials: true });
+            setUsers(res.data.data || []);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            setErrorMsg('Fehler beim Laden der Benutzerliste.');
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
+
+    const fetchUserLoans = useCallback(async (userId: number) => {
+        try {
+            const res = await axios.get(`${API_BASE_URL}/api/admin/users/${userId}/loans`, { withCredentials: true });
+            setUserLoans(res.data.data || []);
+        } catch (error) {
+            console.error('Error fetching user loans:', error);
+        }
+    }, []);
+
+    const handleSelectUser = (user: User) => {
+        setSelectedUser(user);
+        setEditingUser(null);
+        fetchUserLoans(user.id);
+        
+        // Reset lending state
+        setBookSearch('');
+        setFoundBooks([]);
+        setSelectedBookId(null);
+        
+        // Default custom due date is 4 weeks from now
+        const fourWeeks = new Date();
+        fourWeeks.setDate(fourWeeks.getDate() + 28);
+        setCustomDueDate(fourWeeks.toISOString().split('T')[0]);
+    };
+
+    const handleUpdateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingUser) return;
+        
+        try {
+            await axios.put(`${API_BASE_URL}/api/admin/users/${editingUser.id}`, editingUser, { withCredentials: true });
+            setMessage('Benutzerkonto erfolgreich aktualisiert!');
+            fetchUsers();
+            
+            if (selectedUser?.id === editingUser.id) {
+                setSelectedUser(editingUser);
+            }
+            setEditingUser(null);
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error: any) {
+            console.error('Error updating user:', error);
+            setErrorMsg(error.response?.data?.message || 'Fehler beim Aktualisieren des Benutzers.');
+            setTimeout(() => setErrorMsg(''), 4000);
+        }
+    };
+
+    const searchAvailableBooks = useCallback(async (query: string) => {
+        if (!query.trim()) {
+            setFoundBooks([]);
+            return;
+        }
+        try {
+            // Find books matching query. We filter on the frontend or backend.
+            // Let's use backend search endpoint and filter for available status
+            const res = await axios.get(`${API_BASE_URL}/api/books?limit=10&search=${encodeURIComponent(query)}&status=available`, { withCredentials: true });
+            setFoundBooks(res.data.data || []);
+        } catch (error) {
+            console.error('Error searching books:', error);
+        }
+    }, []);
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            searchAvailableBooks(bookSearch);
+        }, 300);
+        return () => clearTimeout(delayDebounce);
+    }, [bookSearch, searchAvailableBooks]);
+
+    const handleLendBook = async () => {
+        if (!selectedUser || !selectedBookId) return;
+        try {
+            await axios.post(`${API_BASE_URL}/api/admin/users/${selectedUser.id}/loans`, {
+                book_id: selectedBookId,
+                due_date: customDueDate || null
+            }, { withCredentials: true });
+            
+            setMessage('Buch erfolgreich ausgeliehen!');
+            fetchUserLoans(selectedUser.id);
+            
+            // Reset lending form
+            setSelectedBookId(null);
+            setBookSearch('');
+            setFoundBooks([]);
+            
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error: any) {
+            console.error('Error lending book:', error);
+            setErrorMsg(error.response?.data?.message || 'Fehler beim Ausleihen.');
+            setTimeout(() => setErrorMsg(''), 4000);
+        }
+    };
+
+    const handleLoanAction = async (loanId: number, action: 'return' | 'extend') => {
+        if (!selectedUser) return;
+        try {
+            await axios.put(`${API_BASE_URL}/api/admin/users/${selectedUser.id}/loans/${loanId}`, {
+                action
+            }, { withCredentials: true });
+            
+            setMessage(`Leihfrist erfolgreich ${action === 'return' ? 'zurückgegeben' : 'verlängert'}.`);
+            fetchUserLoans(selectedUser.id);
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error: any) {
+            console.error('Error modifying loan:', error);
+            setErrorMsg(error.response?.data?.message || 'Fehler bei der Ausleihe-Aktion.');
+            setTimeout(() => setErrorMsg(''), 4000);
+        }
+    };
+
+    // Filter users
+    const filteredUsers = users.filter(user => 
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.phone && user.phone.includes(searchQuery))
+    );
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Column 1: Users List */}
+            <div className="lg:col-span-1 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                <h2 className="font-headline-sm text-headline-sm flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">group</span>
+                    Nutzerkonten ({filteredUsers.length})
+                </h2>
+
+                <div className="relative">
+                    <input 
+                        type="text" 
+                        placeholder="Nutzer suchen..." 
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        className="w-full border border-outline-variant rounded-full py-2.5 pl-10 pr-4 text-body-md bg-surface-container-low focus:bg-surface focus:border-primary outline-none transition-all"
+                    />
+                    <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant">search</span>
+                </div>
+
+                <div className="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-1">
+                    {filteredUsers.length === 0 ? (
+                        <p className="text-on-surface-variant text-center py-8 text-body-md">Keine Nutzer gefunden.</p>
+                    ) : (
+                        filteredUsers.map(u => (
+                            <button
+                                key={u.id}
+                                onClick={() => handleSelectUser(u)}
+                                className={`w-full text-left p-3.5 rounded-lg border transition-all flex justify-between items-start ${selectedUser?.id === u.id ? 'border-primary bg-primary-container/20 shadow-sm' : 'border-outline-variant hover:border-primary-container hover:bg-surface-variant/20'}`}
+                            >
+                                <div className="flex flex-col gap-1 max-w-[70%]">
+                                    <span className="font-title-md text-title-md line-clamp-1">{u.name}</span>
+                                    <span className="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">{u.email}</span>
+                                </div>
+                                <div className="flex flex-col items-end gap-1.5">
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${u.role === 'admin' ? 'bg-primary text-on-primary' : 'bg-secondary-container text-on-secondary-container'}`}>
+                                        {u.role}
+                                    </span>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${u.fee_paid ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-error-container text-on-error-container'}`}>
+                                        {u.fee_paid ? 'Gebühr bezahlt' : 'Beitrag offen'}
+                                    </span>
+                                </div>
+                            </button>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* Column 2 & 3: Details or Edit panel */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
+                {message && (
+                    <div className="bg-secondary-container text-on-secondary-container p-4 rounded-lg flex items-center gap-2 font-body-medium shadow-sm transition-all duration-200">
+                        <span className="material-symbols-outlined">check_circle</span>
+                        {message}
+                    </div>
+                )}
+                {errorMsg && (
+                    <div className="bg-error-container text-on-error-container p-4 rounded-lg flex items-center gap-2 font-body-medium shadow-sm transition-all duration-200">
+                        <span className="material-symbols-outlined">error</span>
+                        {errorMsg}
+                    </div>
+                )}
+
+                {selectedUser ? (
+                    <div className="flex flex-col gap-6">
+                        {/* Selected User Overview */}
+                        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div className="flex flex-col gap-1.5">
+                                <h2 className="font-headline-md text-headline-md">{selectedUser.name}</h2>
+                                <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-sm">mail</span> {selectedUser.email}
+                                    {selectedUser.phone && (
+                                        <>
+                                            <span className="text-outline-variant">|</span>
+                                            <span className="material-symbols-outlined text-sm">phone</span> {selectedUser.phone}
+                                        </>
+                                    )}
+                                </p>
+                            </div>
+                            <div className="flex gap-2.5">
+                                <button 
+                                    onClick={() => setEditingUser(selectedUser)}
+                                    className="border border-outline hover:bg-surface-variant/30 text-on-surface py-2 px-5 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">edit</span>
+                                    Konto bearbeiten
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Edit User Mode */}
+                        {editingUser && (
+                            <form onSubmit={handleUpdateUser} className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                                <h3 className="font-title-lg text-title-lg pb-2 border-b border-outline-variant">Nutzerkonto bearbeiten</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="font-label-md block mb-1">Name</label>
+                                        <input 
+                                            value={editingUser.name} 
+                                            onChange={e => setEditingUser({ ...editingUser, name: e.target.value })} 
+                                            required 
+                                            className="w-full border border-outline-variant rounded p-2 text-body-md" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">E-Mail</label>
+                                        <input 
+                                            type="email"
+                                            value={editingUser.email} 
+                                            onChange={e => setEditingUser({ ...editingUser, email: e.target.value })} 
+                                            required 
+                                            className="w-full border border-outline-variant rounded p-2 text-body-md" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">Telefon</label>
+                                        <input 
+                                            value={editingUser.phone || ''} 
+                                            onChange={e => setEditingUser({ ...editingUser, phone: e.target.value })} 
+                                            className="w-full border border-outline-variant rounded p-2 text-body-md" 
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">Rolle</label>
+                                        <select 
+                                            value={editingUser.role} 
+                                            onChange={e => setEditingUser({ ...editingUser, role: e.target.value })} 
+                                            className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface"
+                                        >
+                                            <option value="member">Mitglied (Member)</option>
+                                            <option value="admin">Administrator (Admin)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-2.5 mt-2">
+                                    <label className="flex items-center gap-3 font-body-md select-none cursor-pointer">
+                                        <input 
+                                            type="checkbox"
+                                            checked={editingUser.fee_paid === 1}
+                                            onChange={e => setEditingUser({ ...editingUser, fee_paid: e.target.checked ? 1 : 0 })}
+                                            className="h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary"
+                                        />
+                                        Mitgliedsgebühr bezahlt (10€ einmalig)
+                                    </label>
+                                    <label className="flex items-center gap-3 font-body-sm text-on-surface-variant select-none cursor-pointer">
+                                        <input 
+                                            type="checkbox"
+                                            checked={editingUser.data_consent === 1}
+                                            onChange={e => setEditingUser({ ...editingUser, data_consent: e.target.checked ? 1 : 0 })}
+                                            className="h-4 w-4 rounded border-outline-variant text-primary"
+                                        />
+                                        Datenschutzeinwilligung erteilt
+                                    </label>
+                                    <label className="flex items-center gap-3 font-body-sm text-on-surface-variant select-none cursor-pointer">
+                                        <input 
+                                            type="checkbox"
+                                            checked={editingUser.rules_consent === 1}
+                                            onChange={e => setEditingUser({ ...editingUser, rules_consent: e.target.checked ? 1 : 0 })}
+                                            className="h-4 w-4 rounded border-outline-variant text-primary"
+                                        />
+                                        Bibliotheksregeln akzeptiert
+                                    </label>
+                                </div>
+
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setEditingUser(null)} 
+                                        className="border border-outline text-on-surface px-6 py-2 rounded-full font-label-md hover:bg-surface-variant/30 transition-colors cursor-pointer"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="bg-primary text-on-primary px-8 py-2 rounded-full font-label-md hover:bg-primary/95 transition-colors shadow-sm cursor-pointer"
+                                    >
+                                        Speichern
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+
+                        {/* Lending Utility (Buch ausleihen) */}
+                        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                            <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary">bookmark_add</span>
+                                Buch an {selectedUser.name} ausleihen
+                            </h3>
+                            
+                            {userLoans.filter(l => l.status !== 'returned').length >= 3 && (
+                                <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 p-3.5 rounded-lg flex items-start gap-2.5 text-body-sm">
+                                    <span className="material-symbols-outlined">warning</span>
+                                    <span>Dieser Nutzer hat bereits {userLoans.filter(l => l.status !== 'returned').length} aktive Bücher ausgeliehen (Standardlimit ist 3). Admins können dieses Limit überspringen.</span>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="relative">
+                                    <label className="font-label-md block mb-1">Buch suchen (Signatur, Titel, Autor)</label>
+                                    <input 
+                                        type="text"
+                                        placeholder="Titel eingeben..."
+                                        value={bookSearch}
+                                        onChange={e => setBookSearch(e.target.value)}
+                                        className="w-full border border-outline-variant rounded p-2 text-body-md"
+                                    />
+                                    {foundBooks.length > 0 && (
+                                        <div className="absolute left-0 right-0 mt-1 bg-surface-container border border-outline-variant rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto">
+                                            {foundBooks.map(b => (
+                                                <button
+                                                    key={b.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedBookId(b.id);
+                                                        setBookSearch(`${b.signature || b.id} - ${b.title}`);
+                                                        setFoundBooks([]);
+                                                    }}
+                                                    className="w-full text-left p-2.5 hover:bg-primary-container/20 text-body-sm border-b border-outline-variant last:border-0"
+                                                >
+                                                    <span className="font-bold font-mono text-xs block text-primary">{b.signature}</span>
+                                                    <span>{b.title} – <span className="text-on-surface-variant font-light">{b.author}</span></span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="font-label-md block mb-1">Rückgabedatum (Fälligkeit)</label>
+                                    <input 
+                                        type="date"
+                                        value={customDueDate}
+                                        onChange={e => setCustomDueDate(e.target.value)}
+                                        className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end mt-2">
+                                <button
+                                    onClick={handleLendBook}
+                                    disabled={!selectedBookId}
+                                    className={`py-2.5 px-8 rounded-full font-label-md shadow-sm transition-all flex items-center gap-1.5 ${selectedBookId ? 'bg-primary text-on-primary hover:bg-primary/95 cursor-pointer' : 'bg-outline-variant text-on-surface-variant cursor-not-allowed'}`}
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">key</span>
+                                    Ausleihen bestätigen
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Active & Past Loans */}
+                        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                            <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant">Ausleihverlauf</h3>
+                            {userLoans.length === 0 ? (
+                                <p className="text-on-surface-variant text-center py-6">Derzeit sind keine Ausleihen für diesen Nutzer registriert.</p>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-outline-variant bg-surface-container-low text-body-sm font-bold text-on-surface">
+                                                <th className="p-3">Signatur</th>
+                                                <th className="p-3">Buch</th>
+                                                <th className="p-3">Ausleihe</th>
+                                                <th className="p-3">Fälligkeit</th>
+                                                <th className="p-3">Rückgabe</th>
+                                                <th className="p-3">Status</th>
+                                                <th className="p-3 text-right">Aktionen</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-outline-variant text-body-sm">
+                                            {userLoans.map(loan => (
+                                                <tr key={loan.id} className="hover:bg-surface-variant/10">
+                                                    <td className="p-3 font-mono font-bold text-primary">{loan.book_signature || loan.book_id}</td>
+                                                    <td className="p-3">
+                                                        <div className="font-medium line-clamp-1" title={loan.book_title}>{loan.book_title}</div>
+                                                        <div className="text-[11px] text-on-surface-variant line-clamp-1">{loan.book_author}</div>
+                                                    </td>
+                                                    <td className="p-3 whitespace-nowrap">{new Date(loan.loan_date).toLocaleDateString()}</td>
+                                                    <td className="p-3 whitespace-nowrap font-medium">{new Date(loan.due_date).toLocaleDateString()}</td>
+                                                    <td className="p-3 whitespace-nowrap text-on-surface-variant">
+                                                        {loan.return_date ? new Date(loan.return_date).toLocaleDateString() : '-'}
+                                                    </td>
+                                                    <td className="p-3 whitespace-nowrap">
+                                                        {loan.status === 'returned' && (
+                                                            <span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                                                                Zurückgegeben
+                                                            </span>
+                                                        )}
+                                                        {loan.status === 'active' && (
+                                                            <span className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                                                                Aktiv
+                                                            </span>
+                                                        )}
+                                                        {loan.status === 'overdue' && (
+                                                            <span className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
+                                                                Überfällig
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-3 text-right whitespace-nowrap">
+                                                        {loan.status !== 'returned' && (
+                                                            <div className="flex gap-2 justify-end">
+                                                                <button
+                                                                    onClick={() => handleLoanAction(loan.id, 'extend')}
+                                                                    className="text-primary hover:underline font-bold px-2 py-1 border border-primary/20 rounded hover:bg-primary-container/10 transition-colors"
+                                                                    title="Um 4 Wochen verlängern"
+                                                                >
+                                                                    Verlängern
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleLoanAction(loan.id, 'return')}
+                                                                    className="text-green-700 dark:text-green-400 hover:underline font-bold px-2 py-1 border border-green-700/20 dark:border-green-400/20 rounded hover:bg-green-100 dark:hover:bg-green-950/20 transition-colors"
+                                                                    title="Buch zurücknehmen"
+                                                                >
+                                                                    Zurückgeben
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant shadow-sm flex flex-col items-center justify-center text-center text-on-surface-variant min-h-[400px]">
+                        <span className="material-symbols-outlined text-[64px] text-primary/40 mb-3">account_box</span>
+                        <h3 className="font-headline-sm text-headline-sm mb-1 text-on-surface">Kein Nutzer ausgewählt</h3>
+                        <p className="max-w-xs text-body-md">Wählen Sie einen Nutzer aus der linken Spalte aus, um Details anzuzeigen, das Konto zu bearbeiten, Leifristen zu verlängern oder Bücher auszuleihen.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default AdminUsers;

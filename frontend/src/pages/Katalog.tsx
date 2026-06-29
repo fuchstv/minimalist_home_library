@@ -35,7 +35,7 @@ const Katalog: React.FC = () => {
             if (categoryFilter) url += `&category=${encodeURIComponent(categoryFilter)}`;
             if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
 
-            const response = await fetch(url);
+            const response = await fetch(url, { credentials: 'include' });
             if (response.ok) {
                 const data = await response.json();
                 setBooks(data.data || []);
@@ -58,7 +58,8 @@ const Katalog: React.FC = () => {
         const res = await fetch(`${API_BASE_URL}/api/loans`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ book_id: bookId, user_id: user.id })
+            body: JSON.stringify({ book_id: bookId, user_id: user.id }),
+            credentials: 'include'
         });
         
         if (res.ok) {

@@ -29,7 +29,8 @@ const Register: React.FC = () => {
             const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password, phone, acceptData, acceptRules })
+                body: JSON.stringify({ name, email, password, phone, acceptData, acceptRules }),
+                credentials: 'include'
             });
             
             if (response.ok) {

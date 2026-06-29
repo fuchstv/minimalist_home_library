@@ -70,6 +70,6 @@ describe('AuthContext', () => {
         expect(removeItemSpy).toHaveBeenCalledWith('user');
 
         // 3. Verify fetch is called with correct parameters
-        expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/auth/logout`, { method: 'POST' });
+        expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
     });
 });

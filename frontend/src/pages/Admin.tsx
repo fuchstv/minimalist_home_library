@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { parseBibTeX } from '../utils/bibtexParser';
 import AdminPages from './AdminPages';
+import AdminUsers from './AdminUsers';
+import AdminLoans from './AdminLoans';
 import { API_BASE_URL } from "../config";
 
 interface Book {
@@ -32,7 +34,7 @@ const Admin: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
     
     // Tab state
-    const [activeTab, setActiveTab] = useState<'single' | 'bibtex' | 'pages'>('single');
+    const [activeTab, setActiveTab] = useState<'single' | 'bibtex' | 'users' | 'loans' | 'pages'>('single');
     
     // Form state
     const [title, setTitle] = useState('');
@@ -51,7 +53,7 @@ const Admin: React.FC = () => {
 
     const fetchBooks = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/books`);
+            const response = await fetch(`${API_BASE_URL}/api/books`, { credentials: 'include' });
             const data = await response.json();
             setBooks((data.data || []).slice(0, 100)); // Show last 100 for brevity
         } catch (error) {
@@ -84,7 +86,8 @@ const Admin: React.FC = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/books`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             });
             if (response.ok) {
                 alert('Buch erfolgreich hinzugefügt!');
@@ -107,7 +110,8 @@ const Admin: React.FC = () => {
         if (!window.confirm('Buch wirklich löschen?')) return;
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include'
             });
             if (response.ok) {
                 fetchBooks();
@@ -148,7 +152,8 @@ const Admin: React.FC = () => {
             const response = await fetch(`${API_BASE_URL}/api/admin/books/import`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ books: selected })
+                body: JSON.stringify({ books: selected }),
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -180,22 +185,34 @@ const Admin: React.FC = () => {
             <h1 className="font-headline-lg text-headline-lg">Admin Dashboard</h1>
 
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
-                <div className="flex border-b border-outline-variant mb-6">
+                <div className="flex border-b border-outline-variant mb-6 overflow-x-auto">
                     <button
                         onClick={() => setActiveTab('single')}
-                        className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'single' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'single' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
                         Einzelnes Buch
                     </button>
                     <button
                         onClick={() => setActiveTab('bibtex')}
-                        className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'bibtex' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'bibtex' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
                         BibTeX Import
                     </button>
                     <button
+                        onClick={() => setActiveTab('users')}
+                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'users' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                    >
+                        Nutzer verwalten
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('loans')}
+                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'loans' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                    >
+                        Ausleihen verwalten
+                    </button>
+                    <button
                         onClick={() => setActiveTab('pages')}
-                        className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'pages' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'pages' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
                         Seiten bearbeiten
                     </button>
@@ -203,6 +220,10 @@ const Admin: React.FC = () => {
 
                 {activeTab === 'pages' ? (
                     <AdminPages />
+                ) : activeTab === 'users' ? (
+                    <AdminUsers />
+                ) : activeTab === 'loans' ? (
+                    <AdminLoans />
                 ) : activeTab === 'single' ? (
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
