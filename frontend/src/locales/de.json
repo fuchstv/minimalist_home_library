@@ -34,6 +34,15 @@
             "poezja": "Lyrik & Poesie",
             "poradniki_popularnonaukowe": "Ratgeber & Sachbücher",
             "reportaze_podroznicze": "Reportagen & Reisen"
+        },
+        "pagination": {
+            "showing": "Zeige {{start}}-{{end}} von {{total}} Büchern",
+            "per_page": "Bücher pro Seite",
+            "show_all": "Alle anzeigen",
+            "first": "Erste Seite",
+            "prev": "Vorherige Seite",
+            "next": "Nächste Seite",
+            "last": "Letzte Seite"
         }
     },
     "auth": {
