@@ -32,7 +32,17 @@ function App() {
           <div className="w-full py-8 px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max-width mx-auto gap-gutter">
             <div className="flex flex-col items-center md:items-start gap-2">
               <img alt="SprachCafé Polnisch Logo" className="h-12 w-auto mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
-              <p className="font-label-sm text-label-sm text-secondary dark:text-secondary-fixed-dim">© 2024 SprachCafé Polnisch e.V. Digitale Hausbibliothek.</p>
+              <p className="font-label-sm text-label-sm text-secondary dark:text-secondary-fixed-dim">
+                © 2026 SprachCafé Polnisch e.V. Digitale Hausbibliothek. Entwickelt von{' '}
+                <a
+                  href="https://github.com/fuchstv/minimalist_home_library"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-primary transition-colors duration-200"
+                >
+                  Philipp Fuchs
+                </a>.
+              </p>
             </div>
             <ul className="flex flex-wrap justify-center gap-6 mt-4 md:mt-0">
               <li><Link className="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" to="/page/regeln">Bibliotheksregeln</Link></li>
