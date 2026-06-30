@@ -1,22 +1,17 @@
-# Node modules and build output
-frontend/node_modules/
-frontend/dist/
-frontend/.DS_Store
-
-# Backend & Database
-backend/uploads/*
-!backend/uploads/.gitkeep
-database/db_data/
-*.log
-
-# IDE & Editor files
-.vscode/
-.idea/
-*.swp
-
-# Environment variables (if used locally)
+# Node & Frontend
+node_modules/
+dist/
 .env
 .env.local
 
-# Docker cache
-.docker/
+# Docker & Datenbank
+*.sql
+*.sql.gz
+caddy_data/
+caddy_config/
+
+# System & IDE
+.DS_Store
+.idea/
+.vscode/
+*.log
