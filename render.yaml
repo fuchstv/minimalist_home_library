@@ -1,0 +1,35 @@
+services:
+  # Backend: PHP API
+  - type: web
+    name: hausbibliothek-backend
+    env: docker
+    dockerContext: backend
+    dockerFilePath: backend/Dockerfile
+    plan: starter
+    region: frankfurt
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false # Set this to your frontend URL
+    # Disks are required for persistent uploads, but not available on the Free plan.
+    # Change plan to 'starter' or higher to use disks.
+    disk:
+      name: uploads
+      mountPath: /var/www/html/uploads
+      sizeGB: 1
+
+  # Frontend: React App (Static Site)
+  - type: static
+    name: hausbibliothek-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false # Set this to your backend URL (e.g., https://hausbibliothek-backend.onrender.com)
