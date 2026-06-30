@@ -63,9 +63,13 @@ Der initiale Buchbestand wurde aus einer CSV-Datei importiert. Das zugehörige S
 ## Lizenz
 Dieses Projekt wurde für den internen Gebrauch des SprachCafé Polnisch e.V. entwickelt.
 
-## Deployment (Render)
+## Deployment
 
-Dieses Projekt ist für das Deployment auf **Render** vorbereitet.
+### Amazon Lightsail (Empfohlen)
+Dieses Projekt ist für das Deployment auf **Amazon Lightsail** optimiert. Detaillierte Anweisungen zur Einrichtung von Containern oder einer VPS-Instanz finden Sie im [LIGHTSAIL_DEPLOYMENT.md](./LIGHTSAIL_DEPLOYMENT.md).
+
+### Render
+Dieses Projekt ist auch für das Deployment auf **Render** vorbereitet.
 
 ### Backend (Web Service)
 1. Erstelle einen neuen **Web Service** auf Render.

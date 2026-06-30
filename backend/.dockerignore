@@ -1,3 +1,4 @@
+uploads/*
 .git
-Dockerfile
-.dockerignore
+.gitignore
+*.orig
