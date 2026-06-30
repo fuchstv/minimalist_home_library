@@ -30,6 +30,8 @@ if (preg_match('/^\/api\/pages/', $request_uri)) {
     require 'auth.php';
 } elseif (preg_match('/^\/api\/admin/', $request_uri)) {
     require 'admin.php';
+} elseif (preg_match('/^\/api\/health/', $request_uri)) {
+    require 'health.php';
 } else {
     http_response_code(404);
     echo json_encode(["message" => "API Endpoint not found."]);

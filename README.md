@@ -62,3 +62,25 @@ Der initiale Buchbestand wurde aus einer CSV-Datei importiert. Das zugehörige S
 
 ## Lizenz
 Dieses Projekt wurde für den internen Gebrauch des SprachCafé Polnisch e.V. entwickelt.
+
+## Deployment (Render)
+
+Dieses Projekt ist für das Deployment auf **Render** vorbereitet.
+
+### Backend (Web Service)
+1. Erstelle einen neuen **Web Service** auf Render.
+2. Verbinde dein Repository.
+3. Wähle `Docker` als Environment.
+4. Setze den `Docker Context` auf `backend` und den `Dockerfile Path` auf `backend/Dockerfile`.
+5. Füge folgende Umgebungsvariablen hinzu:
+   - `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` (deine MySQL Zugangsdaten)
+   - `ALLOWED_ORIGINS` (deine Frontend URL, z.B. `https://hausbibliothek.onrender.com`)
+6. (Optional) Füge ein **Disk** hinzu, um Bilder im `/var/www/html/uploads` Verzeichnis persistent zu speichern.
+
+### Frontend (Static Site)
+1. Erstelle eine neue **Static Site** auf Render.
+2. Verbinde dein Repository.
+3. Build Command: `cd frontend && npm install && npm run build`
+4. Publish Directory: `frontend/dist`
+5. Füge folgende Umgebungsvariable hinzu:
+   - `VITE_API_URL` (URL deines Backends, z.B. `https://hausbibliothek-backend.onrender.com`)
