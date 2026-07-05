@@ -76,6 +76,17 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/admin/pages') !== false) {
         
         $cover_image = null;
         if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            $mimeType = mime_content_type($_FILES['cover_image']['tmp_name']);
+            $extension = strtolower(pathinfo($_FILES['cover_image']['name'], PATHINFO_EXTENSION));
+
+            if (!in_array($mimeType, $allowedMimeTypes) || !in_array($extension, $allowedExtensions)) {
+                http_response_code(400);
+                echo json_encode(["message" => "Invalid file type. Only JPG, PNG, GIF, and WEBP are allowed."]);
+                return;
+            }
             $uploadDir = __DIR__ . '/uploads/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
