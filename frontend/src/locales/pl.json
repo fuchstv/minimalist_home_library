@@ -34,6 +34,15 @@
             "poezja": "Poezja",
             "poradniki_popularnonaukowe": "Poradniki & Popularnonaukowe",
             "reportaze_podroznicze": "Reportaże & Podróże"
+        },
+        "pagination": {
+            "showing": "Wyświetlanie {{start}}-{{end}} z {{total}} książek",
+            "per_page": "Książek na stronę",
+            "show_all": "Pokaż wszystkie",
+            "first": "Pierwsza strona",
+            "prev": "Poprzednia strona",
+            "next": "Następna strona",
+            "last": "Ostatnia strona"
         }
     },
     "auth": {

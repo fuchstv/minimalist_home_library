@@ -1,5 +1,7 @@
 :80 {
-    # Proxy API requests to the backend, preserving the /api prefix
+    root * /usr/share/caddy
+
+    # Proxy API requests to the backend
     handle /api/* {
         reverse_proxy backend:80
     }
@@ -9,8 +11,29 @@
         reverse_proxy backend:80
     }
 
-    # Proxy all other requests to the frontend (Nginx serving static files)
-    handle /* {
-        reverse_proxy frontend:80
+    # Fallback to index.html for Single Page App routing
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
+}
+
+hausbibliothek.org {
+    root * /usr/share/caddy
+
+    # Proxy API requests to the backend
+    handle /api/* {
+        reverse_proxy backend:80
+    }
+
+    # Proxy upload requests to the backend
+    handle /uploads/* {
+        reverse_proxy backend:80
+    }
+
+    # Fallback to index.html for Single Page App routing
+    handle {
+        try_files {path} /index.html
+        file_server
     }
 }

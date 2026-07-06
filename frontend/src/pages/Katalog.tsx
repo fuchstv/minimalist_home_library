@@ -27,10 +27,16 @@ const Katalog: React.FC = () => {
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
+    
+    // Pagination state
+    const [page, setPage] = useState(1);
+    const [limit] = useState(12);
+    const [totalBooks, setTotalBooks] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     const fetchBooks = useCallback(async () => {
         try {
-            let url = `${API_BASE_URL}/api/books?limit=12`;
+            let url = `${API_BASE_URL}/api/books?limit=${limit}&page=${page}`;
             if (search) url += `&search=${encodeURIComponent(search)}`;
             if (categoryFilter) url += `&category=${encodeURIComponent(categoryFilter)}`;
             if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
@@ -39,15 +45,55 @@ const Katalog: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 setBooks(data.data || []);
+                if (data.meta) {
+                    setTotalBooks(data.meta.total || 0);
+                    setTotalPages(data.meta.totalPages || 1);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch books", error);
         }
-    }, [search, categoryFilter, statusFilter]);
+    }, [page, limit, search, categoryFilter, statusFilter]);
 
     useEffect(() => {
         fetchBooks();
     }, [fetchBooks]);
+
+    const handleSearchChange = (val: string) => {
+        setSearch(val);
+        setPage(1);
+    };
+
+    const handleCategoryChange = (val: string) => {
+        setCategoryFilter(val);
+        setPage(1);
+    };
+
+    const handleStatusChange = (val: string) => {
+        setStatusFilter(val);
+        setPage(1);
+    };
+
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxVisiblePages = 5;
+        
+        let startPage = Math.max(1, page - 2);
+        let endPage = Math.min(totalPages, page + 2);
+        
+        if (page <= 3) {
+            startPage = 1;
+            endPage = Math.min(totalPages, maxVisiblePages);
+        } else if (page >= totalPages - 2) {
+            startPage = Math.max(1, totalPages - maxVisiblePages + 1);
+            endPage = totalPages;
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    };
 
     const handleBorrow = async (bookId: number) => {
         if (!user) {
@@ -93,7 +139,7 @@ const Katalog: React.FC = () => {
                             placeholder={t('catalog.search_placeholder')}
                             className="w-full pl-12 pr-4 py-3 rounded-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => handleSearchChange(e.target.value)}
                         />
                     </div>
                     
@@ -101,7 +147,7 @@ const Katalog: React.FC = () => {
                         <select 
                             className="px-4 py-3 rounded-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-md text-body-md text-on-surface cursor-pointer shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]"
                             value={categoryFilter}
-                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            onChange={(e) => handleCategoryChange(e.target.value)}
                         >
                             <option value="">{t('catalog.genre')}</option>
                             <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
@@ -121,7 +167,7 @@ const Katalog: React.FC = () => {
                         <select 
                             className="px-4 py-3 rounded-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-md text-body-md text-on-surface cursor-pointer shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]"
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={(e) => handleStatusChange(e.target.value)}
                         >
                             <option value="">{t('catalog.status')}</option>
                             <option value="available">{t('catalog.available')}</option>
@@ -141,57 +187,118 @@ const Katalog: React.FC = () => {
                         {t('catalog.no_books')}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {books.map((book) => (
-                            <div key={book.id} className="group flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                                <div className="h-48 bg-surface-container flex items-center justify-center relative overflow-hidden">
-                                    {book.cover_image ? (
-                                        <img src={`${API_BASE_URL}/${book.cover_image}`} alt="Cover" className="object-cover w-full h-full" />
-                                    ) : (
-                                        <span className="material-symbols-outlined text-[64px] text-surface-variant group-hover:scale-110 transition-transform duration-500">book_4</span>
-                                    )}
-                                    
-                                    <div className="absolute top-3 right-3">
-                                        {book.availability_status === 'available' ? (
-                                            <span className="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-primary/20 shadow-sm">
-                                                {t('catalog.available')}
-                                            </span>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {books.map((book) => (
+                                <div key={book.id} className="group flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                                    <div className="h-48 bg-surface-container flex items-center justify-center relative overflow-hidden">
+                                        {book.cover_image ? (
+                                            <img src={`${API_BASE_URL}/${book.cover_image}`} alt="Cover" className="object-cover w-full h-full" />
                                         ) : (
-                                            <span className="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant shadow-sm">
-                                                {t('catalog.borrowed')}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                {/* Book Info */}
-                                <div className="p-5 flex flex-col flex-grow">
-                                    <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.signature ? book.signature + " | " : ""}{book.category}</span>
-                                    <h3 className="font-title-md text-title-md text-on-surface mb-1 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                                        {book.title}
-                                    </h3>
-                                    <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 line-clamp-1">
-                                        von {book.author}
-                                    </p>
-                                    
-                                    <div className="mt-auto pt-4 border-t border-outline-variant/50 flex gap-2">
-                                        {book.availability_status === 'available' ? (
-                                            <button onClick={() => handleBorrow(book.id)} className="flex-grow bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm">
-                                                {t('catalog.borrow_btn')}
-                                            </button>
-                                        ) : (
-                                            <button className="flex-grow bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-2.5 rounded-full cursor-not-allowed">
-                                                {t('catalog.reserve_btn')}
-                                            </button>
+                                            <span className="material-symbols-outlined text-[64px] text-surface-variant group-hover:scale-110 transition-transform duration-500">book_4</span>
                                         )}
                                         
-                                        <button className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors" title={t('catalog.details_btn')}>
-                                            <span className="material-symbols-outlined text-[20px]">info</span>
-                                        </button>
+                                        <div className="absolute top-3 right-3">
+                                            {book.availability_status === 'available' ? (
+                                                <span className="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-primary/20 shadow-sm">
+                                                    {t('catalog.available')}
+                                                </span>
+                                            ) : (
+                                                <span className="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant shadow-sm">
+                                                    {t('catalog.borrowed')}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {/* Book Info */}
+                                    <div className="p-5 flex flex-col flex-grow">
+                                        <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.signature ? book.signature + " | " : ""}{book.category}</span>
+                                        <h3 className="font-title-md text-title-md text-on-surface mb-1 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                                            {book.title}
+                                        </h3>
+                                        <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 line-clamp-1">
+                                            von {book.author}
+                                        </p>
+                                        
+                                        <div className="mt-auto pt-4 border-t border-outline-variant/50 flex gap-2">
+                                            {book.availability_status === 'available' ? (
+                                                <button onClick={() => handleBorrow(book.id)} className="flex-grow bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm">
+                                                    {t('catalog.borrow_btn')}
+                                                </button>
+                                            ) : (
+                                                <button className="flex-grow bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-2.5 rounded-full cursor-not-allowed">
+                                                    {t('catalog.reserve_btn')}
+                                                </button>
+                                            )}
+                                            
+                                            <button className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors" title={t('catalog.details_btn')}>
+                                                <span className="material-symbols-outlined text-[20px]">info</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+
+                        {/* Pagination UI */}
+                        {totalPages > 1 && (
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-12 pt-6 border-t border-outline-variant w-full">
+                                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                                    {t('catalog.pagination.showing', {
+                                        start: (page - 1) * limit + 1,
+                                        end: Math.min(page * limit, totalBooks),
+                                        total: totalBooks
+                                    })}
+                                </span>
+                                
+                                <div className="flex items-center gap-1">
+                                    <button 
+                                        disabled={page === 1}
+                                        onClick={() => setPage(1)}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        title={t('catalog.pagination.first')}
+                                    >
+                                        <span className="material-symbols-outlined">first_page</span>
+                                    </button>
+                                    <button 
+                                        disabled={page === 1}
+                                        onClick={() => setPage(p => Math.max(p - 1, 1))}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        title={t('catalog.pagination.prev')}
+                                    >
+                                        <span className="material-symbols-outlined">chevron_left</span>
+                                    </button>
+                                    
+                                    {getPageNumbers().map((pageNum) => (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => setPage(pageNum)}
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md transition-all ${page === pageNum ? 'bg-primary text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-variant/20'}`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    ))}
+                                    
+                                    <button 
+                                        disabled={page === totalPages}
+                                        onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        title={t('catalog.pagination.next')}
+                                    >
+                                        <span className="material-symbols-outlined">chevron_right</span>
+                                    </button>
+                                    <button 
+                                        disabled={page === totalPages}
+                                        onClick={() => setPage(totalPages)}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        title={t('catalog.pagination.last')}
+                                    >
+                                        <span className="material-symbols-outlined">last_page</span>
+                                    </button>
+                                </div>
                             </div>
-                        ))}
-                    </div>
+                        )}
+                    </>
                 )}
             </section>
         </div>
