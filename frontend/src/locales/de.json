@@ -10,11 +10,13 @@
         "overdue_loans": "Überfällige Ausleihen"
     },
     "catalog": {
-        "welcome_title": "Willkommen in unserer Hausbibliothek – Entdecke die Freude am Polnischen",
-        "welcome_desc": "Unsere Bibliothek ist mehr als nur ein Bücherregal – sie ist dein gemütlicher 'Third Space' für Sprachanimation, kulturellen Austausch und gemeinsame Erlebnisse. Mach es dir bequem und stöbere durch unsere Sammlung.",
+        "title": "Hausbibliothek des SprachCafé Polnisch",
+        "subtitle": "Unsere Bibliothek ist mehr als nur ein Bücherregal – sie ist dein gemütlicher 'Third Space' für Sprachanimation, kulturellen Austausch und gemeinsame Erlebnisse. Mach es dir bequem und stöbere durch unsere Sammlung.",
         "search_placeholder": "Finde dein nächstes Lieblingsbuch oder Hörspiel...",
-        "genre": "Genre",
-        "status": "Status",
+        "filter_category": "Kategorie",
+        "filter_status": "Status",
+        "all_categories": "Alle Kategorien",
+        "all_status": "Alle Status",
         "all": "Alle",
         "available": "Verfügbar",
         "borrowed": "Ausgeliehen",
@@ -23,6 +25,9 @@
         "reserve_btn": "Vormerken",
         "details_btn": "Details anzeigen",
         "no_books": "Keine Bücher gefunden.",
+        "clear_filters": "Filter löschen",
+        "borrow_success": "Buch erfolgreich ausgeliehen!",
+        "borrow_error": "Fehler beim Ausleihen des Buches. Bitte versuche es später erneut.",
         "categories": {
             "deutsch": "Auf Deutsch",
             "belytrystyka_polska": "Polnische Belletristik",
