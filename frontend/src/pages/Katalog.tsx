@@ -122,19 +122,17 @@ const Katalog: React.FC = () => {
     };
 
     const handleEditBook = (bookId: number) => {
-        // We'll pass the bookId via search params so Admin page can potentially use it,
-        // though for now it just shows the admin panel.
-        navigate(`/admin?editId=${bookId}`);
+        navigate(`/admin?tab=single&editId=${bookId}`);
     };
 
     return (
         <div className="flex-grow">
             {/* Hero / Header Section */}
             <header className="bg-primary pt-12 pb-24 px-margin-mobile md:px-margin-desktop text-on-primary">
-                <div className="max-w-4xl">
-                    <h1 className="font-headline-lg text-headline-lg mb-4">{t('catalog.title')}</h1>
+                <div className="max-w-4xl mx-auto md:mx-0">
+                    <h1 className="font-headline-lg text-headline-lg mb-4">{t('catalog.welcome_title')}</h1>
                     <p className="font-body-lg text-body-lg text-on-primary/80 mb-8">
-                        {t('catalog.subtitle')}
+                        {t('catalog.welcome_desc')}
                     </p>
 
                     {/* Search Bar */}
@@ -153,56 +151,58 @@ const Katalog: React.FC = () => {
 
             {/* Filters Section */}
             <section className="px-margin-mobile md:px-margin-desktop -mt-12 mb-12">
-                <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant flex flex-wrap gap-4 items-end">
-                    <div className="flex flex-col gap-1.5 min-w-[200px]">
-                        <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.filter_category')}</label>
-                        <select 
-                            value={categoryFilter}
-                            onChange={(e) => handleCategoryChange(e.target.value)}
-                            className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
-                        >
-                            <option value="">{t('catalog.all_categories')}</option>
-                            <option value="Auf Deutsch">Auf Deutsch</option>
-                            <option value="Belytrystyka polska">Belytrystyka polska</option>
-                            <option value="Belytrystyka zagraniczna">Belytrystyka zagraniczna</option>
-                            <option value="Dziecięce">Dziecięce</option>
-                            <option value="Fantasy | Sci-fi">Fantasy | Sci-fi</option>
-                            <option value="Historyczne">Historyczne</option>
-                            <option value="Kryminał | Thriller">Kryminał | Thriller</option>
-                            <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                            <option value="Biografie">Biografie</option>
-                            <option value="Poezja">Poezja</option>
-                            <option value="Poradniki | Popularnonaukowe">Poradniki | Popularnonaukowe</option>
-                            <option value="Reportaże | Podróżnicze">Reportaże | Podróżnicze</option>
-                        </select>
-                    </div>
+                <div className="max-w-container-max-width mx-auto">
+                    <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant flex flex-wrap gap-4 items-end">
+                        <div className="flex flex-col gap-1.5 min-w-[200px]">
+                            <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.genre')}</label>
+                            <select
+                                value={categoryFilter}
+                                onChange={(e) => handleCategoryChange(e.target.value)}
+                                className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
+                            >
+                                <option value="">{t('catalog.all')}</option>
+                                <option value="Auf Deutsch">Auf Deutsch</option>
+                                <option value="Belytrystyka polska">Belytrystyka polska</option>
+                                <option value="Belytrystyka zagraniczna">Belytrystyka zagraniczna</option>
+                                <option value="Dziecięce">Dziecięce</option>
+                                <option value="Fantasy | Sci-fi">Fantasy | Sci-fi</option>
+                                <option value="Historyczne">Historyczne</option>
+                                <option value="Kryminał | Thriller">Kryminał | Thriller</option>
+                                <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
+                                <option value="Biografie">Biografie</option>
+                                <option value="Poezja">Poezja</option>
+                                <option value="Poradniki | Popularnonaukowe">Poradniki | Popularnonaukowe</option>
+                                <option value="Reportaże | Podróżnicze">Reportaże | Podróżnicze</option>
+                            </select>
+                        </div>
 
-                    <div className="flex flex-col gap-1.5 min-w-[160px]">
-                        <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.filter_status')}</label>
-                        <select 
-                            value={statusFilter}
-                            onChange={(e) => handleStatusChange(e.target.value)}
-                            className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
-                        >
-                            <option value="">{t('catalog.all_status')}</option>
-                            <option value="available">{t('catalog.available')}</option>
-                            <option value="borrowed">{t('catalog.borrowed')}</option>
-                        </select>
-                    </div>
+                        <div className="flex flex-col gap-1.5 min-w-[160px]">
+                            <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.status')}</label>
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => handleStatusChange(e.target.value)}
+                                className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
+                            >
+                                <option value="">{t('catalog.all')}</option>
+                                <option value="available">{t('catalog.available')}</option>
+                                <option value="borrowed">{t('catalog.borrowed')}</option>
+                            </select>
+                        </div>
 
-                    <button
-                        onClick={() => {setSearch(''); setCategoryFilter(''); setStatusFilter(''); setPage(1);}}
-                        className="font-label-md text-primary px-4 py-2.5 rounded-xl hover:bg-primary/5 transition-colors ml-auto"
-                    >
-                        {t('catalog.clear_filters')}
-                    </button>
+                        <button
+                            onClick={() => {setSearch(''); setCategoryFilter(''); setStatusFilter(''); setPage(1);}}
+                            className="font-label-md text-primary px-4 py-2.5 rounded-xl hover:bg-primary/5 transition-colors ml-auto"
+                        >
+                            {t('catalog.all')} {t('catalog.status')}
+                        </button>
+                    </div>
                 </div>
             </section>
 
             {/* Catalog Grid */}
-            <section className="px-margin-mobile md:px-margin-desktop mb-24">
+            <section className="px-margin-mobile md:px-margin-desktop mb-24 max-w-container-max-width mx-auto w-full">
                 <div className="flex justify-between items-center mb-6 px-1">
-                    <span className="font-label-md text-label-md text-on-surface-variant">
+                    <span className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">
                         {t('catalog.current_selection')}
                     </span>
                 </div>
@@ -213,23 +213,29 @@ const Katalog: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {books.map((book) => (
-                                <div key={book.id} className="group flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                                    <div className="h-48 bg-surface-container flex items-center justify-center relative overflow-hidden">
+                                <article
+                                    key={book.id}
+                                    className="group flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                                    onClick={() => navigate(`/book/${book.id}`)}
+                                >
+                                    <div className="relative aspect-[2/3] bg-surface-container overflow-hidden">
                                         {book.cover_image ? (
-                                            <img src={`${API_BASE_URL}/${book.cover_image}`} alt="Cover" className="object-cover w-full h-full" />
+                                            <img src={`${API_BASE_URL}/${book.cover_image}`} alt={book.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105" />
                                         ) : (
-                                            <span className="material-symbols-outlined text-[64px] text-surface-variant group-hover:scale-110 transition-transform duration-500">book_4</span>
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <span className="material-symbols-outlined text-[64px] text-surface-variant group-hover:scale-110 transition-transform duration-500">book_4</span>
+                                            </div>
                                         )}
                                         
                                         <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
                                             {book.availability_status === 'available' ? (
-                                                <span className="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-primary/20 shadow-sm">
+                                                <span className="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2.5 py-1 rounded-md border border-secondary/20 shadow-sm">
                                                     {t('catalog.available')}
                                                 </span>
                                             ) : (
-                                                <span className="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant shadow-sm">
+                                                <span className="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-md border border-outline-variant shadow-sm">
                                                     {t('catalog.borrowed')}
                                                 </span>
                                             )}
@@ -245,39 +251,50 @@ const Katalog: React.FC = () => {
                                             )}
                                         </div>
                                     </div>
+
                                     {/* Book Info */}
                                     <div className="p-5 flex flex-col flex-grow">
-                                        <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.signature ? book.signature + " | " : ""}{book.category}</span>
+                                        <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.category}</span>
                                         <h3 className="font-title-md text-title-md text-on-surface mb-1 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                                             {book.title}
                                         </h3>
-                                        <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 line-clamp-1">
+                                        <p className="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-1">
                                             von {book.author}
                                         </p>
                                         
-                                        <div className="mt-auto pt-4 border-t border-outline-variant/50 flex gap-2">
+                                        <div className="mt-auto pt-4 flex flex-col gap-2">
                                             {book.availability_status === 'available' ? (
-                                                <button onClick={() => handleBorrow(book.id)} className="flex-grow bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-full hover:bg-primary/90 transition-colors shadow-sm">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleBorrow(book.id); }}
+                                                    className="w-full bg-primary text-on-primary font-label-md text-label-md py-2.5 rounded-lg hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-2"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">bookmark_add</span>
                                                     {t('catalog.borrow_btn')}
                                                 </button>
                                             ) : (
-                                                <button className="flex-grow bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-2.5 rounded-full cursor-not-allowed">
+                                                <button
+                                                    disabled
+                                                    className="w-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-2.5 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">schedule</span>
                                                     {t('catalog.reserve_btn')}
                                                 </button>
                                             )}
                                             
-                                            <button className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors" title={t('catalog.details_btn')}>
-                                                <span className="material-symbols-outlined text-[20px]">info</span>
+                                            <button
+                                                className="w-full border border-primary text-primary font-label-md text-label-md py-2.5 rounded-lg hover:bg-primary/5 transition-colors"
+                                            >
+                                                {t('catalog.details_btn')}
                                             </button>
                                         </div>
                                     </div>
-                                </div>
+                                </article>
                             ))}
                         </div>
 
                         {/* Pagination UI */}
                         {totalPages > 1 && (
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-12 pt-6 border-t border-outline-variant w-full">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-16 pt-8 border-t border-outline-variant w-full">
                                 <span className="font-body-sm text-body-sm text-on-surface-variant">
                                     {t('catalog.pagination.showing', {
                                         start: (page - 1) * limit + 1,
@@ -290,16 +307,14 @@ const Katalog: React.FC = () => {
                                     <button 
                                         disabled={page === 1}
                                         onClick={() => setPage(1)}
-                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
-                                        title={t('catalog.pagination.first')}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                     >
                                         <span className="material-symbols-outlined">first_page</span>
                                     </button>
                                     <button 
                                         disabled={page === 1}
                                         onClick={() => setPage(p => Math.max(p - 1, 1))}
-                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
-                                        title={t('catalog.pagination.prev')}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                     >
                                         <span className="material-symbols-outlined">chevron_left</span>
                                     </button>
@@ -308,7 +323,7 @@ const Katalog: React.FC = () => {
                                         <button
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md transition-all ${page === pageNum ? 'bg-primary text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-variant/20'}`}
+                                            className={`w-10 h-10 rounded-lg flex items-center justify-center font-label-md text-label-md transition-all ${page === pageNum ? 'bg-primary text-on-primary font-bold shadow-sm' : 'text-on-surface-variant hover:bg-surface-variant/20'}`}
                                         >
                                             {pageNum}
                                         </button>
@@ -317,16 +332,14 @@ const Katalog: React.FC = () => {
                                     <button 
                                         disabled={page === totalPages}
                                         onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
-                                        title={t('catalog.pagination.next')}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                     >
                                         <span className="material-symbols-outlined">chevron_right</span>
                                     </button>
                                     <button 
                                         disabled={page === totalPages}
                                         onClick={() => setPage(totalPages)}
-                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
-                                        title={t('catalog.pagination.last')}
+                                        className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                     >
                                         <span className="material-symbols-outlined">last_page</span>
                                     </button>

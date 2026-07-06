@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import DynamicPage from './pages/DynamicPage';
 import Admin from './pages/Admin';
 import Profil from './pages/Profil';
+import BookDetails from './pages/BookDetails';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <main className="flex-grow flex flex-col w-full">
           <Routes>
             <Route path="/" element={<Katalog />} />
+            <Route path="/book/:id" element={<BookDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/page/:slug" element={<DynamicPage />} />
