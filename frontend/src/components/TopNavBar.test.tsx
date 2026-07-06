@@ -6,9 +6,9 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 
 // Mock fetch
-const globalFetch = global.fetch;
+const globalFetch = globalThis.fetch;
 beforeEach(() => {
-    global.fetch = vi.fn().mockImplementation(() =>
+    globalThis.fetch = vi.fn().mockImplementation(() =>
         Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ count: 0 }),
@@ -17,7 +17,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    global.fetch = globalFetch;
+    globalThis.fetch = globalFetch;
 });
 
 // Mock react-i18next
@@ -107,7 +107,7 @@ describe('TopNavBar', () => {
     });
 
     it('shows notifications count when user has overdue loans', async () => {
-        (global.fetch as any).mockImplementationOnce(() =>
+        (globalThis.fetch as any).mockImplementationOnce(() =>
             Promise.resolve({
                 ok: true,
                 json: () => Promise.resolve({ count: 5 }),
