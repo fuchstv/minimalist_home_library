@@ -30,12 +30,14 @@ const AdminLoans: React.FC = () => {
             const res = await axios.get(`${API_BASE_URL}/api/admin/loans`, { withCredentials: true });
             setLoans(res.data.data || []);
         } catch (error) {
+
             console.error('Error fetching global loans:', error);
             setErrorMsg('Fehler beim Laden des globalen Ausleihregisters.');
         }
     }, []);
 
     useEffect(() => {
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
         fetchLoans();
     }, [fetchLoans]);
 
@@ -48,9 +50,11 @@ const AdminLoans: React.FC = () => {
             setMessage(`Ausleihe erfolgreich ${action === 'return' ? 'zurückgenommen' : 'um 4 Wochen verlängert'}.`);
             fetchLoans();
             setTimeout(() => setMessage(''), 3000);
-        } catch (error: any) {
+        } catch (error) {
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+            const err = error as any;
             console.error('Error modifying loan:', error);
-            setErrorMsg(error.response?.data?.message || 'Fehler beim Bearbeiten der Ausleihe.');
+            setErrorMsg(err.response?.data?.message || 'Fehler beim Bearbeiten der Ausleihe.');
             setTimeout(() => setErrorMsg(''), 4000);
         }
     };
@@ -93,8 +97,8 @@ const AdminLoans: React.FC = () => {
             </div>
 
             {/* Filter Toolbar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative flex-grow w-full">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <div className="relative flex-grow w-full md:min-w-[200px]">
                     <input 
                         type="text" 
                         placeholder="Benutzer, Buchtitel oder Signatur suchen..." 
@@ -105,7 +109,7 @@ const AdminLoans: React.FC = () => {
                     <span className="material-symbols-outlined absolute left-3 top-2 text-on-surface-variant">search</span>
                 </div>
 
-                <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                <div className="flex flex-wrap gap-2 w-full md:w-auto justify-start">
                     <button
                         onClick={() => setStatusFilter('all')}
                         className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm transition-all border shrink-0 ${statusFilter === 'all' ? 'bg-primary text-on-primary border-primary' : 'bg-surface hover:bg-surface-variant/30 border-outline'}`}
