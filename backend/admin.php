@@ -13,6 +13,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = preg_replace('/^\/api/', '', $request_uri);
+$parts = explode('/', trim($path, '/'));
 
 // Handle operations
 if (strpos($request_uri, '/admin/pages') !== false) {
@@ -22,7 +24,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
 } elseif (strpos($request_uri, '/admin/books') !== false) {
     
     if ($method == 'POST') {
-        if (strpos($request_uri, '/admin/books/import') !== false) {
+        if (isset($parts[2]) && $parts[2] === 'import') {
             $input = json_decode(file_get_contents('php://input'), true);
             if (!isset($input['books']) || !is_array($input['books'])) {
                 http_response_code(400);
@@ -65,7 +67,9 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             return;
         }
 
-        // Create new book. We might receive form-data if uploading image
+        // Update or Create book
+        $id = (isset($parts[2]) && is_numeric($parts[2])) ? (int)$parts[2] : null;
+
         $title = $_POST['title'] ?? '';
         $author = $_POST['author'] ?? '';
         $category = $_POST['category'] ?? '';
@@ -73,6 +77,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
         $publisher = $_POST['publisher'] ?? '';
         $isbn = $_POST['isbn'] ?? '';
         $description = $_POST['description'] ?? '';
+        $signature = $_POST['signature'] ?? '';
         
         $cover_image = null;
         if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
@@ -100,23 +105,43 @@ if (strpos($request_uri, '/admin/pages') !== false) {
 
         try {
             $pdo->beginTransaction();
-            $signature = generateSignature($pdo, $category);
-            $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, cover_image, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $cover_image, $signature]);
-            $newId = $pdo->lastInsertId();
-            $pdo->commit();
-            echo json_encode(["message" => "Book created successfully", "id" => $newId, "signature" => $signature]);
+            if ($id) {
+                // Update
+                $sql = "UPDATE books SET title = ?, author = ?, category = ?, publication_year = ?, publisher = ?, isbn = ?, description = ?, signature = ?";
+                $params = [$title, $author, $category, $publication_year, $publisher, $isbn, $description, $signature];
+
+                if ($cover_image) {
+                    $sql .= ", cover_image = ?";
+                    $params[] = $cover_image;
+                }
+
+                $sql .= " WHERE id = ?";
+                $params[] = $id;
+
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($params);
+                $pdo->commit();
+                echo json_encode(["message" => "Book updated successfully", "id" => $id]);
+            } else {
+                // Create
+                if (empty($signature)) {
+                    $signature = generateSignature($pdo, $category);
+                }
+                $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, cover_image, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $cover_image, $signature]);
+                $newId = $pdo->lastInsertId();
+                $pdo->commit();
+                echo json_encode(["message" => "Book created successfully", "id" => $newId, "signature" => $signature]);
+            }
         } catch (\PDOException $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
             http_response_code(400);
-            echo json_encode(["message" => "Failed to create book: " . $e->getMessage()]);
+            echo json_encode(["message" => "Failed to save book: " . $e->getMessage()]);
         }
     } elseif ($method == 'DELETE') {
-        $path = preg_replace('/^\/api/', '', $request_uri);
-        $parts = explode('/', trim($path, '/'));
-        if (count($parts) >= 3 && $parts[0] === 'admin' && $parts[1] === 'books' && is_numeric($parts[2])) {
+        if (isset($parts[2]) && is_numeric($parts[2])) {
             $id = $parts[2];
             $stmt = $pdo->prepare("DELETE FROM books WHERE id = ?");
             $stmt->execute([$id]);

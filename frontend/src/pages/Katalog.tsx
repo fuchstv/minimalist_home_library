@@ -100,82 +100,107 @@ const Katalog: React.FC = () => {
             navigate('/login');
             return;
         }
-        
-        const res = await fetch(`${API_BASE_URL}/api/loans`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ book_id: bookId, user_id: user.id }),
-            credentials: 'include'
-        });
-        
-        if (res.ok) {
-            alert('Buch erfolgreich ausgeliehen!');
-            fetchBooks();
-        } else {
-            const errorData = await res.json();
-            alert(errorData.message || 'Fehler beim Ausleihen.');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/loans`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_id: bookId }),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                alert(t('catalog.borrow_success'));
+                fetchBooks();
+            } else {
+                const error = await response.json();
+                alert(error.message || t('catalog.borrow_error'));
+            }
+        } catch (error) {
+            console.error("Failed to borrow book", error);
         }
     };
 
+    const handleEditBook = (bookId: number) => {
+        // We'll pass the bookId via search params so Admin page can potentially use it,
+        // though for now it just shows the admin panel.
+        navigate(`/admin?editId=${bookId}`);
+    };
+
     return (
-        <div className="flex-grow flex flex-col items-center bg-surface w-full overflow-hidden">
-            <header className="w-full bg-surface-container-low border-b border-outline-variant px-margin-mobile md:px-margin-desktop py-12 md:py-16 text-center">
-                <div className="max-w-container-max-width mx-auto">
-                    <h1 className="font-display-md md:font-display-lg text-display-md md:text-display-lg text-on-surface mb-4 max-w-3xl mx-auto">
-                        {t('catalog.welcome_title')}
-                    </h1>
-                    <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-                        {t('catalog.welcome_desc')}
+        <div className="flex-grow">
+            {/* Hero / Header Section */}
+            <header className="bg-primary pt-12 pb-24 px-margin-mobile md:px-margin-desktop text-on-primary">
+                <div className="max-w-4xl">
+                    <h1 className="font-headline-lg text-headline-lg mb-4">{t('catalog.title')}</h1>
+                    <p className="font-body-lg text-body-lg text-on-primary/80 mb-8">
+                        {t('catalog.subtitle')}
                     </p>
+
+                    {/* Search Bar */}
+                    <div className="relative group max-w-2xl">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+                        <input
+                            type="text"
+                            placeholder={t('catalog.search_placeholder')}
+                            value={search}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                            className="w-full bg-surface text-on-surface py-4 pl-12 pr-4 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-body-md"
+                        />
+                    </div>
                 </div>
             </header>
 
-            <section className="w-full px-margin-mobile md:px-margin-desktop py-12 max-w-container-max-width mx-auto">
-                <div className="flex flex-col md:flex-row gap-4 mb-8">
-                    <div className="relative flex-grow">
-                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-                        <input 
-                            type="text" 
-                            placeholder={t('catalog.search_placeholder')}
-                            className="w-full pl-12 pr-4 py-3 rounded-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]"
-                            value={search}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                        />
-                    </div>
-                    
-                    <div className="flex gap-4 w-full md:w-auto">
+            {/* Filters Section */}
+            <section className="px-margin-mobile md:px-margin-desktop -mt-12 mb-12">
+                <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant flex flex-wrap gap-4 items-end">
+                    <div className="flex flex-col gap-1.5 min-w-[200px]">
+                        <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.filter_category')}</label>
                         <select 
-                            className="px-4 py-3 rounded-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-md text-body-md text-on-surface cursor-pointer shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]"
                             value={categoryFilter}
                             onChange={(e) => handleCategoryChange(e.target.value)}
+                            className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
                         >
-                            <option value="">{t('catalog.genre')}</option>
-                            <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
-                            <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
-                            <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_zagraniczna')}</option>
-                            <option value="Biografie">{t('catalog.categories.biografie')}</option>
-                            <option value="Dziecięce">{t('catalog.categories.dzieciece')}</option>
-                            <option value="Fantasy | Sci-fi">{t('catalog.categories.fantasy_scifi')}</option>
-                            <option value="Historyczne">{t('catalog.categories.historyczne')}</option>
-                            <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
-                            <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
-                            <option value="Poezja">{t('catalog.categories.poezja')}</option>
-                            <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
-                            <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
+                            <option value="">{t('catalog.all_categories')}</option>
+                            <option value="Auf Deutsch">Auf Deutsch</option>
+                            <option value="Belytrystyka polska">Belytrystyka polska</option>
+                            <option value="Belytrystyka zagraniczna">Belytrystyka zagraniczna</option>
+                            <option value="Dziecięce">Dziecięce</option>
+                            <option value="Fantasy | Sci-fi">Fantasy | Sci-fi</option>
+                            <option value="Historyczne">Historyczne</option>
+                            <option value="Kryminał | Thriller">Kryminał | Thriller</option>
+                            <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
+                            <option value="Biografie">Biografie</option>
+                            <option value="Poezja">Poezja</option>
+                            <option value="Poradniki | Popularnonaukowe">Poradniki | Popularnonaukowe</option>
+                            <option value="Reportaże | Podróżnicze">Reportaże | Podróżnicze</option>
                         </select>
+                    </div>
 
+                    <div className="flex flex-col gap-1.5 min-w-[160px]">
+                        <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.filter_status')}</label>
                         <select 
-                            className="px-4 py-3 rounded-full bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-md text-body-md text-on-surface cursor-pointer shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]"
                             value={statusFilter}
                             onChange={(e) => handleStatusChange(e.target.value)}
+                            className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
                         >
-                            <option value="">{t('catalog.status')}</option>
+                            <option value="">{t('catalog.all_status')}</option>
                             <option value="available">{t('catalog.available')}</option>
                             <option value="borrowed">{t('catalog.borrowed')}</option>
                         </select>
                     </div>
-                </div>
 
+                    <button
+                        onClick={() => {setSearch(''); setCategoryFilter(''); setStatusFilter(''); setPage(1);}}
+                        className="font-label-md text-primary px-4 py-2.5 rounded-xl hover:bg-primary/5 transition-colors ml-auto"
+                    >
+                        {t('catalog.clear_filters')}
+                    </button>
+                </div>
+            </section>
+
+            {/* Catalog Grid */}
+            <section className="px-margin-mobile md:px-margin-desktop mb-24">
                 <div className="flex justify-between items-center mb-6 px-1">
                     <span className="font-label-md text-label-md text-on-surface-variant">
                         {t('catalog.current_selection')}
@@ -198,7 +223,7 @@ const Katalog: React.FC = () => {
                                             <span className="material-symbols-outlined text-[64px] text-surface-variant group-hover:scale-110 transition-transform duration-500">book_4</span>
                                         )}
                                         
-                                        <div className="absolute top-3 right-3">
+                                        <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
                                             {book.availability_status === 'available' ? (
                                                 <span className="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-primary/20 shadow-sm">
                                                     {t('catalog.available')}
@@ -207,6 +232,16 @@ const Katalog: React.FC = () => {
                                                 <span className="bg-surface-variant text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant shadow-sm">
                                                     {t('catalog.borrowed')}
                                                 </span>
+                                            )}
+
+                                            {user?.role === 'admin' && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleEditBook(book.id); }}
+                                                    className="bg-secondary text-on-secondary w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+                                                    title="Bearbeiten"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                </button>
                                             )}
                                         </div>
                                     </div>
