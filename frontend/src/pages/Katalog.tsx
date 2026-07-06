@@ -238,7 +238,7 @@ const Katalog: React.FC = () => {
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleEditBook(book.id); }}
                                                     className="bg-secondary text-on-secondary w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
-                                                    title="Bearbeiten"
+                                                    title={t("admin.inventory.edit")}
                                                 >
                                                     <span className="material-symbols-outlined text-[18px]">edit</span>
                                                 </button>

@@ -8,12 +8,16 @@
         "logout": "Wyloguj się"
     },
     "catalog": {
+        "title": "Domowa biblioteka SprachCafé Polnisch",
         "welcome_title": "Witamy w naszej domowej bibliotece – Odkryj radość z języka polskiego",
         "welcome_desc": "Nasza biblioteka to coś więcej niż półka z książkami – to Twoja przytulna \"Trzecia Przestrzeń\" do animacji językowej, wymiany kulturowej i wspólnych doświadczeń. Rozgość się i przeglądaj naszą kolekcję.",
+        "subtitle": "Przeszukuj nasze zbiory i wypożyczaj swoje kolejne książki.",
         "search_placeholder": "Znajdź swoją następną ulubioną książkę lub słuchowisko...",
         "genre": "Gatunek",
         "status": "Status",
         "all": "Wszystkie",
+        "all_categories": "Wszystkie kategorie",
+        "all_status": "Wszystkie statusy",
         "available": "Dostępne",
         "borrowed": "Wypożyczone",
         "current_selection": "Aktualny wybór",
@@ -21,6 +25,9 @@
         "reserve_btn": "Zarezerwuj",
         "details_btn": "Pokaż szczegóły",
         "no_books": "Nie znaleziono książek.",
+        "clear_filters": "Wyczyść filtry",
+        "borrow_success": "Książka została pomyślnie wypożyczona!",
+        "borrow_error": "Błąd podczas wypożyczania.",
         "categories": {
             "deutsch": "Auf Deutsch (Po niemiecku)",
             "belytrystyka_polska": "Polska literatura piękna",
@@ -33,7 +40,7 @@
             "biografie": "Biografie",
             "poezja": "Poezja",
             "poradniki_popularnonaukowe": "Poradniki & Popularnonaukowe",
-            "reportaze_podroznicze": "Reportaże & Podróże"
+            "reportaze_podroznicze": "Reportaż & Podróże"
         },
         "pagination": {
             "showing": "Wyświetlanie {{start}}-{{end}} z {{total}} książek",
@@ -43,6 +50,69 @@
             "prev": "Poprzednia strona",
             "next": "Następna strona",
             "last": "Ostatnia strona"
+        }
+    },
+    "admin": {
+        "dashboard_title": "Panel administratora",
+        "tabs": {
+            "single": "Pojedyncza książka",
+            "edit": "Edytuj książkę",
+            "bibtex": "Import BibTeX",
+            "users": "Zarządzaj użytkownikami",
+            "loans": "Zarządzaj wypożyczeniami",
+            "pages": "Edytuj strony"
+        },
+        "book_form": {
+            "title": "Tytuł",
+            "author": "Autor",
+            "category": "Kategoria",
+            "select_category": "Wybierz kategorię",
+            "year": "Rok",
+            "publisher": "Wydawnictwo",
+            "isbn": "ISBN",
+            "signature": "Sygnatura (automatycznie jeśli puste)",
+            "description": "Opis",
+            "cover": "Okładka",
+            "current_cover": "Aktualna okładka",
+            "add_btn": "Dodaj książkę",
+            "save_btn": "Zapisz",
+            "cancel_btn": "Anuluj",
+            "success_add": "Książka została pomyślnie dodana!",
+            "success_update": "Książka została pomyślnie zaktualizowana!",
+            "error_save": "Błąd podczas zapisywania: "
+        },
+        "bibtex": {
+            "batch_category": "Wspólna kategoria dla tego importu",
+            "content_label": "Zawartość BibTeX",
+            "parse_btn": "Parasuj i podejrzyj",
+            "preview_title": "Podgląd ({{count}} książek)",
+            "import_selected": "Importuj wybrane",
+            "selected_info": "Wybrano {{selected}} z {{total}} książek",
+            "success_import": "Pomyślnie zaimportowano {{count}} książek!",
+            "error_import": "Błąd podczas importu: ",
+            "error_parse": "Błąd podczas parsowania zawartości BibTeX.",
+            "col_title": "Tytuł *",
+            "col_author": "Autor",
+            "col_category": "Kategoria",
+            "col_year": "Rok",
+            "col_isbn": "ISBN",
+            "col_publisher_desc": "Wydawca / Opis",
+            "col_actions": "Akcje",
+            "title_required": "Tytuł jest wymagany",
+            "remove_tooltip": "Usuń z listy"
+        },
+        "inventory": {
+            "title": "Zasoby książek",
+            "search_placeholder": "Szukaj...",
+            "no_books": "Nie znaleziono książek.",
+            "col_signature": "Sygnatura",
+            "col_title": "Tytuł",
+            "col_author": "Autor",
+            "col_actions": "Akcje",
+            "edit": "Edytuj",
+            "delete": "Usuń",
+            "delete_confirm": "Czy na pewno chcesz usunąć tę książkę?",
+            "pagination_info": "Strona {{page}} z {{totalPages}}"
         }
     },
     "auth": {

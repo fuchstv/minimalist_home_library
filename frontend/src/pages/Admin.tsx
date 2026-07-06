@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { parseBibTeX } from '../utils/bibtexParser';
 import AdminPages from './AdminPages';
@@ -34,6 +35,7 @@ interface PreviewBook {
 }
 
 const Admin: React.FC = () => {
+    const { t } = useTranslation();
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
@@ -165,7 +167,7 @@ const Admin: React.FC = () => {
                 credentials: 'include'
             });
             if (response.ok) {
-                alert(editingBookId ? 'Buch erfolgreich aktualisiert!' : 'Buch erfolgreich hinzugefügt!');
+                alert(editingBookId ? t('admin.book_form.success_update') : t('admin.book_form.success_add'));
                 resetForm();
                 fetchBooks();
                 if (editingBookId) {
@@ -173,16 +175,16 @@ const Admin: React.FC = () => {
                 }
             } else {
                 const errorData = await response.json();
-                alert('Fehler beim Speichern: ' + errorData.message);
+                alert(t('admin.book_form.error_save') + errorData.message);
             }
         } catch (error) {
             console.error('Error saving book:', error);
-            alert('Ein Netzwerkfehler ist aufgetreten.');
+            alert(t('admin.book_form.error_save'));
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('Möchten Sie dieses Buch wirklich löschen?')) return;
+        if (!confirm(t('admin.inventory.delete_confirm'))) return;
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, {
                 method: 'DELETE',
@@ -212,7 +214,7 @@ const Admin: React.FC = () => {
             }));
             setPreviewBooks(previewData);
         } catch (error) {
-            alert('Fehler beim Parsen des BibTeX-Inhalts.');
+            alert(t('admin.bibtex.error_parse'));
             console.error(error);
         }
     };
@@ -220,7 +222,7 @@ const Admin: React.FC = () => {
     const handleImportSelected = async () => {
         const selected = previewBooks.filter(b => b.selected);
         if (selected.length === 0) {
-            alert('Bitte wählen Sie mindestens ein Buch aus.');
+            alert(t('admin.bibtex.error_import') + 'None selected');
             return;
         }
 
@@ -234,17 +236,17 @@ const Admin: React.FC = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                alert(`Erfolgreich ${result.count} Bücher importiert!`);
+                alert(t('admin.bibtex.success_import', { count: result.count }));
                 setPreviewBooks([]);
                 setBibtexText('');
                 fetchBooks();
             } else {
                 const errorData = await response.json();
-                alert('Fehler beim Import: ' + errorData.message);
+                alert(t('admin.bibtex.error_import') + errorData.message);
             }
         } catch (error) {
             console.error('Error importing books:', error);
-            alert('Ein Netzwerkfehler ist aufgetreten.');
+            alert(t('admin.bibtex.error_import'));
         }
     };
 
@@ -258,7 +260,7 @@ const Admin: React.FC = () => {
 
     return (
         <div className="flex-grow p-margin-mobile md:p-margin-desktop bg-surface flex flex-col gap-8">
-            <h1 className="font-headline-lg text-headline-lg">Admin Dashboard</h1>
+            <h1 className="font-headline-lg text-headline-lg">{t('admin.dashboard_title')}</h1>
 
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
                 <div className="flex border-b border-outline-variant mb-6 overflow-x-auto">
@@ -266,31 +268,31 @@ const Admin: React.FC = () => {
                         onClick={() => { setActiveTab('single'); resetForm(); navigate('/admin'); }}
                         className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'single' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
-                        {editingBookId ? 'Buch bearbeiten' : 'Einzelnes Buch'}
+                        {editingBookId ? t('admin.tabs.edit') : t('admin.tabs.single')}
                     </button>
                     <button
                         onClick={() => setActiveTab('bibtex')}
                         className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'bibtex' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
-                        BibTeX Import
+                        {t('admin.tabs.bibtex')}
                     </button>
                     <button
                         onClick={() => setActiveTab('users')}
                         className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'users' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
-                        Nutzer verwalten
+                        {t('admin.tabs.users')}
                     </button>
                     <button
                         onClick={() => setActiveTab('loans')}
                         className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'loans' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
-                        Ausleihen verwalten
+                        {t('admin.tabs.loans')}
                     </button>
                     <button
                         onClick={() => setActiveTab('pages')}
                         className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'pages' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
-                        Seiten bearbeiten
+                        {t('admin.tabs.pages')}
                     </button>
                 </div>
 
@@ -303,55 +305,56 @@ const Admin: React.FC = () => {
                 ) : activeTab === 'single' ? (
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="font-label-md block mb-1">Titel</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.title')}</label>
                             <input value={title} onChange={e => setTitle(e.target.value)} required className="w-full border border-outline-variant rounded p-2" />
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">Autor</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.author')}</label>
                             <input value={author} onChange={e => setAuthor(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">Kategorie</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.category')}</label>
                             <select value={category} onChange={e => setCategory(e.target.value)} className="w-full border border-outline-variant rounded p-2 bg-surface">
-                                <option value="">Wähle eine Kategorie</option>
-                                <option value="Auf Deutsch">Auf Deutsch</option>
-                                <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                <option value="Dziecięce">Kinder & Jugend</option>
-                                <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
-                                <option value="Historyczne">Historische Romane</option>
-                                <option value="Kryminał | Thriller">Krimi & Thriller</option>
-                                <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                                <option value="Biografie">Biografien</option>
-                                <option value="Poezja">Lyrik & Poesie</option>
-                                <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
-                                <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
+                                <option value="">{t('admin.book_form.select_category')}</option>
+                                <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
+                                <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
+                                <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_zagraniczna')}</option>
+                                <option value="Dziecięce">{t('catalog.categories.dzieciece')}</option>
+                                <option value="Fantasy | Sci-fi">{t('catalog.categories.fantasy_scifi')}</option>
+                                <option value="Historyczne">{t('catalog.categories.historyczne')}</option>
+                                <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
+                                <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
+                                <option value="Biografie">{t('catalog.categories.biografie')}</option>
+                                <option value="Poezja">{t('catalog.categories.poezja')}</option>
+                                <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
+                                <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
                             </select>
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">Jahr</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.year')}</label>
                             <input value={publicationYear} onChange={e => setPublicationYear(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">Verlag</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.publisher')}</label>
                             <input value={publisher} onChange={e => setPublisher(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">ISBN</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.isbn')}</label>
                             <input value={isbn} onChange={e => setIsbn(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">Signatur (automatisch wenn leer)</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.signature')}</label>
                             <input value={signature} onChange={e => setSignature(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="font-label-md block mb-1">Beschreibung</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.description')}</label>
                             <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-outline-variant rounded p-2 h-24" />
                         </div>
                         <div>
-                            <label className="font-label-md block mb-1">Cover Bild</label>
+                            <label className="font-label-md block mb-1">{t('admin.book_form.cover')}</label>
                             {existingCoverImage && !coverImage && (
                                 <div className="mb-2">
+                                    <p className="text-xs mb-1">{t('admin.book_form.current_cover')}:</p>
                                     <img src={`${API_BASE_URL}/${existingCoverImage}`} alt="Aktuelles Cover" className="h-20 w-auto rounded border" />
                                 </div>
                             )}
@@ -360,40 +363,40 @@ const Admin: React.FC = () => {
                         <div className="md:col-span-2 flex justify-end gap-2">
                             {editingBookId && (
                                 <button type="button" onClick={() => { resetForm(); navigate('/admin'); }} className="border border-outline text-on-surface py-2 px-8 rounded-md hover:bg-surface-variant transition-colors font-label-md">
-                                    Abbrechen
+                                    {t('admin.book_form.cancel_btn')}
                                 </button>
                             )}
                             <button type="submit" className="bg-primary text-on-primary py-2 px-8 rounded-md hover:bg-primary/90 transition-colors font-label-md shadow-sm">
-                                {editingBookId ? 'Speichern' : 'Buch hinzufügen'}
+                                {editingBookId ? t('admin.book_form.save_btn') : t('admin.book_form.add_btn')}
                             </button>
                         </div>
                     </form>
                 ) : (
                     <div className="flex flex-col gap-6">
                         <div>
-                            <label className="font-label-md block mb-1">Gemeinsame Kategorie für diesen Import</label>
+                            <label className="font-label-md block mb-1">{t('admin.bibtex.batch_category')}</label>
                             <select
                                 value={batchCategory}
                                 onChange={e => setBatchCategory(e.target.value)}
                                 className="w-full border border-outline-variant rounded p-2 bg-surface max-w-md"
                             >
-                                <option value="Auf Deutsch">Auf Deutsch</option>
-                                <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                <option value="Dziecięce">Kinder & Jugend</option>
-                                <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
-                                <option value="Historyczne">Historische Romane</option>
-                                <option value="Kryminał | Thriller">Krimi & Thriller</option>
-                                <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                                <option value="Biografie">Biografien</option>
-                                <option value="Poezja">Lyrik & Poesie</option>
-                                <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
-                                <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
+                                <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
+                                <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
+                                <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_zagraniczna')}</option>
+                                <option value="Dziecięce">{t('catalog.categories.dzieciece')}</option>
+                                <option value="Fantasy | Sci-fi">{t('catalog.categories.fantasy_scifi')}</option>
+                                <option value="Historyczne">{t('catalog.categories.historyczne')}</option>
+                                <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
+                                <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
+                                <option value="Biografie">{t('catalog.categories.biografie')}</option>
+                                <option value="Poezja">{t('catalog.categories.poezja')}</option>
+                                <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
+                                <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="font-label-md block mb-1">BibTeX Inhalt</label>
+                            <label className="font-label-md block mb-1">{t('admin.bibtex.content_label')}</label>
                             <textarea
                                 value={bibtexText}
                                 onChange={e => setBibtexText(e.target.value)}
@@ -407,13 +410,13 @@ const Admin: React.FC = () => {
                                 onClick={handleBibtexProcess}
                                 className="bg-secondary text-on-secondary py-2 px-8 rounded-md hover:bg-secondary/90 transition-colors font-label-md shadow-sm cursor-pointer"
                             >
-                                Parsen & Vorschau
+                                {t('admin.bibtex.parse_btn')}
                             </button>
                         </div>
 
                         {previewBooks.length > 0 && (
                             <div className="mt-8 border-t pt-8">
-                                <h3 className="font-headline-sm text-headline-sm mb-4">Vorschau ({previewBooks.length} Bücher)</h3>
+                                <h3 className="font-headline-sm text-headline-sm mb-4">{t('admin.bibtex.preview_title', { count: previewBooks.length })}</h3>
                                 <div className="overflow-x-auto border border-outline-variant rounded-lg">
                                     <table className="w-full text-left border-collapse min-w-[800px]">
                                         <thead>
@@ -426,13 +429,13 @@ const Admin: React.FC = () => {
                                                         className="w-4 h-4"
                                                     />
                                                 </th>
-                                                <th className="p-2 border-b font-label-sm">Titel *</th>
-                                                <th className="p-2 border-b font-label-sm">Autor</th>
-                                                <th className="p-2 border-b font-label-sm">Kategorie</th>
-                                                <th className="p-2 border-b font-label-sm">Jahr</th>
-                                                <th className="p-2 border-b font-label-sm">ISBN</th>
-                                                <th className="p-2 border-b font-label-sm">Verlag / Beschr.</th>
-                                                <th className="p-2 border-b font-label-sm">Aktionen</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_title')}</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_author')}</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_category')}</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_year')}</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_isbn')}</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_publisher_desc')}</th>
+                                                <th className="p-2 border-b font-label-sm">{t('admin.bibtex.col_actions')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -455,14 +458,14 @@ const Admin: React.FC = () => {
                                                                 className={`w-full border rounded p-1 text-sm ${titleError ? 'border-error' : 'border-outline-variant'}`}
                                                             />
                                                             {titleError && (
-                                                                <span className="text-[10px] text-error font-label-sm block mt-0.5">Titel ist erforderlich</span>
+                                                                <span className="text-[10px] text-error font-label-sm block mt-0.5">{t('admin.bibtex.title_required')}</span>
                                                             )}
                                                         </td>
                                                         <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.author}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
-                                                                placeholder="Autor"
+                                                                placeholder={t('admin.bibtex.col_author')}
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm"
                                                             />
                                                         </td>
@@ -472,25 +475,25 @@ const Admin: React.FC = () => {
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm bg-surface"
                                                             >
-                                                                <option value="Auf Deutsch">Auf Deutsch</option>
-                                                                <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                                                <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                                                <option value="Dziecięce">Kinder & Jugend</option>
-                                                                <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
-                                                                <option value="Historyczne">Historische Romane</option>
-                                                                <option value="Kryminał | Thriller">Krimi & Thriller</option>
-                                                                <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                                                                <option value="Biografie">Biografien</option>
-                                                                <option value="Poezja">Lyrik & Poesie</option>
-                                                                <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
-                                                                <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
+                                                                <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
+                                                                <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
+                                                                <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_zagraniczna')}</option>
+                                                                <option value="Dziecięce">{t('catalog.categories.dzieciece')}</option>
+                                                                <option value="Fantasy | Sci-fi">{t('catalog.categories.fantasy_scifi')}</option>
+                                                                <option value="Historyczne">{t('catalog.categories.historyczne')}</option>
+                                                                <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
+                                                                <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
+                                                                <option value="Biografie">{t('catalog.categories.biografie')}</option>
+                                                                <option value="Poezja">{t('catalog.categories.poezja')}</option>
+                                                                <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
+                                                                <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
                                                             </select>
                                                         </td>
                                                         <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.publication_year}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'publication_year', e.target.value)}
-                                                                placeholder="Jahr"
+                                                                placeholder={t('admin.bibtex.col_year')}
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm text-center"
                                                             />
                                                         </td>
@@ -498,7 +501,7 @@ const Admin: React.FC = () => {
                                                             <input
                                                                 value={book.isbn}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'isbn', e.target.value)}
-                                                                placeholder="ISBN"
+                                                                placeholder={t('admin.bibtex.col_isbn')}
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm font-mono"
                                                             />
                                                         </td>
@@ -507,13 +510,13 @@ const Admin: React.FC = () => {
                                                                 <input
                                                                     value={book.publisher}
                                                                     onChange={(e) => handlePreviewBookChange(book.tempId, 'publisher', e.target.value)}
-                                                                    placeholder="Verlag"
+                                                                    placeholder={t('admin.book_form.publisher')}
                                                                     className="w-full border border-outline-variant rounded p-1 text-xs"
                                                                 />
                                                                 <textarea
                                                                     value={book.description}
                                                                     onChange={(e) => handlePreviewBookChange(book.tempId, 'description', e.target.value)}
-                                                                    placeholder="Beschreibung"
+                                                                    placeholder={t('admin.book_form.description')}
                                                                     className="w-full border border-outline-variant rounded p-1 text-xs h-10 resize-y"
                                                                 />
                                                             </div>
@@ -522,7 +525,7 @@ const Admin: React.FC = () => {
                                                             <button
                                                                 onClick={() => setPreviewBooks(prev => prev.filter(b => b.tempId !== book.tempId))}
                                                                 className="text-error hover:text-error/80 cursor-pointer p-1"
-                                                                title="Aus Liste entfernen"
+                                                                title={t('admin.bibtex.remove_tooltip')}
                                                             >
                                                                 <span className="material-symbols-outlined text-[18px]">delete</span>
                                                             </button>
@@ -536,13 +539,13 @@ const Admin: React.FC = () => {
 
                                 <div className="mt-4 flex items-center justify-end gap-4">
                                     <span className="text-body-sm text-on-surface-variant">
-                                        {previewBooks.filter(b => b.selected).length} von {previewBooks.length} Büchern ausgewählt
+                                        {t('admin.bibtex.selected_info', { selected: previewBooks.filter(b => b.selected).length, total: previewBooks.length })}
                                     </span>
                                     <button
                                         onClick={handleImportSelected}
                                         className="bg-primary text-on-primary py-2.5 px-6 rounded-md hover:bg-primary/90 transition-colors font-label-md shadow-sm cursor-pointer"
                                     >
-                                        Ausgewählte importieren
+                                        {t('admin.bibtex.import_selected')}
                                     </button>
                                 </div>
                             </div>
@@ -553,12 +556,12 @@ const Admin: React.FC = () => {
 
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-                    <h2 className="font-headline-md text-headline-md">Buchbestand</h2>
+                    <h2 className="font-headline-md text-headline-md">{t('admin.inventory.title')}</h2>
                     <div className="relative max-w-sm w-full">
                         <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
                         <input
                             type="text"
-                            placeholder="Suchen..."
+                            placeholder={t('admin.inventory.search_placeholder')}
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                             className="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-full text-body-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -569,16 +572,16 @@ const Admin: React.FC = () => {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b">
-                                <th className="p-2 font-label-md">Signatur</th>
-                                <th className="p-2 font-label-md">Titel</th>
-                                <th className="p-2 font-label-md">Autor</th>
-                                <th className="p-2 font-label-md text-right">Aktionen</th>
+                                <th className="p-2 font-label-md">{t('admin.inventory.col_signature')}</th>
+                                <th className="p-2 font-label-md">{t('admin.inventory.col_title')}</th>
+                                <th className="p-2 font-label-md">{t('admin.inventory.col_author')}</th>
+                                <th className="p-2 font-label-md text-right">{t('admin.inventory.col_actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {books.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="p-4 text-center text-on-surface-variant">Keine Bücher gefunden.</td>
+                                    <td colSpan={4} className="p-4 text-center text-on-surface-variant">{t('admin.inventory.no_books')}</td>
                                 </tr>
                             ) : (
                                 books.map(b => (
@@ -587,8 +590,8 @@ const Admin: React.FC = () => {
                                         <td className="p-2 font-body-sm">{b.title}</td>
                                         <td className="p-2 font-body-sm">{b.author}</td>
                                         <td className="p-2 font-body-sm text-right whitespace-nowrap">
-                                            <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">Bearbeiten</button>
-                                            <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">Löschen</button>
+                                            <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.inventory.edit')}</button>
+                                            <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.inventory.delete')}</button>
                                         </td>
                                     </tr>
                                 ))
@@ -606,7 +609,7 @@ const Admin: React.FC = () => {
                         >
                             <span className="material-symbols-outlined text-sm">chevron_left</span>
                         </button>
-                        <span className="text-body-sm">Seite {page} von {totalPages}</span>
+                        <span className="text-body-sm">{t('admin.inventory.pagination_info', { page, totalPages })}</span>
                         <button
                             disabled={page === totalPages}
                             onClick={() => setPage(p => Math.min(p + 1, totalPages))}

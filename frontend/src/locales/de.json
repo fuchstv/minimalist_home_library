@@ -8,12 +8,16 @@
         "logout": "Abmelden"
     },
     "catalog": {
+        "title": "Hausbibliothek des SprachCafé Polnisch",
         "welcome_title": "Willkommen in unserer Hausbibliothek – Entdecke die Freude am Polnischen",
         "welcome_desc": "Unsere Bibliothek ist mehr als nur ein Bücherregal – sie ist dein gemütlicher 'Third Space' für Sprachanimation, kulturellen Austausch und gemeinsame Erlebnisse. Mach es dir bequem und stöbere durch unsere Sammlung.",
+        "subtitle": "Durchsuche unseren Bestand und leihe dir deine nächsten Bücher aus.",
         "search_placeholder": "Finde dein nächstes Lieblingsbuch oder Hörspiel...",
         "genre": "Genre",
         "status": "Status",
         "all": "Alle",
+        "all_categories": "Alle Kategorien",
+        "all_status": "Alle Status",
         "available": "Verfügbar",
         "borrowed": "Ausgeliehen",
         "current_selection": "Aktuelle Auswahl",
@@ -21,6 +25,9 @@
         "reserve_btn": "Vormerken",
         "details_btn": "Details anzeigen",
         "no_books": "Keine Bücher gefunden.",
+        "clear_filters": "Filter zurücksetzen",
+        "borrow_success": "Buch erfolgreich ausgeliehen!",
+        "borrow_error": "Fehler beim Ausleihen.",
         "categories": {
             "deutsch": "Auf Deutsch",
             "belytrystyka_polska": "Polnische Belletristik",
@@ -43,6 +50,69 @@
             "prev": "Vorherige Seite",
             "next": "Nächste Seite",
             "last": "Letzte Seite"
+        }
+    },
+    "admin": {
+        "dashboard_title": "Admin Dashboard",
+        "tabs": {
+            "single": "Einzelnes Buch",
+            "edit": "Buch bearbeiten",
+            "bibtex": "BibTeX Import",
+            "users": "Nutzer verwalten",
+            "loans": "Ausleihen verwalten",
+            "pages": "Seiten bearbeiten"
+        },
+        "book_form": {
+            "title": "Titel",
+            "author": "Autor",
+            "category": "Kategorie",
+            "select_category": "Wähle eine Kategorie",
+            "year": "Jahr",
+            "publisher": "Verlag",
+            "isbn": "ISBN",
+            "signature": "Signatur (automatisch wenn leer)",
+            "description": "Beschreibung",
+            "cover": "Cover Bild",
+            "current_cover": "Aktuelles Cover",
+            "add_btn": "Buch hinzufügen",
+            "save_btn": "Speichern",
+            "cancel_btn": "Abbrechen",
+            "success_add": "Buch erfolgreich hinzugefügt!",
+            "success_update": "Buch erfolgreich aktualisiert!",
+            "error_save": "Fehler beim Speichern: "
+        },
+        "bibtex": {
+            "batch_category": "Gemeinsame Kategorie für diesen Import",
+            "content_label": "BibTeX Inhalt",
+            "parse_btn": "Parsen & Vorschau",
+            "preview_title": "Vorschau ({{count}} Bücher)",
+            "import_selected": "Ausgewählte importieren",
+            "selected_info": "{{selected}} von {{total}} Büchern ausgewählt",
+            "success_import": "Erfolgreich {{count}} Bücher importiert!",
+            "error_import": "Fehler beim Import: ",
+            "error_parse": "Fehler beim Parsen des BibTeX-Inhalts.",
+            "col_title": "Titel *",
+            "col_author": "Autor",
+            "col_category": "Kategorie",
+            "col_year": "Jahr",
+            "col_isbn": "ISBN",
+            "col_publisher_desc": "Verlag / Beschr.",
+            "col_actions": "Aktionen",
+            "title_required": "Titel ist erforderlich",
+            "remove_tooltip": "Aus Liste entfernen"
+        },
+        "inventory": {
+            "title": "Buchbestand",
+            "search_placeholder": "Suchen...",
+            "no_books": "Keine Bücher gefunden.",
+            "col_signature": "Signatur",
+            "col_title": "Titel",
+            "col_author": "Autor",
+            "col_actions": "Aktionen",
+            "edit": "Bearbeiten",
+            "delete": "Löschen",
+            "delete_confirm": "Möchten Sie dieses Buch wirklich löschen?",
+            "pagination_info": "Seite {{page}} von {{totalPages}}"
         }
     },
     "auth": {
