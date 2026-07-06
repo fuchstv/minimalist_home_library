@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -11,12 +12,13 @@ interface PageData {
 }
 
 const AdminPages: React.FC = () => {
+    const { t } = useTranslation();
     const [pages, setPages] = useState<PageData[]>([]);
     const [selectedPage, setSelectedPage] = useState<PageData | null>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
 
-    const fetchPages = useCallback(async () => {
+        const fetchPages = useCallback(async () => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/admin/pages`, { withCredentials: true });
             setPages(response.data);
@@ -28,6 +30,7 @@ const AdminPages: React.FC = () => {
     }, []);
 
     useEffect(() => {
+                                /* eslint-disable-next-line react-hooks/set-state-in-effect */
         fetchPages();
     }, [fetchPages]);
 
@@ -35,16 +38,16 @@ const AdminPages: React.FC = () => {
         if (!selectedPage) return;
         try {
             await axios.post(`${API_BASE_URL}/api/admin/pages/${selectedPage.slug}`, selectedPage, { withCredentials: true });
-            setMessage('Seite erfolgreich gespeichert!');
-            fetchPages();
+            setMessage(t('admin.pages.save_success'));
+                            fetchPages();
             setTimeout(() => setMessage(''), 3000);
         } catch (error) {
             console.error('Error saving page:', error);
-            setMessage('Fehler beim Speichern.');
+            setMessage(t('admin.pages.save_error'));
         }
     };
 
-    if (loading) return <div>Laden...</div>;
+    if (loading) return <div>{t('admin.pages.loading')}</div>;
 
     return (
         <div className="flex flex-col gap-6">
@@ -62,7 +65,7 @@ const AdminPages: React.FC = () => {
 
             {selectedPage && (
                 <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-4">
-                    <h2 className="font-headline-sm text-headline-sm mb-2">Seite bearbeiten: {selectedPage.slug}</h2>
+                    <h2 className="font-headline-sm text-headline-sm mb-2">{t('admin.pages.edit_title', { slug: selectedPage.slug })}</h2>
 
                     {message && (
                         <div className={`p-3 rounded text-body-sm ${message.includes('Fehler') ? 'bg-error-container text-on-error-container' : 'bg-secondary-container text-on-secondary-container'}`}>
@@ -72,9 +75,9 @@ const AdminPages: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="flex flex-col gap-4">
-                            <h3 className="font-title-md border-b pb-1">Deutsch</h3>
+                            <h3 className="font-title-md border-b pb-1">{t("admin.pages.german")}</h3>
                             <div>
-                                <label htmlFor="title_de" className="font-label-sm block mb-1">Titel (DE)</label>
+                                <label htmlFor="title_de" className="font-label-sm block mb-1">{t("admin.pages.title_de")}</label>
                                 <input
                                     id="title_de"
                                     type="text"
@@ -84,7 +87,7 @@ const AdminPages: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="content_de" className="font-label-sm block mb-1">Inhalt (DE)</label>
+                                <label htmlFor="content_de" className="font-label-sm block mb-1">{t("admin.pages.content_de")}</label>
                                 <textarea
                                     id="content_de"
                                     value={selectedPage.content_de}
@@ -95,9 +98,9 @@ const AdminPages: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col gap-4">
-                            <h3 className="font-title-md border-b pb-1">Polnisch</h3>
+                            <h3 className="font-title-md border-b pb-1">{t("admin.pages.polish")}</h3>
                             <div>
-                                <label htmlFor="title_pl" className="font-label-sm block mb-1">Titel (PL)</label>
+                                <label htmlFor="title_pl" className="font-label-sm block mb-1">{t("admin.pages.title_pl")}</label>
                                 <input
                                     id="title_pl"
                                     type="text"
@@ -107,7 +110,7 @@ const AdminPages: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="content_pl" className="font-label-sm block mb-1">Inhalt (PL)</label>
+                                <label htmlFor="content_pl" className="font-label-sm block mb-1">{t("admin.pages.content_pl")}</label>
                                 <textarea
                                     id="content_pl"
                                     value={selectedPage.content_pl}
