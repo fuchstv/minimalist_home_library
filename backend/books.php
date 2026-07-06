@@ -7,10 +7,14 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method == 'GET') {
     // Check if a specific ID is requested
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    // Remove /api prefix if present for uniform processing
+    $path = preg_replace('/^\/api/', '', $path);
     $parts = explode('/', trim($path, '/'));
     $id = null;
-    if (count($parts) > 2 && is_numeric($parts[2])) {
-        $id = $parts[2];
+
+    // Path is now /books/{id}
+    if (count($parts) >= 2 && $parts[0] === 'books' && is_numeric($parts[1])) {
+        $id = $parts[1];
     }
 
     if ($id) {

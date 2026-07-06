@@ -9,7 +9,7 @@ $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if ($method == 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (strpos($path, '/login') !== false) {
+    if (strpos($path, '/auth/login') !== false) {
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
@@ -33,7 +33,7 @@ if ($method == 'POST') {
             http_response_code(401);
             echo json_encode(["message" => "Invalid credentials"]);
         }
-    } elseif (strpos($path, '/register') !== false) {
+    } elseif (strpos($path, '/auth/register') !== false) {
         $name = $data['name'] ?? '';
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
@@ -63,11 +63,11 @@ if ($method == 'POST') {
             http_response_code(400);
             echo json_encode(["message" => "Email already exists or invalid data"]);
         }
-    } elseif (strpos($path, '/logout') !== false) {
+    } elseif (strpos($path, '/auth/logout') !== false) {
         session_destroy();
         echo json_encode(["message" => "Logout successful"]);
     }
-} elseif ($method == 'GET' && strpos($path, '/me') !== false) {
+} elseif ($method == 'GET' && strpos($path, '/auth/me') !== false) {
     if (isset($_SESSION['user_id'])) {
         $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE id = ?");
         $stmt->execute([$_SESSION['user_id']]);
