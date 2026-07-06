@@ -69,8 +69,9 @@ cd <repo-dir>
 
 # Create .env file with production secrets
 cat <<EOT > .env
-DB_USER=library_prod_user
-DB_PASS=ZFMwWwWoQ52qJrii
+MYSQL_USER=library_prod_user
+MYSQL_PASSWORD=ZFMwWwWoQ52qJrii
+MYSQL_DATABASE=library_db
 MYSQL_ROOT_PASSWORD=AljO2D1aBnyb4sQ0
 ALLOWED_ORIGINS=http://<your-instance-ip>,https://<your-domain>
 VITE_API_URL=
@@ -81,6 +82,20 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### 4. Firewall
 In the Lightsail console under **Networking**, ensure port 80 (HTTP) and 443 (HTTPS) are open.
+
+## Troubleshooting: Database User Issues
+If you are re-deploying or changing the `.env` file after the database volume has already been initialized, the MySQL container will **not** automatically create the new user or change the password. This is because the initialization scripts only run on an empty volume.
+
+To fix this, you must manually create the user via the MySQL console:
+```bash
+# Enter the database container
+docker exec -it <container_id_or_name> mysql -u root -p
+
+# Inside MySQL:
+CREATE USER 'library_prod_user'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON library_db.* TO 'library_prod_user'@'%';
+FLUSH PRIVILEGES;
+```
 
 ## Persistent Data
 - **Uploads**: The `uploads_data` volume in `docker-compose.prod.yml` ensures that book covers are not lost when the backend container restarts.
