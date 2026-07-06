@@ -107,8 +107,13 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             $pdo->beginTransaction();
             if ($id) {
                 // Update
-                $sql = "UPDATE books SET title = ?, author = ?, category = ?, publication_year = ?, publisher = ?, isbn = ?, description = ?, signature = ?";
-                $params = [$title, $author, $category, $publication_year, $publisher, $isbn, $description, $signature];
+                $sql = "UPDATE books SET title = ?, author = ?, category = ?, publication_year = ?, publisher = ?, isbn = ?, description = ?";
+                $params = [$title, $author, $category, $publication_year, $publisher, $isbn, $description];
+
+                if (!empty(trim($signature))) {
+                    $sql .= ", signature = ?";
+                    $params[] = trim($signature);
+                }
 
                 if ($cover_image) {
                     $sql .= ", cover_image = ?";
