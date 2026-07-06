@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { parseBibTeX } from '../utils/bibtexParser';
 import AdminPages from './AdminPages';
@@ -13,6 +13,11 @@ interface Book {
     author: string;
     category: string;
     signature?: string;
+    publisher?: string;
+    publication_year?: string;
+    isbn?: string;
+    description?: string;
+    cover_image?: string;
 }
 
 interface PreviewBook {
@@ -31,12 +36,20 @@ interface PreviewBook {
 const Admin: React.FC = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation();
     const [books, setBooks] = useState<Book[]>([]);
     
+    // Pagination and search for admin book list
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [search, setSearch] = useState('');
+    const limit = 20;
+
     // Tab state
     const [activeTab, setActiveTab] = useState<'single' | 'bibtex' | 'users' | 'loans' | 'pages'>('single');
     
-    // Form state
+    // Form state (also used for editing)
+    const [editingBookId, setEditingBookId] = useState<number | null>(null);
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [category, setCategory] = useState('');
@@ -44,7 +57,9 @@ const Admin: React.FC = () => {
     const [publicationYear, setPublicationYear] = useState('');
     const [isbn, setIsbn] = useState('');
     const [description, setDescription] = useState('');
+    const [signature, setSignature] = useState('');
     const [coverImage, setCoverImage] = useState<File | null>(null);
+    const [existingCoverImage, setExistingCoverImage] = useState<string | null>(null);
 
     // BibTeX Import State
     const [bibtexText, setBibtexText] = useState('');
@@ -53,13 +68,19 @@ const Admin: React.FC = () => {
 
     const fetchBooks = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/books`, { credentials: 'include' });
-            const data = await response.json();
-            setBooks((data.data || []).slice(0, 100)); // Show last 100 for brevity
+            const queryParams = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+                search: search
+            });
+            const response = await fetch(`${API_BASE_URL}/api/books?${queryParams}`, { credentials: 'include' });
+            const result = await response.json();
+            setBooks(result.data || []);
+            setTotalPages(result.meta?.totalPages || 1);
         } catch (error) {
             console.error('Error fetching books:', error);
         }
-    }, []);
+    }, [page, search]);
 
     useEffect(() => {
         if (!user || user.role !== 'admin') {
@@ -68,6 +89,55 @@ const Admin: React.FC = () => {
             fetchBooks();
         }
     }, [user, navigate, fetchBooks]);
+
+    const handleEdit = useCallback((book: Book) => {
+        setEditingBookId(book.id);
+        setTitle(book.title);
+        setAuthor(book.author);
+        setCategory(book.category);
+        setPublisher(book.publisher || '');
+        setPublicationYear(book.publication_year || '');
+        setIsbn(book.isbn || '');
+        setDescription(book.description || '');
+        setSignature(book.signature || '');
+        setExistingCoverImage(book.cover_image || null);
+        setActiveTab('single');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
+
+    // Handle deep link to edit a book
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const editId = params.get('editId');
+        if (editId && user?.role === 'admin') {
+            const fetchBookAndEdit = async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/books/${editId}`, { credentials: 'include' });
+                    if (response.ok) {
+                        const book = await response.json();
+                        handleEdit(book);
+                    }
+                } catch (error) {
+                    console.error('Error fetching book for edit:', error);
+                }
+            };
+            fetchBookAndEdit();
+        }
+    }, [location.search, user, handleEdit]);
+
+    const resetForm = () => {
+        setEditingBookId(null);
+        setTitle('');
+        setAuthor('');
+        setCategory('');
+        setPublisher('');
+        setPublicationYear('');
+        setIsbn('');
+        setDescription('');
+        setSignature('');
+        setCoverImage(null);
+        setExistingCoverImage(null);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -79,35 +149,40 @@ const Admin: React.FC = () => {
         formData.append('publication_year', publicationYear);
         formData.append('isbn', isbn);
         formData.append('description', description);
+        formData.append('signature', signature);
         if (coverImage) {
             formData.append('cover_image', coverImage);
         }
 
+        const url = editingBookId
+            ? `${API_BASE_URL}/api/admin/books/${editingBookId}`
+            : `${API_BASE_URL}/api/admin/books`;
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/books`, {
+            const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
             });
             if (response.ok) {
-                alert('Buch erfolgreich hinzugefügt!');
-                setTitle('');
-                setAuthor('');
-                setCategory('');
-                setPublisher('');
-                setPublicationYear('');
-                setIsbn('');
-                setDescription('');
-                setCoverImage(null);
+                alert(editingBookId ? 'Buch erfolgreich aktualisiert!' : 'Buch erfolgreich hinzugefügt!');
+                resetForm();
                 fetchBooks();
+                if (editingBookId) {
+                    navigate('/admin'); // Clear query params
+                }
+            } else {
+                const errorData = await response.json();
+                alert('Fehler beim Speichern: ' + errorData.message);
             }
         } catch (error) {
-            console.error('Error adding book:', error);
+            console.error('Error saving book:', error);
+            alert('Ein Netzwerkfehler ist aufgetreten.');
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm('Buch wirklich löschen?')) return;
+        if (!confirm('Möchten Sie dieses Buch wirklich löschen?')) return;
         try {
             const response = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, {
                 method: 'DELETE',
@@ -121,23 +196,24 @@ const Admin: React.FC = () => {
         }
     };
 
-    const handleParseBibTeX = () => {
+    const handleBibtexProcess = () => {
         try {
             const parsed = parseBibTeX(bibtexText);
-            const previewData: PreviewBook[] = parsed.map((b) => ({
-                tempId: Math.random().toString(36).substr(2, 9),
-                title: b.title || '',
-                author: b.author || '',
+            const previewData: PreviewBook[] = parsed.map((b, index) => ({
+                tempId: `temp-${Date.now()}-${index}`,
+                title: b.title,
+                author: b.author,
+                category: batchCategory,
                 publisher: b.publisher || '',
                 publication_year: b.publication_year || '',
                 isbn: b.isbn || '',
                 description: b.description || '',
-                category: batchCategory,
                 selected: true
             }));
             setPreviewBooks(previewData);
-        } catch (_) {
-            alert('Fehler beim Parsen der BibTeX-Daten. Bitte Format prüfen.');
+        } catch (error) {
+            alert('Fehler beim Parsen des BibTeX-Inhalts.');
+            console.error(error);
         }
     };
 
@@ -187,10 +263,10 @@ const Admin: React.FC = () => {
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
                 <div className="flex border-b border-outline-variant mb-6 overflow-x-auto">
                     <button
-                        onClick={() => setActiveTab('single')}
+                        onClick={() => { setActiveTab('single'); resetForm(); navigate('/admin'); }}
                         className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'single' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
                     >
-                        Einzelnes Buch
+                        {editingBookId ? 'Buch bearbeiten' : 'Einzelnes Buch'}
                     </button>
                     <button
                         onClick={() => setActiveTab('bibtex')}
@@ -264,17 +340,31 @@ const Admin: React.FC = () => {
                             <label className="font-label-md block mb-1">ISBN</label>
                             <input value={isbn} onChange={e => setIsbn(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
                         </div>
+                        <div>
+                            <label className="font-label-md block mb-1">Signatur (automatisch wenn leer)</label>
+                            <input value={signature} onChange={e => setSignature(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
+                        </div>
                         <div className="md:col-span-2">
                             <label className="font-label-md block mb-1">Beschreibung</label>
                             <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-outline-variant rounded p-2 h-24" />
                         </div>
                         <div>
                             <label className="font-label-md block mb-1">Cover Bild</label>
+                            {existingCoverImage && !coverImage && (
+                                <div className="mb-2">
+                                    <img src={`${API_BASE_URL}/${existingCoverImage}`} alt="Aktuelles Cover" className="h-20 w-auto rounded border" />
+                                </div>
+                            )}
                             <input type="file" onChange={e => setCoverImage(e.target.files ? e.target.files[0] : null)} className="w-full" />
                         </div>
-                        <div className="md:col-span-2 flex justify-end">
+                        <div className="md:col-span-2 flex justify-end gap-2">
+                            {editingBookId && (
+                                <button type="button" onClick={() => { resetForm(); navigate('/admin'); }} className="border border-outline text-on-surface py-2 px-8 rounded-md hover:bg-surface-variant transition-colors font-label-md">
+                                    Abbrechen
+                                </button>
+                            )}
                             <button type="submit" className="bg-primary text-on-primary py-2 px-8 rounded-md hover:bg-primary/90 transition-colors font-label-md shadow-sm">
-                                Buch hinzufügen
+                                {editingBookId ? 'Speichern' : 'Buch hinzufügen'}
                             </button>
                         </div>
                     </form>
@@ -303,79 +393,72 @@ const Admin: React.FC = () => {
                         </div>
 
                         <div>
-                            <label className="font-label-md block mb-1">BibTeX Daten einfügen</label>
+                            <label className="font-label-md block mb-1">BibTeX Inhalt</label>
                             <textarea
                                 value={bibtexText}
                                 onChange={e => setBibtexText(e.target.value)}
-                                placeholder="@book{key, title={...}, author={...}, ...}"
-                                className="w-full border border-outline-variant rounded p-3 h-48 font-mono text-sm"
+                                placeholder="@book{...}"
+                                className="w-full border border-outline-variant rounded p-2 h-48 font-mono text-sm"
                             />
+                        </div>
+
+                        <div className="flex justify-end">
                             <button
-                                onClick={handleParseBibTeX}
-                                className="mt-2 bg-secondary text-on-secondary py-2 px-6 rounded-md hover:bg-secondary/90 transition-colors font-label-md"
+                                onClick={handleBibtexProcess}
+                                className="bg-secondary text-on-secondary py-2 px-8 rounded-md hover:bg-secondary/90 transition-colors font-label-md shadow-sm cursor-pointer"
                             >
                                 Parsen & Vorschau
                             </button>
                         </div>
 
                         {previewBooks.length > 0 && (
-                            <div className="mt-4 border-t pt-6">
-                                <h3 className="font-headline-sm text-headline-sm mb-4">Vorschau & Bearbeitung ({previewBooks.length} Bücher)</h3>
-
-                                <div className="mb-4 flex items-center gap-4">
-                                    <button
-                                        onClick={() => toggleSelectAll(true)}
-                                        className="text-primary font-label-sm hover:underline"
-                                    >
-                                        Alle auswählen
-                                    </button>
-                                    <button
-                                        onClick={() => toggleSelectAll(false)}
-                                        className="text-primary font-label-sm hover:underline"
-                                    >
-                                        Keines auswählen
-                                    </button>
-                                </div>
-
-                                <div className="overflow-x-auto border rounded-lg">
-                                    <table className="w-full text-left border-collapse min-w-[1000px]">
+                            <div className="mt-8 border-t pt-8">
+                                <h3 className="font-headline-sm text-headline-sm mb-4">Vorschau ({previewBooks.length} Bücher)</h3>
+                                <div className="overflow-x-auto border border-outline-variant rounded-lg">
+                                    <table className="w-full text-left border-collapse min-w-[800px]">
                                         <thead>
-                                            <tr className="bg-surface-container-low border-b border-outline-variant">
-                                                <th className="p-2 font-label-sm w-10"></th>
-                                                <th className="p-2 font-label-sm w-[30%]">Titel</th>
-                                                <th className="p-2 font-label-sm w-[20%]">Autor</th>
-                                                <th className="p-2 font-label-sm w-[15%]">Kategorie</th>
-                                                <th className="p-2 font-label-sm w-20 text-center">Jahr</th>
-                                                <th className="p-2 font-label-sm w-40">ISBN</th>
-                                                <th className="p-2 font-label-sm">Details</th>
-                                                <th className="p-2 font-label-sm w-12 text-center"></th>
+                                            <tr className="bg-surface-container">
+                                                <th className="p-2 border-b">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={previewBooks.every(b => b.selected)}
+                                                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                                                        className="w-4 h-4"
+                                                    />
+                                                </th>
+                                                <th className="p-2 border-b font-label-sm">Titel *</th>
+                                                <th className="p-2 border-b font-label-sm">Autor</th>
+                                                <th className="p-2 border-b font-label-sm">Kategorie</th>
+                                                <th className="p-2 border-b font-label-sm">Jahr</th>
+                                                <th className="p-2 border-b font-label-sm">ISBN</th>
+                                                <th className="p-2 border-b font-label-sm">Verlag / Beschr.</th>
+                                                <th className="p-2 border-b font-label-sm">Aktionen</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-outline-variant">
+                                        <tbody>
                                             {previewBooks.map((book) => {
-                                                const isTitleEmpty = !book.title.trim();
+                                                const titleError = !book.title || book.title.trim() === '';
                                                 return (
-                                                    <tr key={book.tempId} className={`hover:bg-surface-variant/30 ${isTitleEmpty ? 'bg-error-container/10' : ''}`}>
-                                                        <td className="p-2 text-center">
+                                                    <tr key={book.tempId} className="hover:bg-surface-container-low">
+                                                        <td className="p-2 border-b align-top">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={book.selected}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'selected', e.target.checked)}
-                                                                className="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary"
+                                                                className="w-4 h-4"
                                                             />
                                                         </td>
-                                                        <td className="p-2">
+                                                        <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.title}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'title', e.target.value)}
-                                                                placeholder="Titel (erforderlich)"
-                                                                className={`w-full border rounded p-1 text-sm ${isTitleEmpty ? 'border-error bg-error-container/5' : 'border-outline-variant'}`}
+                                                                className={`w-full border rounded p-1 text-sm ${titleError ? 'border-error' : 'border-outline-variant'}`}
                                                             />
-                                                            {isTitleEmpty && (
+                                                            {titleError && (
                                                                 <span className="text-[10px] text-error font-label-sm block mt-0.5">Titel ist erforderlich</span>
                                                             )}
                                                         </td>
-                                                        <td className="p-2">
+                                                        <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.author}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
@@ -383,7 +466,7 @@ const Admin: React.FC = () => {
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm"
                                                             />
                                                         </td>
-                                                        <td className="p-2">
+                                                        <td className="p-2 border-b align-top">
                                                             <select
                                                                 value={book.category}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
@@ -403,7 +486,7 @@ const Admin: React.FC = () => {
                                                                 <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
                                                             </select>
                                                         </td>
-                                                        <td className="p-2">
+                                                        <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.publication_year}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'publication_year', e.target.value)}
@@ -411,7 +494,7 @@ const Admin: React.FC = () => {
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm text-center"
                                                             />
                                                         </td>
-                                                        <td className="p-2">
+                                                        <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.isbn}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'isbn', e.target.value)}
@@ -419,7 +502,7 @@ const Admin: React.FC = () => {
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm font-mono"
                                                             />
                                                         </td>
-                                                        <td className="p-2">
+                                                        <td className="p-2 border-b align-top">
                                                             <div className="flex flex-col gap-1">
                                                                 <input
                                                                     value={book.publisher}
@@ -435,7 +518,7 @@ const Admin: React.FC = () => {
                                                                 />
                                                             </div>
                                                         </td>
-                                                        <td className="p-2 text-center">
+                                                        <td className="p-2 border-b align-top text-center">
                                                             <button
                                                                 onClick={() => setPreviewBooks(prev => prev.filter(b => b.tempId !== book.tempId))}
                                                                 className="text-error hover:text-error/80 cursor-pointer p-1"
@@ -469,7 +552,19 @@ const Admin: React.FC = () => {
             </div>
 
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
-                <h2 className="font-headline-md text-headline-md mb-4">Buchbestand (Letzte 100)</h2>
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+                    <h2 className="font-headline-md text-headline-md">Buchbestand</h2>
+                    <div className="relative max-w-sm w-full">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                        <input
+                            type="text"
+                            placeholder="Suchen..."
+                            value={search}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                            className="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-full text-body-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        />
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
@@ -477,23 +572,50 @@ const Admin: React.FC = () => {
                                 <th className="p-2 font-label-md">Signatur</th>
                                 <th className="p-2 font-label-md">Titel</th>
                                 <th className="p-2 font-label-md">Autor</th>
-                                <th className="p-2 font-label-md">Aktionen</th>
+                                <th className="p-2 font-label-md text-right">Aktionen</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {books.map(b => (
-                                <tr key={b.id} className="border-b hover:bg-surface-variant">
-                                    <td className="p-2 font-body-sm">{b.signature || b.id}</td>
-                                    <td className="p-2 font-body-sm">{b.title}</td>
-                                    <td className="p-2 font-body-sm">{b.author}</td>
-                                    <td className="p-2 font-body-sm">
-                                        <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">Löschen</button>
-                                    </td>
+                            {books.length === 0 ? (
+                                <tr>
+                                    <td colSpan={4} className="p-4 text-center text-on-surface-variant">Keine Bücher gefunden.</td>
                                 </tr>
-                            ))}
+                            ) : (
+                                books.map(b => (
+                                    <tr key={b.id} className="border-b hover:bg-surface-variant">
+                                        <td className="p-2 font-body-sm whitespace-nowrap">{b.signature || b.id}</td>
+                                        <td className="p-2 font-body-sm">{b.title}</td>
+                                        <td className="p-2 font-body-sm">{b.author}</td>
+                                        <td className="p-2 font-body-sm text-right whitespace-nowrap">
+                                            <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">Bearbeiten</button>
+                                            <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">Löschen</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-6">
+                        <button
+                            disabled={page === 1}
+                            onClick={() => setPage(p => Math.max(p - 1, 1))}
+                            className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant disabled:opacity-30"
+                        >
+                            <span className="material-symbols-outlined text-sm">chevron_left</span>
+                        </button>
+                        <span className="text-body-sm">Seite {page} von {totalPages}</span>
+                        <button
+                            disabled={page === totalPages}
+                            onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+                            className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant disabled:opacity-30"
+                        >
+                            <span className="material-symbols-outlined text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
