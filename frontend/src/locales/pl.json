@@ -5,7 +5,9 @@
         "loans": "Wypożyczenia",
         "admin": "Admin",
         "login": "Zaloguj się",
-        "logout": "Wyloguj się"
+        "logout": "Wyloguj się",
+        "notifications": "Powiadomienia",
+        "overdue_loans": "Zaległe wypożyczenia"
     },
     "catalog": {
         "welcome_title": "Witamy w naszej domowej bibliotece – Odkryj radość z języka polskiego",

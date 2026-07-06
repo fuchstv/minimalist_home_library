@@ -39,6 +39,8 @@ if (matchPath($request_uri, '/pages')) {
     require 'loans.php';
 } elseif (matchPath($request_uri, '/auth')) {
     require 'auth.php';
+} elseif (matchPath($request_uri, '/notifications')) {
+    require 'notifications.php';
 } elseif (matchPath($request_uri, '/admin')) {
     require 'admin.php';
 } elseif (matchPath($request_uri, '/health')) {

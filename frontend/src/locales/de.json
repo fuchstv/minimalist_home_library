@@ -5,7 +5,9 @@
         "loans": "Ausleihen",
         "admin": "Admin",
         "login": "Anmelden",
-        "logout": "Abmelden"
+        "logout": "Abmelden",
+        "notifications": "Benachrichtigungen",
+        "overdue_loans": "Überfällige Ausleihen"
     },
     "catalog": {
         "welcome_title": "Willkommen in unserer Hausbibliothek – Entdecke die Freude am Polnischen",
