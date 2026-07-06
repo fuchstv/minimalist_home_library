@@ -266,9 +266,6 @@ const Katalog: React.FC = () => {
                                                 </button>
                                             )}
                                             
-                                            <button className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors" title={t('catalog.details_btn')}>
-                                                <span className="material-symbols-outlined text-[20px]">info</span>
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
