@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
@@ -35,6 +36,7 @@ interface Book {
 }
 
 const AdminUsers: React.FC = () => {
+    const { t } = useTranslation();
     const [users, setUsers] = useState<User[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -51,21 +53,24 @@ const AdminUsers: React.FC = () => {
     const [message, setMessage] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
-    const fetchUsers = useCallback(async () => {
+                const fetchUsers = useCallback(async () => {
+
         try {
             const res = await axios.get(`${API_BASE_URL}/api/admin/users`, { withCredentials: true });
             setUsers(res.data.data || []);
         } catch (error) {
             console.error('Error fetching users:', error);
-            setErrorMsg('Fehler beim Laden der Benutzerliste.');
+            setErrorMsg(t('admin.users.load_error'));
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
+                                        /* eslint-disable-next-line react-hooks/set-state-in-effect */
         fetchUsers();
     }, [fetchUsers]);
 
-    const fetchUserLoans = useCallback(async (userId: number) => {
+            const fetchUserLoans = useCallback(async (userId: number) => {
+
         try {
             const res = await axios.get(`${API_BASE_URL}/api/admin/users/${userId}/loans`, { withCredentials: true });
             setUserLoans(res.data.data || []);
@@ -96,8 +101,8 @@ const AdminUsers: React.FC = () => {
         
         try {
             await axios.put(`${API_BASE_URL}/api/admin/users/${editingUser.id}`, editingUser, { withCredentials: true });
-            setMessage('Benutzerkonto erfolgreich aktualisiert!');
-            fetchUsers();
+            setMessage(t('admin.users.update_success'));
+                            fetchUsers();
             
             if (selectedUser?.id === editingUser.id) {
                 setSelectedUser(editingUser);
@@ -106,12 +111,13 @@ const AdminUsers: React.FC = () => {
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
             console.error('Error updating user:', error);
-            setErrorMsg(error.response?.data?.message || 'Fehler beim Aktualisieren des Benutzers.');
+            setErrorMsg(error.response?.data?.message || t('admin.users.update_error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }
     };
 
-    const searchAvailableBooks = useCallback(async (query: string) => {
+            const searchAvailableBooks = useCallback(async (query: string) => {
+
         if (!query.trim()) {
             setFoundBooks([]);
             return;
@@ -141,7 +147,7 @@ const AdminUsers: React.FC = () => {
                 due_date: customDueDate || null
             }, { withCredentials: true });
             
-            setMessage('Buch erfolgreich ausgeliehen!');
+            setMessage(t('admin.users.lend.success'));
             fetchUserLoans(selectedUser.id);
             
             // Reset lending form
@@ -152,7 +158,7 @@ const AdminUsers: React.FC = () => {
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
             console.error('Error lending book:', error);
-            setErrorMsg(error.response?.data?.message || 'Fehler beim Ausleihen.');
+            setErrorMsg(error.response?.data?.message || t('admin.users.lend.error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }
     };
@@ -164,12 +170,12 @@ const AdminUsers: React.FC = () => {
                 action
             }, { withCredentials: true });
             
-            setMessage(`Leihfrist erfolgreich ${action === 'return' ? 'zurückgegeben' : 'verlängert'}.`);
+            setMessage(action === 'return' ? t('admin.users.loans.actions.return_success') : t('admin.users.loans.actions.extend_success'));
             fetchUserLoans(selectedUser.id);
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
             console.error('Error modifying loan:', error);
-            setErrorMsg(error.response?.data?.message || 'Fehler bei der Ausleihe-Aktion.');
+            setErrorMsg(error.response?.data?.message || t('admin.users.loans.actions.error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }
     };
@@ -187,13 +193,13 @@ const AdminUsers: React.FC = () => {
             <div className="lg:col-span-1 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
                 <h2 className="font-headline-sm text-headline-sm flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">group</span>
-                    Nutzerkonten ({filteredUsers.length})
+                    {t('admin.users.title', { count: filteredUsers.length })}
                 </h2>
 
                 <div className="relative">
                     <input 
                         type="text" 
-                        placeholder="Nutzer suchen..." 
+                        placeholder={t("admin.users.search_placeholder")}
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         className="w-full border border-outline-variant rounded-full py-2.5 pl-10 pr-4 text-body-md bg-surface-container-low focus:bg-surface focus:border-primary outline-none transition-all"
@@ -203,7 +209,7 @@ const AdminUsers: React.FC = () => {
 
                 <div className="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-1">
                     {filteredUsers.length === 0 ? (
-                        <p className="text-on-surface-variant text-center py-8 text-body-md">Keine Nutzer gefunden.</p>
+                        <p className="text-on-surface-variant text-center py-8 text-body-md">{t("admin.users.no_users")}</p>
                     ) : (
                         filteredUsers.map(u => (
                             <button
@@ -220,7 +226,7 @@ const AdminUsers: React.FC = () => {
                                         {u.role}
                                     </span>
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${u.fee_paid ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-error-container text-on-error-container'}`}>
-                                        {u.fee_paid ? 'Gebühr bezahlt' : 'Beitrag offen'}
+                                        {u.fee_paid ? t('admin.users.fee_paid') : t('admin.users.fee_unpaid')}
                                     </span>
                                 </div>
                             </button>
@@ -266,7 +272,7 @@ const AdminUsers: React.FC = () => {
                                     className="border border-outline hover:bg-surface-variant/30 text-on-surface py-2 px-5 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <span className="material-symbols-outlined text-[18px]">edit</span>
-                                    Konto bearbeiten
+                                    {t('admin.users.edit_btn')}
                                 </button>
                             </div>
                         </div>
@@ -274,10 +280,10 @@ const AdminUsers: React.FC = () => {
                         {/* Edit User Mode */}
                         {editingUser && (
                             <form onSubmit={handleUpdateUser} className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
-                                <h3 className="font-title-lg text-title-lg pb-2 border-b border-outline-variant">Nutzerkonto bearbeiten</h3>
+                                <h3 className="font-title-lg text-title-lg pb-2 border-b border-outline-variant">{t('admin.users.edit_title')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="font-label-md block mb-1">Name</label>
+                                        <label className="font-label-md block mb-1">{t("admin.users.name")}</label>
                                         <input 
                                             value={editingUser.name} 
                                             onChange={e => setEditingUser({ ...editingUser, name: e.target.value })} 
@@ -286,7 +292,7 @@ const AdminUsers: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="font-label-md block mb-1">E-Mail</label>
+                                        <label className="font-label-md block mb-1">{t("admin.users.email")}</label>
                                         <input 
                                             type="email"
                                             value={editingUser.email} 
@@ -296,7 +302,7 @@ const AdminUsers: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="font-label-md block mb-1">Telefon</label>
+                                        <label className="font-label-md block mb-1">{t("admin.users.phone")}</label>
                                         <input 
                                             value={editingUser.phone || ''} 
                                             onChange={e => setEditingUser({ ...editingUser, phone: e.target.value })} 
@@ -304,14 +310,14 @@ const AdminUsers: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="font-label-md block mb-1">Rolle</label>
+                                        <label className="font-label-md block mb-1">{t("admin.users.role")}</label>
                                         <select 
                                             value={editingUser.role} 
                                             onChange={e => setEditingUser({ ...editingUser, role: e.target.value })} 
                                             className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface"
                                         >
-                                            <option value="member">Mitglied (Member)</option>
-                                            <option value="admin">Administrator (Admin)</option>
+                                            <option value="member">{t("admin.users.roles.member")}</option>
+                                            <option value="admin">{t("admin.users.roles.admin")}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -324,7 +330,7 @@ const AdminUsers: React.FC = () => {
                                             onChange={e => setEditingUser({ ...editingUser, fee_paid: e.target.checked ? 1 : 0 })}
                                             className="h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary"
                                         />
-                                        Mitgliedsgebühr bezahlt (10€ einmalig)
+                                        {t('admin.users.fee_label')}
                                     </label>
                                     <label className="flex items-center gap-3 font-body-sm text-on-surface-variant select-none cursor-pointer">
                                         <input 
@@ -333,7 +339,7 @@ const AdminUsers: React.FC = () => {
                                             onChange={e => setEditingUser({ ...editingUser, data_consent: e.target.checked ? 1 : 0 })}
                                             className="h-4 w-4 rounded border-outline-variant text-primary"
                                         />
-                                        Datenschutzeinwilligung erteilt
+                                        {t('admin.users.data_consent')}
                                     </label>
                                     <label className="flex items-center gap-3 font-body-sm text-on-surface-variant select-none cursor-pointer">
                                         <input 
@@ -342,7 +348,7 @@ const AdminUsers: React.FC = () => {
                                             onChange={e => setEditingUser({ ...editingUser, rules_consent: e.target.checked ? 1 : 0 })}
                                             className="h-4 w-4 rounded border-outline-variant text-primary"
                                         />
-                                        Bibliotheksregeln akzeptiert
+                                        {t('admin.users.rules_consent')}
                                     </label>
                                 </div>
 
@@ -352,13 +358,13 @@ const AdminUsers: React.FC = () => {
                                         onClick={() => setEditingUser(null)} 
                                         className="border border-outline text-on-surface px-6 py-2 rounded-full font-label-md hover:bg-surface-variant/30 transition-colors cursor-pointer"
                                     >
-                                        Abbrechen
+                                        {t('admin.users.cancel_btn')}
                                     </button>
                                     <button 
                                         type="submit" 
                                         className="bg-primary text-on-primary px-8 py-2 rounded-full font-label-md hover:bg-primary/95 transition-colors shadow-sm cursor-pointer"
                                     >
-                                        Speichern
+                                        {t('admin.users.save_btn')}
                                     </button>
                                 </div>
                             </form>
@@ -368,22 +374,22 @@ const AdminUsers: React.FC = () => {
                         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
                             <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">bookmark_add</span>
-                                Buch an {selectedUser.name} ausleihen
+                                {t('admin.users.lend.title', { name: selectedUser.name })}
                             </h3>
                             
                             {userLoans.filter(l => l.status !== 'returned').length >= 3 && (
                                 <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 p-3.5 rounded-lg flex items-start gap-2.5 text-body-sm">
                                     <span className="material-symbols-outlined">warning</span>
-                                    <span>Dieser Nutzer hat bereits {userLoans.filter(l => l.status !== 'returned').length} aktive Bücher ausgeliehen (Standardlimit ist 3). Admins können dieses Limit überspringen.</span>
+                                    <span>{t('admin.users.lend.limit_warning', { count: userLoans.filter(l => l.status !== 'returned').length })}</span>
                                 </div>
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="relative">
-                                    <label className="font-label-md block mb-1">Buch suchen (Signatur, Titel, Autor)</label>
+                                    <label className="font-label-md block mb-1">{t("admin.users.lend.search_label")}</label>
                                     <input 
                                         type="text"
-                                        placeholder="Titel eingeben..."
+                                        placeholder={t("admin.users.lend.search_placeholder")}
                                         value={bookSearch}
                                         onChange={e => setBookSearch(e.target.value)}
                                         className="w-full border border-outline-variant rounded p-2 text-body-md"
@@ -410,7 +416,7 @@ const AdminUsers: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="font-label-md block mb-1">Rückgabedatum (Fälligkeit)</label>
+                                    <label className="font-label-md block mb-1">{t("admin.users.lend.due_date")}</label>
                                     <input 
                                         type="date"
                                         value={customDueDate}
@@ -427,28 +433,28 @@ const AdminUsers: React.FC = () => {
                                     className={`py-2.5 px-8 rounded-full font-label-md shadow-sm transition-all flex items-center gap-1.5 ${selectedBookId ? 'bg-primary text-on-primary hover:bg-primary/95 cursor-pointer' : 'bg-outline-variant text-on-surface-variant cursor-not-allowed'}`}
                                 >
                                     <span className="material-symbols-outlined text-[18px]">key</span>
-                                    Ausleihen bestätigen
+                                    {t('admin.users.lend.confirm_btn')}
                                 </button>
                             </div>
                         </div>
 
                         {/* Active & Past Loans */}
                         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
-                            <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant">Ausleihverlauf</h3>
+                            <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant">{t("admin.users.loans.title")}</h3>
                             {userLoans.length === 0 ? (
-                                <p className="text-on-surface-variant text-center py-6">Derzeit sind keine Ausleihen für diesen Nutzer registriert.</p>
+                                <p className="text-on-surface-variant text-center py-6">{t("admin.users.loans.no_loans")}</p>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="border-b border-outline-variant bg-surface-container-low text-body-sm font-bold text-on-surface">
-                                                <th className="p-3">Signatur</th>
-                                                <th className="p-3">Buch</th>
-                                                <th className="p-3">Ausleihe</th>
-                                                <th className="p-3">Fälligkeit</th>
-                                                <th className="p-3">Rückgabe</th>
-                                                <th className="p-3">Status</th>
-                                                <th className="p-3 text-right">Aktionen</th>
+                                                <th className="p-3">{t("admin.users.loans.table.signature")}</th>
+                                                <th className="p-3">{t("admin.users.loans.table.book")}</th>
+                                                <th className="p-3">{t("admin.users.loans.table.loan_date")}</th>
+                                                <th className="p-3">{t("admin.users.loans.table.due_date")}</th>
+                                                <th className="p-3">{t("admin.users.loans.table.return_date")}</th>
+                                                <th className="p-3">{t("admin.users.loans.table.status")}</th>
+                                                <th className="p-3 text-right">{t("admin.users.loans.table.actions")}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-outline-variant text-body-sm">
@@ -467,17 +473,17 @@ const AdminUsers: React.FC = () => {
                                                     <td className="p-3 whitespace-nowrap">
                                                         {loan.status === 'returned' && (
                                                             <span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
-                                                                Zurückgegeben
+                                                                {t('admin.users.loans.status.returned')}
                                                             </span>
                                                         )}
                                                         {loan.status === 'active' && (
                                                             <span className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
-                                                                Aktiv
+                                                                {t('admin.users.loans.status.active')}
                                                             </span>
                                                         )}
                                                         {loan.status === 'overdue' && (
                                                             <span className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 font-bold px-2 py-0.5 rounded text-[10px] uppercase">
-                                                                Überfällig
+                                                                {t('admin.users.loans.status.overdue')}
                                                             </span>
                                                         )}
                                                     </td>
@@ -487,14 +493,14 @@ const AdminUsers: React.FC = () => {
                                                                 <button
                                                                     onClick={() => handleLoanAction(loan.id, 'extend')}
                                                                     className="text-primary hover:underline font-bold px-2 py-1 border border-primary/20 rounded hover:bg-primary-container/10 transition-colors"
-                                                                    title="Um 4 Wochen verlängern"
+                                                                    title={t("admin.users.loans.actions.extend")}
                                                                 >
                                                                     Verlängern
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleLoanAction(loan.id, 'return')}
                                                                     className="text-green-700 dark:text-green-400 hover:underline font-bold px-2 py-1 border border-green-700/20 dark:border-green-400/20 rounded hover:bg-green-100 dark:hover:bg-green-950/20 transition-colors"
-                                                                    title="Buch zurücknehmen"
+                                                                    title={t("admin.users.loans.actions.return")}
                                                                 >
                                                                     Zurückgeben
                                                                 </button>
@@ -512,8 +518,8 @@ const AdminUsers: React.FC = () => {
                 ) : (
                     <div className="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant shadow-sm flex flex-col items-center justify-center text-center text-on-surface-variant min-h-[400px]">
                         <span className="material-symbols-outlined text-[64px] text-primary/40 mb-3">account_box</span>
-                        <h3 className="font-headline-sm text-headline-sm mb-1 text-on-surface">Kein Nutzer ausgewählt</h3>
-                        <p className="max-w-xs text-body-md">Wählen Sie einen Nutzer aus der linken Spalte aus, um Details anzuzeigen, das Konto zu bearbeiten, Leifristen zu verlängern oder Bücher auszuleihen.</p>
+                        <h3 className="font-headline-sm text-headline-sm mb-1 text-on-surface">{t("admin.users.no_user_selected")}</h3>
+                        <p className="max-w-xs text-body-md">{t("admin.users.select_user_hint")}</p>
                     </div>
                 )}
             </div>
