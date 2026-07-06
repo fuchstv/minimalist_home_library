@@ -1,9 +1,24 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TopNavBar from './TopNavBar';
 import { AuthContext } from '../context/AuthContext';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
+
+// Mock fetch
+const globalFetch = global.fetch;
+beforeEach(() => {
+    global.fetch = vi.fn().mockImplementation(() =>
+        Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ count: 0 }),
+        })
+    );
+});
+
+afterEach(() => {
+    global.fetch = globalFetch;
+});
 
 // Mock react-i18next
 const changeLanguageMock = vi.fn();
@@ -89,5 +104,22 @@ describe('TopNavBar', () => {
         // Should change to 'pl'
         expect(changeLanguageMock).toHaveBeenCalledWith('pl');
         expect(setItemSpy).toHaveBeenCalledWith('language', 'pl');
+    });
+
+    it('shows notifications count when user has overdue loans', async () => {
+        (global.fetch as any).mockImplementationOnce(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ count: 5 }),
+            })
+        );
+
+        const user = { id: 1, name: 'Test User', email: 'test@example.com', role: 'member' };
+        renderNavBar(user);
+
+        await waitFor(() => {
+            expect(screen.getByText('5')).toBeInTheDocument();
+        });
+        expect(screen.getByText('notifications')).toBeInTheDocument();
     });
 });

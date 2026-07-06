@@ -1,18 +1,45 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from "../config";
 
 const TopNavBar: React.FC = () => {
     const location = useLocation();
     const { t, i18n } = useTranslation();
     const { user, logout } = useContext(AuthContext);
+    const [notificationCount, setNotificationCount] = useState(0);
 
     const toggleLanguage = () => {
         const newLang = i18n.language === 'de' ? 'pl' : 'de';
         i18n.changeLanguage(newLang);
         localStorage.setItem('language', newLang);
     };
+
+    useEffect(() => {
+        if (user) {
+            const fetchNotifications = async () => {
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/notifications`, { credentials: 'include' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setNotificationCount(data.count || 0);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch notifications", error);
+                }
+            };
+
+            fetchNotifications();
+            // Refresh every 5 minutes
+            const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
+            return () => clearInterval(interval);
+        } else {
+            setNotificationCount(0);
+        }
+    }, [user]);
+
+    const notificationLink = user?.role === 'admin' ? '/admin?tab=loans' : '/ausleihen';
 
     return (
         <nav className="bg-surface dark:bg-inverse-surface sticky top-0 w-full z-50 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
@@ -51,6 +78,19 @@ const TopNavBar: React.FC = () => {
                 </ul>
 
                 <div className="flex items-center gap-4">
+                    {user && notificationCount > 0 && (
+                        <Link
+                            to={notificationLink}
+                            className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant"
+                            title={t('nav.overdue_loans')}
+                        >
+                            <span className="material-symbols-outlined">notifications</span>
+                            <span className="absolute top-1.5 right-1.5 bg-error text-on-error text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-surface">
+                                {notificationCount}
+                            </span>
+                        </Link>
+                    )}
+
                     <button onClick={toggleLanguage} className="font-label-md text-label-md bg-surface-container-low text-on-surface hover:bg-surface-variant px-3 py-1.5 rounded-full transition-colors border border-outline-variant">
                         {i18n.language.toUpperCase()}
                     </button>

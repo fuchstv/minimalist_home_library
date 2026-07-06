@@ -15,7 +15,12 @@ if (isset($parts[1]) && $parts[1] === 'loans') {
         if ($method === 'GET') {
             try {
                 $stmt = $pdo->query("
-                    SELECT l.*, b.title as book_title, b.author as book_author, b.signature as book_signature, u.name as user_name
+                    SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
+                           CASE
+                               WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
+                               ELSE l.status
+                           END as status,
+                           b.title as book_title, b.author as book_author, b.signature as book_signature, u.name as user_name, u.email as user_email
                     FROM loans l
                     JOIN books b ON l.book_id = b.id
                     JOIN users u ON l.user_id = u.id
@@ -109,7 +114,12 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                 if ($method === 'GET') {
                     try {
                         $stmt = $pdo->prepare("
-                            SELECT l.*, b.title as book_title, b.author as book_author, b.signature as book_signature, b.isbn as book_isbn
+                            SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
+                                   CASE
+                                       WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
+                                       ELSE l.status
+                                   END as status,
+                                   b.title as book_title, b.author as book_author, b.signature as book_signature, b.isbn as book_isbn
                             FROM loans l
                             JOIN books b ON l.book_id = b.id
                             WHERE l.user_id = ?

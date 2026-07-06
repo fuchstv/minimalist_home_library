@@ -47,422 +47,339 @@ const Admin: React.FC = () => {
 
     // Tab state
     const [activeTab, setActiveTab] = useState<'single' | 'bibtex' | 'users' | 'loans' | 'pages'>('single');
-    
-    // Form state (also used for editing)
-    const [editingBookId, setEditingBookId] = useState<number | null>(null);
-    const [title, setTitle] = useState('');
-    const [author, setAuthor] = useState('');
-    const [category, setCategory] = useState('');
-    const [publisher, setPublisher] = useState('');
-    const [publicationYear, setPublicationYear] = useState('');
-    const [isbn, setIsbn] = useState('');
-    const [description, setDescription] = useState('');
-    const [signature, setSignature] = useState('');
-    const [coverImage, setCoverImage] = useState<File | null>(null);
-    const [existingCoverImage, setExistingCoverImage] = useState<string | null>(null);
 
-    // BibTeX Import State
-    const [bibtexText, setBibtexText] = useState('');
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tab = queryParams.get('tab');
+        if (tab === 'loans' || tab === 'users' || tab === 'pages' || tab === 'bibtex' || tab === 'single') {
+            setActiveTab(tab as 'single' | 'bibtex' | 'users' | 'loans' | 'pages');
+        }
+    }, [location]);
+
+    const handleTabChange = (tab: 'single' | 'bibtex' | 'users' | 'loans' | 'pages') => {
+        setActiveTab(tab);
+        navigate(`/admin?tab=${tab}`, { replace: true });
+    };
+
+    const [bookForm, setBookForm] = useState({
+        id: null as number | null,
+        title: '',
+        author: '',
+        category: 'Belytrystyka polska',
+        publication_year: '',
+        publisher: '',
+        isbn: '',
+        description: '',
+        signature: '',
+        cover_image: null as File | null
+    });
+
+    const [bibtex, setBibtex] = useState('');
     const [previewBooks, setPreviewBooks] = useState<PreviewBook[]>([]);
-    const [batchCategory, setBatchCategory] = useState('Belytrystyka polska');
+    const [message, setMessage] = useState('');
 
     const fetchBooks = useCallback(async () => {
-        try {
-            const queryParams = new URLSearchParams({
-                page: page.toString(),
-                limit: limit.toString(),
-                search: search
-            });
-            const response = await fetch(`${API_BASE_URL}/api/books?${queryParams}`, { credentials: 'include' });
-            const result = await response.json();
-            setBooks(result.data || []);
-            setTotalPages(result.meta?.totalPages || 1);
-        } catch (error) {
-            console.error('Error fetching books:', error);
+        const res = await fetch(`${API_BASE_URL}/api/books?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`, { credentials: 'include' });
+        if (res.ok) {
+            const data = await res.json();
+            setBooks(data.data);
+            setTotalPages(data.meta.total_pages);
         }
-    }, [page, search]);
+    }, [page, search, limit]);
 
     useEffect(() => {
         if (!user || user.role !== 'admin') {
-            navigate('/');
-        } else {
-            fetchBooks();
+            navigate('/login');
+            return;
         }
+        fetchBooks();
     }, [user, navigate, fetchBooks]);
 
-    const handleEdit = useCallback((book: Book) => {
-        setEditingBookId(book.id);
-        setTitle(book.title);
-        setAuthor(book.author);
-        setCategory(book.category);
-        setPublisher(book.publisher || '');
-        setPublicationYear(book.publication_year || '');
-        setIsbn(book.isbn || '');
-        setDescription(book.description || '');
-        setSignature(book.signature || '');
-        setExistingCoverImage(book.cover_image || null);
-        setActiveTab('single');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, []);
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setBookForm(prev => ({ ...prev, [name]: value }));
+    };
 
-    // Handle deep link to edit a book
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const editId = params.get('editId');
-        if (editId && user?.role === 'admin') {
-            const fetchBookAndEdit = async () => {
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/books/${editId}`, { credentials: 'include' });
-                    if (response.ok) {
-                        const book = await response.json();
-                        handleEdit(book);
-                    }
-                } catch (error) {
-                    console.error('Error fetching book for edit:', error);
-                }
-            };
-            fetchBookAndEdit();
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setBookForm(prev => ({ ...prev, cover_image: e.target.files![0] }));
         }
-    }, [location.search, user, handleEdit]);
-
-    const resetForm = () => {
-        setEditingBookId(null);
-        setTitle('');
-        setAuthor('');
-        setCategory('');
-        setPublisher('');
-        setPublicationYear('');
-        setIsbn('');
-        setDescription('');
-        setSignature('');
-        setCoverImage(null);
-        setExistingCoverImage(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('author', author);
-        formData.append('category', category);
-        formData.append('publisher', publisher);
-        formData.append('publication_year', publicationYear);
-        formData.append('isbn', isbn);
-        formData.append('description', description);
-        formData.append('signature', signature);
-        if (coverImage) {
-            formData.append('cover_image', coverImage);
-        }
+        Object.entries(bookForm).forEach(([key, value]) => {
+            if (value !== null) formData.append(key, value as string | Blob);
+        });
 
-        const url = editingBookId
-            ? `${API_BASE_URL}/api/admin/books/${editingBookId}`
-            : `${API_BASE_URL}/api/admin/books`;
+        const url = bookForm.id ? `${API_BASE_URL}/api/admin/books/${bookForm.id}` : `${API_BASE_URL}/api/admin/books`;
+        const res = await fetch(url, {
+            method: 'POST', // Use POST for both (multipart/form-data)
+            body: formData,
+            credentials: 'include'
+        });
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            });
-            if (response.ok) {
-                alert(editingBookId ? 'Buch erfolgreich aktualisiert!' : 'Buch erfolgreich hinzugefügt!');
-                resetForm();
-                fetchBooks();
-                if (editingBookId) {
-                    navigate('/admin'); // Clear query params
-                }
-            } else {
-                const errorData = await response.json();
-                alert('Fehler beim Speichern: ' + errorData.message);
-            }
-        } catch (error) {
-            console.error('Error saving book:', error);
-            alert('Ein Netzwerkfehler ist aufgetreten.');
+        if (res.ok) {
+            setMessage(bookForm.id ? 'Buch aktualisiert!' : 'Buch erstellt!');
+            setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null });
+            fetchBooks();
+            setTimeout(() => setMessage(''), 3000);
+        } else {
+            const err = await res.json();
+            alert(err.message || 'Fehler beim Speichern');
         }
+    };
+
+    const handleEdit = (book: Book) => {
+        setBookForm({
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            category: book.category,
+            publication_year: book.publication_year || '',
+            publisher: book.publisher || '',
+            isbn: book.isbn || '',
+            description: book.description || '',
+            signature: book.signature || '',
+            cover_image: null
+        });
+        handleTabChange('single');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('Möchten Sie dieses Buch wirklich löschen?')) return;
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            if (response.ok) {
-                fetchBooks();
-            }
-        } catch (error) {
-            console.error('Error deleting book:', error);
+        if (!confirm('Buch wirklich löschen?')) return;
+        const res = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, { method: 'DELETE', credentials: 'include' });
+        if (res.ok) {
+            fetchBooks();
         }
     };
 
-    const handleBibtexProcess = () => {
+    const handleBibtexImport = () => {
         try {
-            const parsed = parseBibTeX(bibtexText);
-            const previewData: PreviewBook[] = parsed.map((b, index) => ({
-                tempId: `temp-${Date.now()}-${index}`,
-                title: b.title,
-                author: b.author,
-                category: batchCategory,
-                publisher: b.publisher || '',
-                publication_year: b.publication_year || '',
-                isbn: b.isbn || '',
-                description: b.description || '',
+            const parsed = parseBibTeX(bibtex);
+            const preview = parsed.map((b, i) => ({
+                ...b,
+                tempId: `temp-${Date.now()}-${i}`,
                 selected: true
             }));
-            setPreviewBooks(previewData);
-        } catch (error) {
-            alert('Fehler beim Parsen des BibTeX-Inhalts.');
-            console.error(error);
+            setPreviewBooks(preview);
+        } catch {
+            alert('Fehler beim Parsen von BibTeX');
         }
+    };
+
+    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: string | boolean) => {
+        setPreviewBooks(prev => prev.map(b => b.tempId === tempId ? { ...b, [field]: value } : b));
     };
 
     const handleImportSelected = async () => {
         const selected = previewBooks.filter(b => b.selected);
-        if (selected.length === 0) {
-            alert('Bitte wählen Sie mindestens ein Buch aus.');
-            return;
-        }
+        if (selected.length === 0) return;
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/books/import`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ books: selected }),
-                credentials: 'include'
-            });
+        const res = await fetch(`${API_BASE_URL}/api/admin/books/import`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ books: selected }),
+            credentials: 'include'
+        });
 
-            if (response.ok) {
-                const result = await response.json();
-                alert(`Erfolgreich ${result.count} Bücher importiert!`);
-                setPreviewBooks([]);
-                setBibtexText('');
-                fetchBooks();
-            } else {
-                const errorData = await response.json();
-                alert('Fehler beim Import: ' + errorData.message);
-            }
-        } catch (error) {
-            console.error('Error importing books:', error);
-            alert('Ein Netzwerkfehler ist aufgetreten.');
+        if (res.ok) {
+            const result = await res.json();
+            setMessage(`${result.count} Bücher erfolgreich importiert!`);
+            setPreviewBooks([]);
+            setBibtex('');
+            fetchBooks();
+            setTimeout(() => setMessage(''), 5000);
+        } else {
+            const err = await res.json();
+            alert(err.message || 'Import fehlgeschlagen');
         }
     };
 
-    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: string | number | boolean) => {
-        setPreviewBooks(prev => prev.map(b => b.tempId === tempId ? { ...b, [field]: value } : b));
-    };
-
-    const toggleSelectAll = (selected: boolean) => {
-        setPreviewBooks(prev => prev.map(b => ({ ...b, selected })));
-    };
+    if (!user || user.role !== 'admin') return null;
 
     return (
-        <div className="flex-grow p-margin-mobile md:p-margin-desktop bg-surface flex flex-col gap-8">
-            <h1 className="font-headline-lg text-headline-lg">Admin Dashboard</h1>
+        <div className="flex-grow flex flex-col p-margin-mobile md:p-margin-desktop bg-surface max-w-container-max-width mx-auto w-full gap-8">
+            <h1 className="font-display-lg text-display-lg text-on-surface">Administrator Bereich</h1>
+
+            {message && (
+                <div className="bg-primary-container text-on-primary-container p-4 rounded-lg font-label-md">
+                    {message}
+                </div>
+            )}
+
+            <div className="flex border-b border-outline-variant overflow-x-auto whitespace-nowrap">
+                <button
+                    onClick={() => handleTabChange('single')}
+                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'single' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                >
+                    Buch hinzufügen/bearbeiten
+                </button>
+                <button
+                    onClick={() => handleTabChange('bibtex')}
+                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'bibtex' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                >
+                    BibTeX Import
+                </button>
+                <button
+                    onClick={() => handleTabChange('users')}
+                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'users' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                >
+                    Benutzerverwaltung
+                </button>
+                <button
+                    onClick={() => handleTabChange('loans')}
+                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'loans' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                >
+                    Ausleihen
+                </button>
+                <button
+                    onClick={() => handleTabChange('pages')}
+                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'pages' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
+                >
+                    Seiteninhalte
+                </button>
+            </div>
 
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
-                <div className="flex border-b border-outline-variant mb-6 overflow-x-auto">
-                    <button
-                        onClick={() => { setActiveTab('single'); resetForm(); navigate('/admin'); }}
-                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'single' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                    >
-                        {editingBookId ? 'Buch bearbeiten' : 'Einzelnes Buch'}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('bibtex')}
-                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'bibtex' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                    >
-                        BibTeX Import
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('users')}
-                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'users' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                    >
-                        Nutzer verwalten
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('loans')}
-                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'loans' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                    >
-                        Ausleihen verwalten
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('pages')}
-                        className={`px-6 py-3 font-label-lg transition-colors shrink-0 ${activeTab === 'pages' ? 'border-b-2 border-primary text-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                    >
-                        Seiten bearbeiten
-                    </button>
-                </div>
-
-                {activeTab === 'pages' ? (
-                    <AdminPages />
-                ) : activeTab === 'users' ? (
+                {activeTab === 'users' ? (
                     <AdminUsers />
                 ) : activeTab === 'loans' ? (
                     <AdminLoans />
+                ) : activeTab === 'pages' ? (
+                    <AdminPages />
                 ) : activeTab === 'single' ? (
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="font-label-md block mb-1">Titel</label>
-                            <input value={title} onChange={e => setTitle(e.target.value)} required className="w-full border border-outline-variant rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">Autor</label>
-                            <input value={author} onChange={e => setAuthor(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">Kategorie</label>
-                            <select value={category} onChange={e => setCategory(e.target.value)} className="w-full border border-outline-variant rounded p-2 bg-surface">
-                                <option value="">Wähle eine Kategorie</option>
-                                <option value="Auf Deutsch">Auf Deutsch</option>
-                                <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                <option value="Dziecięce">Kinder & Jugend</option>
-                                <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
-                                <option value="Historyczne">Historische Romane</option>
-                                <option value="Kryminał | Thriller">Krimi & Thriller</option>
-                                <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                                <option value="Biografie">Biografien</option>
-                                <option value="Poezja">Lyrik & Poesie</option>
-                                <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
-                                <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">Jahr</label>
-                            <input value={publicationYear} onChange={e => setPublicationYear(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">Verlag</label>
-                            <input value={publisher} onChange={e => setPublisher(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">ISBN</label>
-                            <input value={isbn} onChange={e => setIsbn(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">Signatur (automatisch wenn leer)</label>
-                            <input value={signature} onChange={e => setSignature(e.target.value)} className="w-full border border-outline-variant rounded p-2" />
-                        </div>
-                        <div className="md:col-span-2">
-                            <label className="font-label-md block mb-1">Beschreibung</label>
-                            <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-outline-variant rounded p-2 h-24" />
-                        </div>
-                        <div>
-                            <label className="font-label-md block mb-1">Cover Bild</label>
-                            {existingCoverImage && !coverImage && (
-                                <div className="mb-2">
-                                    <img src={`${API_BASE_URL}/${existingCoverImage}`} alt="Aktuelles Cover" className="h-20 w-auto rounded border" />
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="block font-label-medium mb-1">Buchtitel *</label>
+                                <input name="title" value={bookForm.title} onChange={handleInputChange} required className="w-full border border-outline-variant rounded p-2" />
+                            </div>
+                            <div>
+                                <label className="block font-label-medium mb-1">Autor</label>
+                                <input name="author" value={bookForm.author} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
+                            </div>
+                            <div>
+                                <label className="block font-label-medium mb-1">Kategorie</label>
+                                <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2">
+                                    <option value="Auf Deutsch">Auf Deutsch</option>
+                                    <option value="Belytrystyka polska">Belytrystyka polska</option>
+                                    <option value="Belytrystyka zagraniczna">Belytrystyka zagraniczna</option>
+                                    <option value="Dla dzieci">Dla dzieci</option>
+                                    <option value="Fantasy | Sci-Fi">Fantasy | Sci-Fi</option>
+                                    <option value="Powieści historyczne">Powieści historyczne</option>
+                                    <option value="Kryminał | Thriller">Kryminał | Thriller</option>
+                                    <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
+                                    <option value="Biografie">Biografie</option>
+                                    <option value="Poezja">Poezja</option>
+                                    <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
+                                    <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block font-label-medium mb-1">Erscheinungsjahr</label>
+                                    <input name="publication_year" value={bookForm.publication_year} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
                                 </div>
-                            )}
-                            <input type="file" onChange={e => setCoverImage(e.target.files ? e.target.files[0] : null)} className="w-full" />
+                                <div>
+                                    <label className="block font-label-medium mb-1">Verlag</label>
+                                    <input name="publisher" value={bookForm.publisher} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block font-label-medium mb-1">ISBN</label>
+                                <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
+                            </div>
                         </div>
-                        <div className="md:col-span-2 flex justify-end gap-2">
-                            {editingBookId && (
-                                <button type="button" onClick={() => { resetForm(); navigate('/admin'); }} className="border border-outline text-on-surface py-2 px-8 rounded-md hover:bg-surface-variant transition-colors font-label-md">
-                                    Abbrechen
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="block font-label-medium mb-1">Signatur (Optional)</label>
+                                <input name="signature" value={bookForm.signature} onChange={handleInputChange} placeholder="Wird automatisch generiert, falls leer" className="w-full border border-outline-variant rounded p-2 font-mono" />
+                            </div>
+                            <div>
+                                <label className="block font-label-medium mb-1">Beschreibung</label>
+                                <textarea name="description" value={bookForm.description} onChange={handleInputChange} rows={5} className="w-full border border-outline-variant rounded p-2" />
+                            </div>
+                            <div>
+                                <label className="block font-label-medium mb-1">Cover Bild</label>
+                                <input type="file" onChange={handleFileChange} accept="image/*" className="w-full" />
+                            </div>
+                            <div className="mt-4 flex gap-4">
+                                <button type="submit" className="bg-primary text-on-primary py-2 px-6 rounded font-label-md hover:bg-primary/90 transition-colors">
+                                    {bookForm.id ? 'Aktualisieren' : 'Speichern'}
                                 </button>
-                            )}
-                            <button type="submit" className="bg-primary text-on-primary py-2 px-8 rounded-md hover:bg-primary/90 transition-colors font-label-md shadow-sm">
-                                {editingBookId ? 'Speichern' : 'Buch hinzufügen'}
-                            </button>
+                                {bookForm.id && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })}
+                                        className="bg-surface-variant text-on-surface-variant py-2 px-6 rounded font-label-md hover:bg-surface-variant/80 transition-colors"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </form>
                 ) : (
                     <div className="flex flex-col gap-6">
-                        <div>
-                            <label className="font-label-md block mb-1">Gemeinsame Kategorie für diesen Import</label>
-                            <select
-                                value={batchCategory}
-                                onChange={e => setBatchCategory(e.target.value)}
-                                className="w-full border border-outline-variant rounded p-2 bg-surface max-w-md"
-                            >
-                                <option value="Auf Deutsch">Auf Deutsch</option>
-                                <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                <option value="Dziecięce">Kinder & Jugend</option>
-                                <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
-                                <option value="Historyczne">Historische Romane</option>
-                                <option value="Kryminał | Thriller">Krimi & Thriller</option>
-                                <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                                <option value="Biografie">Biografien</option>
-                                <option value="Poezja">Lyrik & Poesie</option>
-                                <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
-                                <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="font-label-md block mb-1">BibTeX Inhalt</label>
+                        <div className="flex flex-col gap-2">
+                            <label className="font-label-medium">BibTeX-Code hier einfügen</label>
                             <textarea
-                                value={bibtexText}
-                                onChange={e => setBibtexText(e.target.value)}
+                                value={bibtex}
+                                onChange={(e) => setBibtex(e.target.value)}
+                                rows={10}
                                 placeholder="@book{...}"
-                                className="w-full border border-outline-variant rounded p-2 h-48 font-mono text-sm"
+                                className="w-full border border-outline-variant rounded p-4 font-mono text-sm bg-surface-container-low"
                             />
-                        </div>
-
-                        <div className="flex justify-end">
                             <button
-                                onClick={handleBibtexProcess}
-                                className="bg-secondary text-on-secondary py-2 px-8 rounded-md hover:bg-secondary/90 transition-colors font-label-md shadow-sm cursor-pointer"
+                                onClick={handleBibtexImport}
+                                className="self-start bg-secondary text-on-secondary py-2 px-6 rounded font-label-md hover:bg-secondary/90 transition-colors"
                             >
-                                Parsen & Vorschau
+                                In Liste laden
                             </button>
                         </div>
 
                         {previewBooks.length > 0 && (
-                            <div className="mt-8 border-t pt-8">
-                                <h3 className="font-headline-sm text-headline-sm mb-4">Vorschau ({previewBooks.length} Bücher)</h3>
-                                <div className="overflow-x-auto border border-outline-variant rounded-lg">
-                                    <table className="w-full text-left border-collapse min-w-[800px]">
+                            <div className="mt-4 border-t pt-6">
+                                <h3 className="font-headline-small mb-4">Vorschau ({previewBooks.length} Bücher)</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-sm border-collapse">
                                         <thead>
                                             <tr className="bg-surface-container">
-                                                <th className="p-2 border-b">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={previewBooks.every(b => b.selected)}
-                                                        onChange={(e) => toggleSelectAll(e.target.checked)}
-                                                        className="w-4 h-4"
-                                                    />
-                                                </th>
-                                                <th className="p-2 border-b font-label-sm">Titel *</th>
-                                                <th className="p-2 border-b font-label-sm">Autor</th>
-                                                <th className="p-2 border-b font-label-sm">Kategorie</th>
-                                                <th className="p-2 border-b font-label-sm">Jahr</th>
-                                                <th className="p-2 border-b font-label-sm">ISBN</th>
-                                                <th className="p-2 border-b font-label-sm">Verlag / Beschr.</th>
-                                                <th className="p-2 border-b font-label-sm">Aktionen</th>
+                                                <th className="p-2 border-b text-center"><input type="checkbox" checked={previewBooks.every(b => b.selected)} onChange={(e) => setPreviewBooks(prev => prev.map(b => ({ ...b, selected: e.target.checked })))} /></th>
+                                                <th className="p-2 border-b">Titel</th>
+                                                <th className="p-2 border-b">Autor</th>
+                                                <th className="p-2 border-b">Kategorie</th>
+                                                <th className="p-2 border-b">Jahr</th>
+                                                <th className="p-2 border-b">ISBN</th>
+                                                <th className="p-2 border-b">Details</th>
+                                                <th className="p-2 border-b">Aktionen</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {previewBooks.map((book) => {
-                                                const titleError = !book.title || book.title.trim() === '';
                                                 return (
-                                                    <tr key={book.tempId} className="hover:bg-surface-container-low">
-                                                        <td className="p-2 border-b align-top">
+                                                    <tr key={book.tempId} className="hover:bg-surface-variant/30">
+                                                        <td className="p-2 border-b text-center">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={book.selected}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'selected', e.target.checked)}
-                                                                className="w-4 h-4"
                                                             />
                                                         </td>
                                                         <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.title}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'title', e.target.value)}
-                                                                className={`w-full border rounded p-1 text-sm ${titleError ? 'border-error' : 'border-outline-variant'}`}
+                                                                className="w-full border border-outline-variant rounded p-1 text-sm font-semibold"
                                                             />
-                                                            {titleError && (
-                                                                <span className="text-[10px] text-error font-label-sm block mt-0.5">Titel ist erforderlich</span>
-                                                            )}
                                                         </td>
                                                         <td className="p-2 border-b align-top">
                                                             <input
                                                                 value={book.author}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
-                                                                placeholder="Autor"
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm"
                                                             />
                                                         </td>
@@ -470,23 +387,23 @@ const Admin: React.FC = () => {
                                                             <select
                                                                 value={book.category}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
-                                                                className="w-full border border-outline-variant rounded p-1 text-sm bg-surface"
+                                                                className="w-full border border-outline-variant rounded p-1 text-xs"
                                                             >
                                                                 <option value="Auf Deutsch">Auf Deutsch</option>
-                                                                <option value="Belytrystyka polska">Polnische Belletristik</option>
-                                                                <option value="Belytrystyka zagraniczna">Internationale Belletristik</option>
-                                                                <option value="Dziecięce">Kinder & Jugend</option>
-                                                                <option value="Fantasy | Sci-fi">Fantasy & Sci-fi</option>
-                                                                <option value="Historyczne">Historische Romane</option>
-                                                                <option value="Kryminał | Thriller">Krimi & Thriller</option>
+                                                                <option value="Belytrystyka polska">Belytrystyka polska</option>
+                                                                <option value="Belytrystyka zagraniczna">Belytrystyka zagraniczna</option>
+                                                                <option value="Dla dzieci">Dla dzieci</option>
+                                                                <option value="Fantasy | Sci-Fi">Fantasy | Sci-Fi</option>
+                                                                <option value="Powieści historyczne">Powieści historyczne</option>
+                                                                <option value="Kryminał | Thriller">Kryminał | Thriller</option>
                                                                 <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                                                                <option value="Biografie">Biografien</option>
-                                                                <option value="Poezja">Lyrik & Poesie</option>
+                                                                <option value="Biografie">Biografie</option>
+                                                                <option value="Poezja">Poezja</option>
                                                                 <option value="Poradniki | Popularnonaukowe">Ratgeber & Sachbücher</option>
                                                                 <option value="Reportaże | Podróżnicze">Reportagen & Reisen</option>
                                                             </select>
                                                         </td>
-                                                        <td className="p-2 border-b align-top">
+                                                        <td className="p-2 border-b align-top text-center">
                                                             <input
                                                                 value={book.publication_year}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'publication_year', e.target.value)}
@@ -494,7 +411,7 @@ const Admin: React.FC = () => {
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm text-center"
                                                             />
                                                         </td>
-                                                        <td className="p-2 border-b align-top">
+                                                        <td className="p-2 border-b align-top text-center">
                                                             <input
                                                                 value={book.isbn}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'isbn', e.target.value)}
