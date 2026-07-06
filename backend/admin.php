@@ -12,17 +12,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Handle operations
-if (strpos($_SERVER['REQUEST_URI'], '/api/admin/pages') !== false) {
+if (strpos($request_uri, '/admin/pages') !== false) {
     require 'admin_pages.php';
-} elseif (strpos($_SERVER['REQUEST_URI'], '/api/admin/users') !== false || strpos($_SERVER['REQUEST_URI'], '/api/admin/loans') !== false) {
+} elseif (strpos($request_uri, '/admin/users') !== false || strpos($request_uri, '/admin/loans') !== false) {
     require 'admin_users.php';
-} elseif (strpos($_SERVER['REQUEST_URI'], '/api/admin/books') !== false) {
+} elseif (strpos($request_uri, '/admin/books') !== false) {
     
     if ($method == 'POST') {
-        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        if (strpos($path, '/api/admin/books/import') !== false) {
+        if (strpos($request_uri, '/admin/books/import') !== false) {
             $input = json_decode(file_get_contents('php://input'), true);
             if (!isset($input['books']) || !is_array($input['books'])) {
                 http_response_code(400);
@@ -114,10 +114,10 @@ if (strpos($_SERVER['REQUEST_URI'], '/api/admin/pages') !== false) {
             echo json_encode(["message" => "Failed to create book: " . $e->getMessage()]);
         }
     } elseif ($method == 'DELETE') {
-        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $path = preg_replace('/^\/api/', '', $request_uri);
         $parts = explode('/', trim($path, '/'));
-        if (count($parts) > 3 && is_numeric($parts[3])) {
-            $id = $parts[3];
+        if (count($parts) >= 3 && $parts[0] === 'admin' && $parts[1] === 'books' && is_numeric($parts[2])) {
+            $id = $parts[2];
             $stmt = $pdo->prepare("DELETE FROM books WHERE id = ?");
             $stmt->execute([$id]);
             echo json_encode(["message" => "Book deleted"]);

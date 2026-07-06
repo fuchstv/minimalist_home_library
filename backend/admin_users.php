@@ -4,43 +4,36 @@ require_once 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Normalize path by removing optional /api prefix for consistent internal routing
+$path = preg_replace('/^\/api/', '', $path);
 $parts = explode('/', trim($path, '/'));
 
-// Helper to calculate overdue status dynamically
-function checkAndUpdateOverdueLoans($pdo) {
-    $today = date('Y-m-d');
-    $stmt = $pdo->prepare("UPDATE loans SET status = 'overdue' WHERE due_date < ? AND status = 'active'");
-    $stmt->execute([$today]);
-}
-
-// Keep status up to date
-checkAndUpdateOverdueLoans($pdo);
-
-// Check if path is /api/admin/loans (global loans list)
-if (isset($parts[2]) && $parts[2] === 'loans') {
-    if ($method === 'GET') {
-        try {
-            $query = "
-                SELECT l.*, u.name as user_name, u.email as user_email, u.phone as user_phone,
-                       b.title as book_title, b.author as book_author, b.signature as book_signature
-                FROM loans l
-                JOIN users u ON l.user_id = u.id
-                JOIN books b ON l.book_id = b.id
-                ORDER BY l.status DESC, l.due_date ASC
-            ";
-            $stmt = $pdo->query($query);
-            $loans = $stmt->fetchAll();
-            echo json_encode(["data" => $loans]);
-        } catch (\Exception $e) {
-            http_response_code(500);
-            echo json_encode(["message" => "Failed to fetch loans: " . $e->getMessage()]);
+// Check if path is /admin/loans
+if (isset($parts[1]) && $parts[1] === 'loans') {
+    // GET /admin/loans
+    if (count($parts) === 2) {
+        if ($method === 'GET') {
+            try {
+                $stmt = $pdo->query("
+                    SELECT l.*, b.title as book_title, b.author as book_author, b.signature as book_signature, u.name as user_name
+                    FROM loans l
+                    JOIN books b ON l.book_id = b.id
+                    JOIN users u ON l.user_id = u.id
+                    ORDER BY l.status DESC, l.loan_date DESC
+                ");
+                $loans = $stmt->fetchAll();
+                echo json_encode(["data" => $loans]);
+            } catch (\Exception $e) {
+                http_response_code(500);
+                echo json_encode(["message" => "Failed to fetch loans: " . $e->getMessage()]);
+            }
+            return;
         }
-        return;
     }
     
-    // PUT /api/admin/loans/{loan_id} (global action on loan)
-    if (count($parts) > 3 && is_numeric($parts[3])) {
-        $loan_id = (int)$parts[3];
+    // /admin/loans/{id}
+    if (count($parts) === 3 && is_numeric($parts[2])) {
+        $loan_id = (int)$parts[2];
         if ($method === 'PUT') {
             $input = json_decode(file_get_contents('php://input'), true);
             $action = $input['action'] ?? null;
@@ -89,10 +82,10 @@ if (isset($parts[2]) && $parts[2] === 'loans') {
     }
 }
 
-// Check if path is /api/admin/users
-if (isset($parts[2]) && $parts[2] === 'users') {
-    // GET /api/admin/users
-    if (count($parts) === 3) {
+// Check if path is /admin/users
+if (isset($parts[1]) && $parts[1] === 'users') {
+    // GET /admin/users
+    if (count($parts) === 2) {
         if ($method === 'GET') {
             try {
                 $stmt = $pdo->query("SELECT id, name, email, phone, fee_paid, data_consent, rules_consent, role, created_at FROM users ORDER BY name ASC");
@@ -106,13 +99,13 @@ if (isset($parts[2]) && $parts[2] === 'users') {
         }
     }
     
-    // /api/admin/users/{id}
-    if (count($parts) >= 4 && is_numeric($parts[3])) {
-        $user_id = (int)$parts[3];
+    // /admin/users/{id}
+    if (count($parts) >= 3 && is_numeric($parts[2])) {
+        $user_id = (int)$parts[2];
         
-        // /api/admin/users/{id}/loans
-        if (isset($parts[4]) && $parts[4] === 'loans') {
-            if (count($parts) === 5) {
+        // /admin/users/{id}/loans
+        if (isset($parts[3]) && $parts[3] === 'loans') {
+            if (count($parts) === 4) {
                 if ($method === 'GET') {
                     try {
                         $stmt = $pdo->prepare("
@@ -178,9 +171,9 @@ if (isset($parts[2]) && $parts[2] === 'users') {
                 }
             }
             
-            // /api/admin/users/{id}/loans/{loan_id}
-            if (count($parts) === 6 && is_numeric($parts[5])) {
-                $loan_id = (int)$parts[5];
+            // /admin/users/{id}/loans/{loan_id}
+            if (count($parts) === 5 && is_numeric($parts[4])) {
+                $loan_id = (int)$parts[4];
                 if ($method === 'PUT') {
                     $input = json_decode(file_get_contents('php://input'), true);
                     $action = $input['action'] ?? null;
@@ -230,7 +223,7 @@ if (isset($parts[2]) && $parts[2] === 'users') {
         }
         
         // Single user operations: GET / PUT
-        if (count($parts) === 4) {
+        if (count($parts) === 3) {
             if ($method === 'GET') {
                 try {
                     $stmt = $pdo->prepare("SELECT id, name, email, phone, fee_paid, data_consent, rules_consent, role, created_at FROM users WHERE id = ?");

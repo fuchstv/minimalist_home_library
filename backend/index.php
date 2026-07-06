@@ -16,21 +16,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-$request_uri = $_SERVER['REQUEST_URI'];
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
+/**
+ * Helper to check if the path matches the given endpoint,
+ * optionally prefixed with /api.
+ */
+function matchPath($path, $endpoint) {
+    return $path === $endpoint ||
+           strpos($path, $endpoint . '/') === 0 ||
+           $path === '/api' . $endpoint ||
+           strpos($path, '/api' . $endpoint . '/') === 0;
+}
+
 // Route incoming requests
-if (preg_match('/^\/api\/pages/', $request_uri)) {
+if (matchPath($request_uri, '/pages')) {
     require 'pages.php';
-} elseif (preg_match('/^\/api\/books/', $request_uri)) {
+} elseif (matchPath($request_uri, '/books')) {
     require 'books.php';
-} elseif (preg_match('/^\/api\/loans/', $request_uri)) {
+} elseif (matchPath($request_uri, '/loans')) {
     require 'loans.php';
-} elseif (preg_match('/^\/api\/auth/', $request_uri)) {
+} elseif (matchPath($request_uri, '/auth')) {
     require 'auth.php';
-} elseif (preg_match('/^\/api\/admin/', $request_uri)) {
+} elseif (matchPath($request_uri, '/admin')) {
     require 'admin.php';
-} elseif (preg_match('/^\/api\/health/', $request_uri)) {
+} elseif (matchPath($request_uri, '/health')) {
     require 'health.php';
 } else {
     http_response_code(404);

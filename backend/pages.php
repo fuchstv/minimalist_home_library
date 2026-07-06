@@ -4,11 +4,12 @@ require_once 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = preg_replace('/^\/api/', '', $path);
 $parts = explode('/', trim($path, '/'));
 
-// Expected path: /api/pages/{slug}
-if (count($parts) >= 3 && $parts[1] === 'pages') {
-    $slug = $parts[2];
+// Expected path: /pages/{slug}
+if (count($parts) >= 2 && $parts[0] === 'pages') {
+    $slug = $parts[1];
 
     if ($method === 'GET') {
         $stmt = $pdo->prepare("SELECT * FROM pages WHERE slug = ?");
