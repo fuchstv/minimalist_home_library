@@ -18,7 +18,7 @@ if ($method == 'GET') {
                b.title, b.author, b.isbn, b.location
         FROM loans l
         JOIN books b ON l.book_id = b.id
-        WHERE l.user_id = ?
+        WHERE l.user_id = ? AND l.status != 'returned'
         ORDER BY l.loan_date DESC
     ";
     $stmt = $pdo->prepare($query);

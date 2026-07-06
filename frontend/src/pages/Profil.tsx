@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -20,16 +20,26 @@ const Profil: React.FC = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [loans, setLoans] = useState<Loan[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const fetchLoans = async () => {
+    const fetchLoans = useCallback(async () => {
         if (!user) return;
-        // Fetch loans for this user
-        const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`, { credentials: 'include' });
-        if (res.ok) {
-            const data = await res.json();
-            setLoans(data.data || []);
+        setLoading(true);
+        try {
+            // Fetch loans for this user
+            const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`, { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                // Even if backend filters, we filter here too for extra safety
+                const activeLoans = (data.data || []).filter((l: Loan) => l.status !== 'returned');
+                setLoans(activeLoans);
+            }
+        } catch (error) {
+            console.error("Error fetching loans:", error);
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [user]);
 
     useEffect(() => {
         if (!user) {
@@ -37,21 +47,26 @@ const Profil: React.FC = () => {
         } else {
             fetchLoans();
         }
-    }, [user, navigate]);
+    }, [user, navigate, fetchLoans]);
 
     const handleReturn = async (loanId: number) => {
-        const res = await fetch(`${API_BASE_URL}/api/loans`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'return', loan_id: loanId }),
-            credentials: 'include'
-        });
-        
-        if (res.ok) {
-            fetchLoans();
-            alert('Buch erfolgreich zurückgegeben.');
-        } else {
-            alert('Fehler bei der Rückgabe.');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/loans`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'return', loan_id: loanId }),
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                await fetchLoans();
+                alert('Buch erfolgreich zurückgegeben.');
+            } else {
+                const errorData = await res.json();
+                alert(errorData.message || 'Fehler bei der Rückgabe.');
+            }
+        } catch {
+            alert('Netzwerkfehler bei der Rückgabe.');
         }
     };
 
@@ -63,7 +78,9 @@ const Profil: React.FC = () => {
             
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
                 <h2 className="font-headline-md text-headline-md mb-4">{t('nav.loans')}</h2>
-                {loans.length === 0 ? (
+                {loading ? (
+                    <p className="text-on-surface-variant">Lädt...</p>
+                ) : loans.length === 0 ? (
                     <p className="text-on-surface-variant">Du hast derzeit keine Bücher ausgeliehen.</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
