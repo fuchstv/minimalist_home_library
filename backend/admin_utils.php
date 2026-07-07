@@ -33,3 +33,41 @@ function generateSignature($pdo, $category) {
 
     return $abbr . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 }
+
+function normalizeIsbn($isbn) {
+    if (!$isbn) return null;
+    return preg_replace('/[^0-9X]/i', '', $isbn);
+}
+
+function findDuplicateBook($pdo, $title, $author, $isbn, $excludeId = null) {
+    // 1. Check by ISBN if provided
+    $normalizedIsbn = normalizeIsbn($isbn);
+    if ($normalizedIsbn) {
+        $sql = "SELECT id, title, author, signature FROM books WHERE (REPLACE(REPLACE(isbn, '-', ''), ' ', '') = ?) ";
+        $params = [$normalizedIsbn];
+        if ($excludeId) {
+            $sql .= " AND id != ?";
+            $params[] = $excludeId;
+        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $duplicate = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($duplicate) return $duplicate;
+    }
+
+    // 2. Check by Title and Author
+    if (!empty(trim($title))) {
+        $sql = "SELECT id, title, author, signature FROM books WHERE LOWER(TRIM(title)) = LOWER(TRIM(?)) AND LOWER(TRIM(author)) = LOWER(TRIM(?))";
+        $params = [$title, $author];
+        if ($excludeId) {
+            $sql .= " AND id != ?";
+            $params[] = $excludeId;
+        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $duplicate = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($duplicate) return $duplicate;
+    }
+
+    return null;
+}

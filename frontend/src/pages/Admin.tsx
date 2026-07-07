@@ -191,7 +191,7 @@ const Admin: React.FC = () => {
 
         if (res.ok) {
             const result = await res.json();
-            setMessage(t('admin.bibtex.import_success', { count: result.count }));
+            setMessage(t('admin.bibtex.import_success', { count: result.count, skipped: result.skipped }));
             setPreviewBooks([]);
             setBibtex('');
                             fetchBooks();

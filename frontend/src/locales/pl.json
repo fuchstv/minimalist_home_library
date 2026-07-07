@@ -127,7 +127,7 @@
       "preview": "Podgląd ({{count}} książek)",
       "selected_count": "Wybrano {{selected}} z {{total}} książek",
       "import_btn": "Importuj wybrane",
-      "import_success": "Pomyślnie zaimportowano {{count}} książek!",
+      "import_success": "Pomyślnie zaimportowano {{count}} książek! Pominięto {{skipped}} duplikaty.",
       "import_error": "Import nie powiódł się",
       "table": {
         "title": "Tytuł",

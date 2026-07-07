@@ -37,6 +37,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 
                 $importedCount = 0;
+                $skippedCount = 0;
                 foreach ($input['books'] as $book) {
                     $title = $book['title'] ?? '';
                     $author = $book['author'] ?? '';
@@ -50,13 +51,23 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                         throw new Exception("Title is required for all books.");
                     }
 
+                    // Duplicate check
+                    if (findDuplicateBook($pdo, $title, $author, $isbn)) {
+                        $skippedCount++;
+                        continue;
+                    }
+
                     $signature = generateSignature($pdo, $category);
                     $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $signature]);
                     $importedCount++;
                 }
 
                 $pdo->commit();
-                echo json_encode(["message" => "Imported $importedCount books successfully.", "count" => $importedCount]);
+                echo json_encode([
+                    "message" => "Imported $importedCount books successfully." . ($skippedCount > 0 ? " $skippedCount duplicates skipped." : ""),
+                    "count" => $importedCount,
+                    "skipped" => $skippedCount
+                ]);
             } catch (\Exception $e) {
                 if ($pdo->inTransaction()) {
                     $pdo->rollBack();
@@ -105,6 +116,13 @@ if (strpos($request_uri, '/admin/pages') !== false) {
 
         try {
             $pdo->beginTransaction();
+
+            // Duplicate Check
+            $duplicate = findDuplicateBook($pdo, $title, $author, $isbn, $id);
+            if ($duplicate) {
+                throw new Exception("A similar book already exists with signature: " . ($duplicate['signature'] ?: "N/A"));
+            }
+
             if ($id) {
                 // Update
                 $sql = "UPDATE books SET title = ?, author = ?, category = ?, publication_year = ?, publisher = ?, isbn = ?, description = ?, signature = ?";
@@ -133,7 +151,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 $pdo->commit();
                 echo json_encode(["message" => "Book created successfully", "id" => $newId, "signature" => $signature]);
             }
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
