@@ -2,6 +2,7 @@
 // backend/loans.php
 
 require_once 'db.php';
+require_once 'notification_utils.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -112,6 +113,8 @@ if ($method == 'GET') {
 
                 $stmt = $pdo->prepare("UPDATE books SET availability_status = 'available' WHERE id = ?");
                 $stmt->execute([$loan['book_id']]);
+
+                notifyBookAvailable($pdo, $loan['book_id']);
 
                 $message = "Book successfully returned.";
             } elseif ($action === 'extend') {

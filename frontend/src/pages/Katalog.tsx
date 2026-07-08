@@ -68,6 +68,34 @@ const Katalog: React.FC = () => {
         return pages;
     };
 
+    const handleReserve = async (bookId: number) => {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+
+        try {
+            const headers: HeadersInit = { "Content-Type": "application/json" };
+            if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
+
+            const response = await fetch(`${API_BASE_URL}/api/reservations`, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify({ book_id: bookId }),
+                credentials: "include"
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert(t("catalog.reserve_success"));
+                fetchBooks();
+            } else {
+                alert(data.message || t("catalog.reserve_error"));
+            }
+        } catch {
+            alert(t("catalog.reserve_error"));
+        }
+    };
+
     const handleBorrow = async (bookId: number) => {
         if (!user) {
             navigate('/login');
@@ -214,7 +242,7 @@ const Katalog: React.FC = () => {
                                                     {t('catalog.borrow_btn')}
                                                 </button>
                                             ) : (
-                                                <button className="flex-grow bg-surface-container-high text-on-surface-variant font-label-md text-label-md py-2.5 rounded-full cursor-not-allowed">
+                                                <button onClick={() => handleReserve(book.id)} className="flex-grow bg-secondary text-on-secondary font-label-md text-label-md py-2.5 rounded-full hover:bg-secondary/90 transition-colors shadow-sm">
                                                     {t('catalog.reserve_btn')}
                                                 </button>
                                             )}

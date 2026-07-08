@@ -1,19 +1,21 @@
 <?php
-// backend/admin_users.php (updated for error handling)
+// backend/admin_users.php
+require_once 'db.php';
 require_once 'error_utils.php';
+require_once 'notification_utils.php';
 
-// Check if path is /admin/loans
+// Check if it's the admin global loans request
+$method = $_SERVER['REQUEST_METHOD'];
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = preg_replace('/^\/api/', '', $request_uri);
+$parts = explode('/', trim($path, '/'));
+
 if (isset($parts[1]) && $parts[1] === 'loans') {
     if (count($parts) === 2) {
         if ($method === 'GET') {
             try {
                 $stmt = $pdo->query("
-                    SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
-                           CASE
-                               WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
-                               ELSE l.status
-                           END as status,
-                           b.title as book_title, b.author as book_author, b.signature as book_signature, b.isbn as book_isbn,
+                    SELECT l.*, b.title as book_title, b.author as book_author, b.signature as book_signature,
                            u.name as user_name, u.email as user_email
                     FROM loans l
                     JOIN books b ON l.book_id = b.id
@@ -148,6 +150,8 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                             $stmt = $pdo->prepare("UPDATE books SET availability_status = 'available' WHERE id = ?");
                             $stmt->execute([$loan['book_id']]);
                             
+                            notifyBookAvailable($pdo, $loan['book_id']);
+
                             $message = "Book successfully returned.";
                         } elseif ($action === 'extend') {
                             if (!$due_date) {

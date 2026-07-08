@@ -23,6 +23,8 @@
     "current_selection": "Aktualny wybór",
     "borrow_btn": "Wypożycz",
     "reserve_btn": "Zarezerwuj",
+    "reserve_success": "Książka została pomyślnie zarezerwowana! Powiadomimy Cię, gdy będzie ponownie dostępna.",
+    "reserve_error": "Błąd podczas rezerwacji książki.",
     "no_books": "Nie znaleziono książek.",
     "clear_filters": "Wyczyść filtry",
     "borrow_success": "Książka została pomyślnie wypożyczona!",
@@ -85,6 +87,12 @@
     "section3_content": "Prosimy o staranne obchodzenie się z wypożyczonymi książkami. W przypadku uszkodzenia lub zgubienia należy dokonać wymiany lub zwrotu kosztów.",
     "section4_title": "Zwrot",
     "section4_content": "Książki należy zwracać terminowo w godzinach otwarcia SprachCafé."
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "none": "Brak nowych powiadomień.",
+    "mark_read": "Oznacz jako przeczytane",
+    "mark_all_read": "Oznacz wszystkie jako przeczytane"
   },
   "admin": {
     "title": "Panel administratora",
