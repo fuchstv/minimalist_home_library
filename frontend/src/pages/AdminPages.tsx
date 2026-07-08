@@ -17,6 +17,7 @@ const AdminPages: React.FC = () => {
     const [selectedPage, setSelectedPage] = useState<PageData | null>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const [isError, setIsError] = useState(false);
 
         const fetchPages = useCallback(async () => {
         try {
@@ -39,11 +40,13 @@ const AdminPages: React.FC = () => {
         try {
             await axios.post(`${API_BASE_URL}/api/admin/pages/${selectedPage.slug}`, selectedPage, { withCredentials: true });
             setMessage(t('admin.pages.save_success'));
+            setIsError(false);
                             fetchPages();
             setTimeout(() => setMessage(''), 3000);
         } catch (error) {
             console.error('Error saving page:', error);
             setMessage(t('admin.pages.save_error'));
+            setIsError(true);
         }
     };
 
@@ -67,8 +70,9 @@ const AdminPages: React.FC = () => {
                 <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-4">
                     <h2 className="font-headline-sm text-headline-sm mb-2">{t('admin.pages.edit_title', { slug: selectedPage.slug })}</h2>
 
-                    {message && (
-                        <div className={`p-3 rounded text-body-sm ${message.includes('Fehler') ? 'bg-error-container text-on-error-container' : 'bg-secondary-container text-on-secondary-container'}`}>
+                    {
+                    message && (
+                        <div className={`p-3 rounded text-body-sm ${isError ? 'bg-error-container text-on-error-container' : 'bg-secondary-container text-on-secondary-container'}`}>
                             {message}
                         </div>
                     )}
