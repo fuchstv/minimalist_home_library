@@ -58,7 +58,7 @@ const AdminPages: React.FC = () => {
                         onClick={() => setSelectedPage(page)}
                         className={`px-4 py-2 rounded-md font-label-md transition-colors ${selectedPage?.slug === page.slug ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface hover:bg-surface-container-highest'}`}
                     >
-                        {page.title_de}
+                        {t(`admin.pages.slugs.${page.slug}`, { defaultValue: page.title_de })}
                     </button>
                 ))}
             </div>
