@@ -134,7 +134,16 @@
       "isbn": "ISBN",
       "cover_image": "Okładka",
       "signature_placeholder": "Zostanie wygenerowane automatycznie...",
-      "description": "Opis"
+      "description": "Opis",
+      "category": "Kategoria",
+      "isbn_lookup": "Szukaj",
+      "isbn_lookup_hint": "Wpisz ISBN i wyszukaj w Open Library",
+      "isbn_not_found": "Nie znaleziono książki",
+      "isbn_error": "Błąd podczas wyszukiwania",
+      "isbn_looking_up": "Szukanie...",
+      "browse": "Przeglądaj",
+      "no_file_selected": "Nie wybrano pliku",
+      "lookup_success": "Znaleziono dane książki!"
     },
     "bibtex": {
       "label": "Wklej tutaj kod BibTeX",

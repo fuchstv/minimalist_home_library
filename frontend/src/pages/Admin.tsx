@@ -52,6 +52,8 @@ const Admin: React.FC = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [message, setMessage] = useState('');
+    const [isLookingUp, setIsLookingUp] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
     const limit = 10;
 
     // BibTeX Import State
@@ -130,6 +132,37 @@ const Admin: React.FC = () => {
         } else {
             const data = await res.json();
             alert(data.message || 'Fehler beim Speichern');
+        }
+    };
+
+
+    const handleOpenLibraryLookup = async () => {
+        if (!bookForm.isbn) return;
+        setIsLookingUp(true);
+        try {
+            const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${bookForm.isbn}&format=json&jscmd=data`);
+            const data = await res.json();
+            const bookKey = `ISBN:${bookForm.isbn}`;
+            if (data[bookKey]) {
+                const info = data[bookKey];
+                setBookForm(prev => ({
+                    ...prev,
+                    title: info.title || prev.title,
+                    author: info.authors ? info.authors.map((a: any) => a.name).join(", ") : prev.author,
+                    publication_year: info.publish_date || prev.publication_year,
+                    publisher: info.publishers ? info.publishers.map((p: any) => p.name).join(", ") : prev.publisher,
+                    description: info.notes || (info.subtitle ? info.subtitle : prev.description)
+                }));
+                setMessage(t("admin.books.lookup_success"));
+                setTimeout(() => setMessage(""), 3000);
+            } else {
+                alert(t("admin.books.isbn_not_found"));
+            }
+        } catch (error) {
+            console.error("Open Library lookup failed:", error);
+            alert(t("admin.books.isbn_error"));
+        } finally {
+            setIsLookingUp(false);
         }
     };
 
@@ -302,7 +335,19 @@ const Admin: React.FC = () => {
                                     </div>
                                     <div>
                                         <label className="font-label-md block mb-1">{t('admin.books.isbn')}</label>
-                                        <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                                        <div className="flex gap-1">
+                                            <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="flex-grow border border-outline-variant rounded p-2 text-body-md bg-surface" placeholder="e.g. 978..." />
+                                            <button
+                                                type="button"
+                                                onClick={handleOpenLibraryLookup}
+                                                disabled={isLookingUp || !bookForm.isbn}
+                                                className="bg-secondary text-on-secondary px-3 rounded hover:bg-secondary/90 disabled:opacity-50 transition-colors text-xs font-label-md"
+                                                title={t("admin.books.isbn_lookup_hint")}
+                                            >
+                                                {isLookingUp ? t("admin.books.isbn_looking_up") : t("admin.books.isbn_lookup")}
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] text-on-surface-variant mt-0.5">{t("admin.books.isbn_lookup_hint")}</p>
                                     </div>
                                 </div>
 
@@ -312,11 +357,27 @@ const Admin: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="font-label-md block mb-1">{t('admin.books.cover_image')}</label>
-                                    <input type="file" onChange={handleFileChange} className="w-full text-body-sm" />
-                                    {typeof bookForm.cover_image === 'string' && (
-                                        <p className="text-xs text-on-surface-variant mt-1 italic">Aktuelles Bild: {bookForm.cover_image}</p>
-                                    )}
+                                    <label className="font-label-md block mb-1">{t("admin.books.cover_image")}</label>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="flex items-center gap-2 px-4 py-2 border border-outline rounded-md hover:bg-surface-variant/20 transition-colors text-body-sm font-label-md cursor-pointer"
+                                        >
+                                            <span className="material-symbols-outlined text-sm">upload_file</span>
+                                            {t("admin.books.browse")}
+                                        </button>
+                                        <span className="text-xs text-on-surface-variant truncate">
+                                            {bookForm.cover_image instanceof File ? bookForm.cover_image.name : (typeof bookForm.cover_image === "string" ? bookForm.cover_image : t("admin.books.no_file_selected"))}
+                                        </span>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                            accept="image/*"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-2 mt-2">
