@@ -66,7 +66,8 @@
     "rules_consent_1": "Przeczytałem i akceptuję",
     "rules_link": "regulamin biblioteki",
     "rules_consent_2": ".",
-    "accept_terms_error": "Proszę zaakceptować politykę prywatności i regulamin biblioteki."
+    "accept_terms_error": "Proszę zaakceptować politykę prywatności i regulamin biblioteki.",
+    "password_too_short": "Hasło musi mieć co najmniej 8 znaków."
   },
   "rules": {
     "title": "Regulamin biblioteki",
