@@ -39,7 +39,7 @@ const Admin: React.FC = () => {
         id: null,
         title: '',
         author: '',
-        category: 'Belytrystyka polska',
+        category: 'belytrystyka_polska',
         publication_year: '',
         publisher: '',
         isbn: '',
@@ -126,7 +126,7 @@ const Admin: React.FC = () => {
 
         if (res.ok) {
             setMessage(bookForm.id ? t('admin.books.update_success') : t('admin.books.create_success'));
-            setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null });
+            setBookForm({ id: null, title: '', author: '', category: 'belytrystyka_polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null });
             fetchBooks();
             setTimeout(() => setMessage(''), 3000);
         } else {
@@ -171,7 +171,7 @@ const Admin: React.FC = () => {
             id: book.id,
             title: book.title || '',
             author: book.author || '',
-            category: book.category || 'Belytrystyka polska',
+            category: book.category || 'belytrystyka_polska',
             publication_year: book.publication_year || '',
             publisher: book.publisher || '',
             isbn: book.isbn || '',
@@ -210,7 +210,7 @@ const Admin: React.FC = () => {
                 selected: true,
                 title: entry.title || '',
                 author: entry.author || '',
-                category: 'Belytrystyka polska',
+                category: 'belytrystyka_polska',
                 publication_year: entry.publication_year || '',
                 publisher: entry.publisher || '',
                 isbn: entry.isbn || '',
@@ -385,7 +385,7 @@ const Admin: React.FC = () => {
                                         {bookForm.id ? t('admin.books.save_btn') : t('admin.books.add_btn')}
                                     </button>
                                     {bookForm.id && (
-                                        <button type="button" onClick={() => setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })} className="px-6 border border-outline rounded-full font-label-lg hover:bg-surface-variant/20 transition-colors">
+                                        <button type="button" onClick={() => setBookForm({ id: null, title: '', author: '', category: 'belytrystyka_polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })} className="px-6 border border-outline rounded-full font-label-lg hover:bg-surface-variant/20 transition-colors">
                                             Abbrechen
                                         </button>
                                     )}
