@@ -1,16 +1,9 @@
 <?php
-// backend/admin_users.php
-require_once 'db.php';
-
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-// Normalize path by removing optional /api prefix for consistent internal routing
-$path = preg_replace('/^\/api/', '', $path);
-$parts = explode('/', trim($path, '/'));
+// backend/admin_users.php (updated for error handling)
+require_once 'error_utils.php';
 
 // Check if path is /admin/loans
 if (isset($parts[1]) && $parts[1] === 'loans') {
-    // GET /admin/loans
     if (count($parts) === 2) {
         if ($method === 'GET') {
             try {
@@ -20,7 +13,8 @@ if (isset($parts[1]) && $parts[1] === 'loans') {
                                WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
                                ELSE l.status
                            END as status,
-                           b.title as book_title, b.author as book_author, b.signature as book_signature, u.name as user_name, u.email as user_email
+                           b.title as book_title, b.author as book_author, b.signature as book_signature, b.isbn as book_isbn,
+                           u.name as user_name, u.email as user_email
                     FROM loans l
                     JOIN books b ON l.book_id = b.id
                     JOIN users u ON l.user_id = u.id
@@ -29,58 +23,7 @@ if (isset($parts[1]) && $parts[1] === 'loans') {
                 $loans = $stmt->fetchAll();
                 echo json_encode(["data" => $loans]);
             } catch (\Exception $e) {
-                http_response_code(500);
-                echo json_encode(["message" => "Failed to fetch loans: " . $e->getMessage()]);
-            }
-            return;
-        }
-    }
-    
-    // /admin/loans/{id}
-    if (count($parts) === 3 && is_numeric($parts[2])) {
-        $loan_id = (int)$parts[2];
-        if ($method === 'PUT') {
-            $input = json_decode(file_get_contents('php://input'), true);
-            $action = $input['action'] ?? null;
-            $due_date = $input['due_date'] ?? null;
-            
-            $pdo->beginTransaction();
-            try {
-                $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? FOR UPDATE");
-                $stmt->execute([$loan_id]);
-                $loan = $stmt->fetch();
-                if (!$loan) {
-                    throw new Exception("Loan not found.");
-                }
-                
-                if ($action === 'return') {
-                    $return_date = date('Y-m-d');
-                    $stmt = $pdo->prepare("UPDATE loans SET status = 'returned', return_date = ? WHERE id = ?");
-                    $stmt->execute([$return_date, $loan_id]);
-                    
-                    $stmt = $pdo->prepare("UPDATE books SET availability_status = 'available' WHERE id = ?");
-                    $stmt->execute([$loan['book_id']]);
-                    
-                    $message = "Book successfully returned.";
-                } elseif ($action === 'extend') {
-                    if (!$due_date) {
-                        $due_date = date('Y-m-d', strtotime($loan['due_date'] . ' +4 weeks'));
-                    }
-                    $status = (strtotime($due_date) < time()) ? 'overdue' : 'active';
-                    $stmt = $pdo->prepare("UPDATE loans SET due_date = ?, status = ? WHERE id = ?");
-                    $stmt->execute([$due_date, $status, $loan_id]);
-                    
-                    $message = "Loan extended to $due_date.";
-                } else {
-                    throw new Exception("Invalid action.");
-                }
-                
-                $pdo->commit();
-                echo json_encode(["message" => $message]);
-            } catch (\Exception $e) {
-                $pdo->rollBack();
-                http_response_code(400);
-                echo json_encode(["message" => $e->getMessage()]);
+                handleException($e, "Failed to fetch loans");
             }
             return;
         }
@@ -97,8 +40,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                 $users = $stmt->fetchAll();
                 echo json_encode(["data" => $users]);
             } catch (\Exception $e) {
-                http_response_code(500);
-                echo json_encode(["message" => "Failed to fetch users: " . $e->getMessage()]);
+                handleException($e, "Failed to fetch users");
             }
             return;
         }
@@ -129,8 +71,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         $loans = $stmt->fetchAll();
                         echo json_encode(["data" => $loans]);
                     } catch (\Exception $e) {
-                        http_response_code(500);
-                        echo json_encode(["message" => "Failed to fetch user loans: " . $e->getMessage()]);
+                        handleException($e, "Failed to fetch user loans");
                     }
                     return;
                 } elseif ($method === 'POST') {
@@ -173,9 +114,10 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         $pdo->commit();
                         echo json_encode(["message" => "Book successfully borrowed.", "due_date" => $due_date]);
                     } catch (\Exception $e) {
-                        $pdo->rollBack();
-                        http_response_code(400);
-                        echo json_encode(["message" => $e->getMessage()]);
+                        if ($pdo->inTransaction()) {
+                            $pdo->rollBack();
+                        }
+                        handleException($e, "An error occurred while lending the book");
                     }
                     return;
                 }
@@ -223,9 +165,10 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         $pdo->commit();
                         echo json_encode(["message" => $message]);
                     } catch (\Exception $e) {
-                        $pdo->rollBack();
-                        http_response_code(400);
-                        echo json_encode(["message" => $e->getMessage()]);
+                        if ($pdo->inTransaction()) {
+                            $pdo->rollBack();
+                        }
+                        handleException($e, "An error occurred while updating the loan");
                     }
                     return;
                 }
@@ -246,8 +189,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         echo json_encode(["message" => "User not found."]);
                     }
                 } catch (\Exception $e) {
-                    http_response_code(500);
-                    echo json_encode(["message" => "Failed to fetch user: " . $e->getMessage()]);
+                    handleException($e, "Failed to fetch user");
                 }
                 return;
             } elseif ($method === 'PUT') {
@@ -272,8 +214,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                     $stmt->execute([$name, $email, $phone, $role, $fee_paid, $data_consent, $rules_consent, $user_id]);
                     echo json_encode(["message" => "User updated successfully."]);
                 } catch (\Exception $e) {
-                    http_response_code(400);
-                    echo json_encode(["message" => "Failed to update user: " . $e->getMessage()]);
+                    handleException($e, "Failed to update user");
                 }
                 return;
             }

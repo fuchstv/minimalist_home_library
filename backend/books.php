@@ -1,6 +1,7 @@
 <?php
 // backend/books.php
 require_once 'db.php';
+require_once 'error_utils.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -17,71 +18,75 @@ if ($method == 'GET') {
         $id = $parts[1];
     }
 
-    if ($id) {
-        $stmt = $pdo->prepare("SELECT * FROM books WHERE id = ?");
-        $stmt->execute([$id]);
-        $book = $stmt->fetch();
-        if ($book) {
-            echo json_encode($book);
+    try {
+        if ($id) {
+            $stmt = $pdo->prepare("SELECT * FROM books WHERE id = ?");
+            $stmt->execute([$id]);
+            $book = $stmt->fetch();
+            if ($book) {
+                echo json_encode($book);
+            } else {
+                http_response_code(404);
+                echo json_encode(["message" => "Book not found."]);
+            }
         } else {
-            http_response_code(404);
-            echo json_encode(["message" => "Book not found."]);
+            // Handle search, filter, pagination
+            $search = $_GET['search'] ?? '';
+            $category = $_GET['category'] ?? '';
+            $status = $_GET['status'] ?? '';
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 12;
+            $offset = ($page - 1) * $limit;
+
+            $query = "SELECT * FROM books WHERE 1=1";
+            $countQuery = "SELECT COUNT(*) as total FROM books WHERE 1=1";
+            $params = [];
+
+            if ($search) {
+                $query .= " AND (title LIKE ? OR author LIKE ? OR isbn LIKE ?)";
+                $countQuery .= " AND (title LIKE ? OR author LIKE ? OR isbn LIKE ?)";
+                $searchTerm = "%$search%";
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+            }
+
+            if ($category) {
+                // Using LIKE for category because CSV categories are broad
+                $query .= " AND category LIKE ?";
+                $countQuery .= " AND category LIKE ?";
+                $params[] = "%$category%";
+            }
+
+            if ($status) {
+                $query .= " AND availability_status = ?";
+                $countQuery .= " AND availability_status = ?";
+                $params[] = $status;
+            }
+
+            // Get total count
+            $stmtCount = $pdo->prepare($countQuery);
+            $stmtCount->execute($params);
+            $totalRows = $stmtCount->fetch()['total'];
+
+            // Get paginated results
+            $query .= " LIMIT $limit OFFSET $offset";
+            $stmt = $pdo->prepare($query);
+            $stmt->execute($params);
+            $books = $stmt->fetchAll();
+
+            echo json_encode([
+                "data" => $books,
+                "meta" => [
+                    "total" => $totalRows,
+                    "page" => $page,
+                    "limit" => $limit,
+                    "totalPages" => ceil($totalRows / $limit)
+                ]
+            ]);
         }
-    } else {
-        // Handle search, filter, pagination
-        $search = $_GET['search'] ?? '';
-        $category = $_GET['category'] ?? '';
-        $status = $_GET['status'] ?? '';
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 12;
-        $offset = ($page - 1) * $limit;
-
-        $query = "SELECT * FROM books WHERE 1=1";
-        $countQuery = "SELECT COUNT(*) as total FROM books WHERE 1=1";
-        $params = [];
-
-        if ($search) {
-            $query .= " AND (title LIKE ? OR author LIKE ? OR isbn LIKE ?)";
-            $countQuery .= " AND (title LIKE ? OR author LIKE ? OR isbn LIKE ?)";
-            $searchTerm = "%$search%";
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-        }
-
-        if ($category) {
-            // Using LIKE for category because CSV categories are broad
-            $query .= " AND category LIKE ?";
-            $countQuery .= " AND category LIKE ?";
-            $params[] = "%$category%";
-        }
-
-        if ($status) {
-            $query .= " AND availability_status = ?";
-            $countQuery .= " AND availability_status = ?";
-            $params[] = $status;
-        }
-
-        // Get total count
-        $stmtCount = $pdo->prepare($countQuery);
-        $stmtCount->execute($params);
-        $totalRows = $stmtCount->fetch()['total'];
-
-        // Get paginated results
-        $query .= " LIMIT $limit OFFSET $offset";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute($params);
-        $books = $stmt->fetchAll();
-
-        echo json_encode([
-            "data" => $books,
-            "meta" => [
-                "total" => $totalRows,
-                "page" => $page,
-                "limit" => $limit,
-                "totalPages" => ceil($totalRows / $limit)
-            ]
-        ]);
+    } catch (\Exception $e) {
+        handleException($e, "Failed to fetch books");
     }
 } else {
     http_response_code(405);
