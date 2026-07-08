@@ -16,6 +16,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     try {
+        // Clean up any existing read notifications first
+        $pdo->prepare("DELETE FROM notifications WHERE user_id = ? AND is_read = TRUE")->execute([$user_id]);
+
         // Count overdue loans
         $overdue_count = 0;
         if ($user_role === 'admin') {
@@ -32,8 +35,8 @@ if ($method === 'GET') {
         $stmt->execute([$user_id]);
         $unread_notifications_count = (int)$stmt->fetchColumn();
 
-        // Get actual notifications
-        $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50");
+        // Get actual notifications (only unread ones)
+        $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = FALSE ORDER BY created_at DESC LIMIT 50");
         $stmt->execute([$user_id]);
         $notifications = $stmt->fetchAll();
 
@@ -46,21 +49,21 @@ if ($method === 'GET') {
     } catch (\Exception $e) {
         sendGenericError($e, "Internal Server Error");
     }
-} elseif ($method === 'PUT') {
-    // Mark as read
+} elseif ($method === 'PUT' || $method === 'DELETE') {
+    // Delete notifications instead of marking as read
     $data = json_decode(file_get_contents('php://input'), true);
     $notification_id = $data['id'] ?? null;
 
     try {
         if ($notification_id) {
-            $stmt = $pdo->prepare("UPDATE notifications SET is_read = TRUE WHERE id = ? AND user_id = ?");
+            $stmt = $pdo->prepare("DELETE FROM notifications WHERE id = ? AND user_id = ?");
             $stmt->execute([$notification_id, $user_id]);
         } else {
-            // Mark all as read
-            $stmt = $pdo->prepare("UPDATE notifications SET is_read = TRUE WHERE user_id = ?");
+            // Delete all for this user
+            $stmt = $pdo->prepare("DELETE FROM notifications WHERE user_id = ?");
             $stmt->execute([$user_id]);
         }
-        echo json_encode(["message" => "Notifications updated"]);
+        echo json_encode(["message" => "Notifications deleted"]);
     } catch (\Exception $e) {
         sendGenericError($e, "Internal Server Error");
     }
