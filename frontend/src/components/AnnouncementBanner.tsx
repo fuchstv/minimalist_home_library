@@ -38,9 +38,9 @@ const AnnouncementBanner: React.FC = () => {
     if (!announcement) return null;
 
     return (
-        <div className="bg-primary text-on-primary py-3 px-margin-mobile md:px-margin-desktop w-full">
+        <div className="bg-primary text-on-primary py-3 px-margin-mobile md:px-margin-desktop w-full" role="status" aria-live="polite">
             <div className="max-w-container-max-width mx-auto flex items-center gap-3">
-                <span className="material-symbols-outlined flex-shrink-0">info</span>
+                <span className="material-symbols-outlined flex-shrink-0" aria-hidden="true">info</span>
                 <p className="font-label-md text-label-md flex-grow">
                     {announcement}
                 </p>
