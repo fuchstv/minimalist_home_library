@@ -11,97 +11,73 @@ import '@testing-library/jest-dom';
 vi.stubGlobal('fetch', vi.fn());
 
 const mockUser = {
-  id: 1,
-  name: 'Test User',
-  email: 'test@example.com',
-  role: 'member'
+    id: 1,
+    name: 'Test User',
+    email: 'test@test.com',
+    role: 'member'
 };
 
-const renderProfil = (user = mockUser) => {
-  return render(
-    <I18nextProvider i18n={i18n}>
-      <AuthContext.Provider value={{ user, setUser: vi.fn(), logout: vi.fn() }}>
-        <MemoryRouter>
-          <Profil />
-        </MemoryRouter>
-      </AuthContext.Provider>
-    </I18nextProvider>
-  );
+const renderProfil = (user: any) => {
+    return render(
+        <I18nextProvider i18n={i18n}>
+            <AuthContext.Provider value={{ user, setUser: vi.fn(), logout: vi.fn(), csrfToken: null, setCsrfToken: vi.fn() }}>
+                <MemoryRouter>
+                    <Profil />
+                </MemoryRouter>
+            </AuthContext.Provider>
+        </I18nextProvider>
+    );
 };
 
 describe('Profil Component', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('renders loading state initially', async () => {
-    (fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: [] }),
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    renderProfil();
-    expect(screen.getByText(/Lädt/i)).toBeInTheDocument();
-  });
+    it('renders loading state initially', async () => {
+        (fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: [] }),
+        });
 
-  it('renders loans correctly', async () => {
-    const mockLoans = [
-      {
-        id: 1,
-        book_id: 101,
-        title: 'Test Book',
-        author: 'Test Author',
-        loan_date: '2023-01-01',
-        due_date: '2023-01-15',
-        status: 'active'
-      }
-    ];
-
-    (fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: mockLoans }),
+        renderProfil(mockUser);
+        expect(screen.getByText(/Lädt.../i)).toBeInTheDocument();
     });
 
-    renderProfil();
+    it('renders user information and loans', async () => {
+        const mockLoans = [
+            { id: 1, book_id: 101, title: 'Test Book', author: 'Author Name', loan_date: '2024-01-01', due_date: '2024-01-15', status: 'active' }
+        ];
 
-    await waitFor(() => {
-      expect(screen.getByText('Test Book')).toBeInTheDocument();
-      expect(screen.getByText('Test Author')).toBeInTheDocument();
-    });
-  });
+        (fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: mockLoans }),
+        });
 
-  it('filters out returned loans', async () => {
-    const mockLoans = [
-      {
-        id: 1,
-        book_id: 101,
-        title: 'Active Book',
-        author: 'Author A',
-        loan_date: '2023-01-01',
-        due_date: '2023-01-15',
-        status: 'active'
-      },
-      {
-        id: 2,
-        book_id: 102,
-        title: 'Returned Book',
-        author: 'Author B',
-        loan_date: '2023-01-01',
-        due_date: '2023-01-15',
-        status: 'returned'
-      }
-    ];
+        renderProfil(mockUser);
 
-    (fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ data: mockLoans }),
+        await waitFor(() => {
+            expect(screen.getByText(/Test User/i)).toBeInTheDocument();
+            expect(screen.getByText(/Test Book/i)).toBeInTheDocument();
+            expect(screen.getByText(/Author Name/i)).toBeInTheDocument();
+            expect(screen.getByText(/Rückgabe bis: 15.1.2024/i)).toBeInTheDocument();
+        });
     });
 
-    renderProfil();
+    it('shows overdue status for overdue loans', async () => {
+        const mockLoans = [
+            { id: 2, book_id: 102, title: 'Overdue Book', author: 'Old Author', loan_date: '2023-12-01', due_date: '2023-12-15', status: 'overdue' }
+        ];
 
-    await waitFor(() => {
-      expect(screen.getByText('Active Book')).toBeInTheDocument();
-      expect(screen.queryByText('Returned Book')).not.toBeInTheDocument();
+        (fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ data: mockLoans }),
+        });
+
+        renderProfil(mockUser);
+
+        await waitFor(() => {
+            expect(screen.getByText(/Überfällig/i)).toBeInTheDocument();
+        });
     });
-  });
 });

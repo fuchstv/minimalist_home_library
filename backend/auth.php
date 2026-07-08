@@ -2,7 +2,6 @@
 // backend/auth.php
 require_once 'db.php';
 require_once 'error_utils.php';
-session_start();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -29,7 +28,8 @@ if ($method == 'POST') {
                         "name" => $user['name'],
                         "email" => $user['email'],
                         "role" => $user['role']
-                    ]
+                    ],
+                    "csrfToken" => generateCsrfToken()
                 ]);
             } else {
                 http_response_code(401);
@@ -83,7 +83,10 @@ if ($method == 'POST') {
             $stmt->execute([$_SESSION['user_id']]);
             $user = $stmt->fetch();
             if ($user) {
-                echo json_encode(["user" => $user]);
+                echo json_encode([
+                    "user" => $user,
+                    "csrfToken" => generateCsrfToken()
+                ]);
             } else {
                 http_response_code(401);
                 echo json_encode(["message" => "Not authenticated"]);

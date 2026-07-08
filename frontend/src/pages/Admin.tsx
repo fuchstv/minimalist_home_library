@@ -1,71 +1,38 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import { parseBibTeX } from '../utils/bibtexParser';
-import AdminPages from './AdminPages';
-import AdminUsers from './AdminUsers';
-import AdminLoans from './AdminLoans';
-import { API_BASE_URL } from "../config";
 
 interface Book {
-    id: number;
+    id: number | null;
     title: string;
     author: string;
     category: string;
-    signature?: string;
-    publisher?: string;
-    publication_year?: string;
-    isbn?: string;
-    description?: string;
-    cover_image?: string;
-}
-
-interface PreviewBook {
-    tempId: string;
-    title: string;
-    author: string;
-    category: string;
-    signature?: string;
-    publisher: string;
     publication_year: string;
+    publisher: string;
     isbn: string;
     description: string;
+    signature: string;
+    cover_image: File | string | null;
+}
+
+interface PreviewBook extends Omit<Book, 'id' | 'cover_image'> {
+    tempId: string;
     selected: boolean;
+    description: string;
 }
 
 const Admin: React.FC = () => {
     const { t } = useTranslation();
-    const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
-    const [books, setBooks] = useState<Book[]>([]);
-    
-    // Pagination and search for admin book list
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [search, setSearch] = useState('');
-    const limit = 20;
+    const { user, csrfToken } = useContext(AuthContext);
 
-    // Tab state
-    const [activeTab, setActiveTab] = useState<'single' | 'bibtex' | 'users' | 'loans' | 'pages'>('single');
-
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const tab = queryParams.get('tab');
-        if (tab === 'loans' || tab === 'users' || tab === 'pages' || tab === 'bibtex' || tab === 'single') {
-                                                /* eslint-disable-next-line react-hooks/set-state-in-effect */
-            setActiveTab(tab as 'single' | 'bibtex' | 'users' | 'loans' | 'pages');
-        }
-    }, [location]);
-
-    const handleTabChange = (tab: 'single' | 'bibtex' | 'users' | 'loans' | 'pages') => {
-        setActiveTab(tab);
-        navigate(`/admin?tab=${tab}`, { replace: true });
-    };
-
-    const [bookForm, setBookForm] = useState({
-        id: null as number | null,
+    const [books, setBooks] = useState<any[]>([]);
+    const [bookForm, setBookForm] = useState<Book>({
+        id: null,
         title: '',
         author: '',
         category: 'Belytrystyka polska',
@@ -74,21 +41,44 @@ const Admin: React.FC = () => {
         isbn: '',
         description: '',
         signature: '',
-        cover_image: null as File | null
+        cover_image: null
     });
 
-    const [bibtex, setBibtex] = useState('');
-    const [previewBooks, setPreviewBooks] = useState<PreviewBook[]>([]);
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [message, setMessage] = useState('');
+    const limit = 10;
 
-        const fetchBooks = useCallback(async () => {
-        const res = await fetch(`${API_BASE_URL}/api/books?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`, { credentials: 'include' });
-        if (res.ok) {
-            const data = await res.json();
-            setBooks(data.data);
-            setTotalPages(data.meta.total_pages);
+    // BibTeX Import State
+    const [bibtexInput, setBibtexInput] = useState('');
+    const [previewBooks, setPreviewBooks] = useState<PreviewBook[]>([]);
+    const [showBibtexArea, setShowBibtexArea] = useState(false);
+
+    const fetchBooks = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/books?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`, { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setBooks(data.data);
+                setTotalPages(data.meta.totalPages);
+
+                // Handle edit redirect from Katalog
+                const params = new URLSearchParams(location.search);
+                const editId = params.get('edit');
+                if (editId && data.data) {
+                    const bookToEdit = data.data.find((b: any) => b.id === parseInt(editId));
+                    if (bookToEdit) {
+                        handleEdit(bookToEdit);
+                        // Clean up URL
+                        navigate('/admin', { replace: true });
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching books:', error);
         }
-    }, [page, search, limit]);
+    }, [page, search, location.search, navigate]);
 
     useEffect(() => {
         if (!user || user.role !== 'admin') {
@@ -118,8 +108,13 @@ const Admin: React.FC = () => {
         });
 
         const url = bookForm.id ? `${API_BASE_URL}/api/admin/books/${bookForm.id}` : `${API_BASE_URL}/api/admin/books`;
+
+        const headers: HeadersInit = {};
+        if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
         const res = await fetch(url, {
             method: 'POST', // Use POST for both (multipart/form-data)
+            headers: headers,
             body: formData,
             credentials: 'include'
         });
@@ -130,284 +125,297 @@ const Admin: React.FC = () => {
                             fetchBooks();
             setTimeout(() => setMessage(''), 3000);
         } else {
-            const err = await res.json();
-            alert(err.message || t('admin.books.save_error'));
+            const data = await res.json();
+            alert(data.message || 'Fehler beim Speichern');
         }
     };
 
-    const handleEdit = (book: Book) => {
+    const handleEdit = (book: any) => {
         setBookForm({
             id: book.id,
-            title: book.title,
-            author: book.author,
-            category: book.category,
+            title: book.title || '',
+            author: book.author || '',
+            category: book.category || 'Belytrystyka polska',
             publication_year: book.publication_year || '',
             publisher: book.publisher || '',
             isbn: book.isbn || '',
             description: book.description || '',
             signature: book.signature || '',
-            cover_image: null
+            cover_image: book.cover_image || null
         });
-        handleTabChange('single');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm(t('admin.books.confirm_delete'))) return;
-        const res = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, { method: 'DELETE', credentials: 'include' });
+        if (!window.confirm(t('admin.books.confirm_delete'))) return;
+
+        const headers: HeadersInit = {};
+        if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
+        const res = await fetch(`${API_BASE_URL}/api/admin/books/${id}`, {
+            method: 'DELETE',
+            headers: headers,
+            credentials: 'include'
+        });
         if (res.ok) {
-                            fetchBooks();
+            fetchBooks();
         }
     };
 
-    const handleBibtexImport = () => {
+    const handleParseBibtex = () => {
         try {
-            const parsed = parseBibTeX(bibtex);
-            const preview = parsed.map((b, i) => ({
-                ...b,
-                tempId: `temp-${Date.now()}-${i}`,
-                selected: true
+            const parsed = parseBibTeX(bibtexInput);
+            if (parsed.length === 0) {
+                alert(t('admin.bibtex.no_entries_found'));
+                return;
+            }
+            const previewData: PreviewBook[] = parsed.map(entry => ({
+                tempId: Math.random().toString(36).substr(2, 9),
+                selected: true,
+                title: entry.title || '',
+                author: entry.author || '',
+                category: 'Belytrystyka polska', // Default
+                publication_year: entry.publication_year || '',
+                publisher: entry.publisher || '',
+                isbn: entry.isbn || '',
+                description: entry.description || '',
+                signature: ''
             }));
-            setPreviewBooks(preview);
-        } catch {
+            setPreviewBooks(prev => [...prev, ...previewData]);
+            setBibtexInput('');
+            setShowBibtexArea(false);
+        } catch (e) {
             alert(t('admin.bibtex.parse_error'));
+            console.error(e);
         }
-    };
-
-    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: string | boolean) => {
-        setPreviewBooks(prev => prev.map(b => b.tempId === tempId ? { ...b, [field]: value } : b));
     };
 
     const handleImportSelected = async () => {
-        const selected = previewBooks.filter(b => b.selected);
-        if (selected.length === 0) return;
+        const toImport = previewBooks.filter(b => b.selected);
+        if (toImport.length === 0) return;
+
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
 
         const res = await fetch(`${API_BASE_URL}/api/admin/books/import`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ books: selected }),
+            headers: headers,
+            body: JSON.stringify({ books: toImport }),
             credentials: 'include'
         });
 
         if (res.ok) {
-            const result = await res.json();
-            setMessage(t('admin.bibtex.import_success', { count: result.count, skipped: result.skipped }));
-            setPreviewBooks([]);
-            setBibtex('');
+            const data = await res.json();
+            alert(data.message);
+            setPreviewBooks(prev => prev.filter(b => !b.selected));
                             fetchBooks();
-            setTimeout(() => setMessage(''), 5000);
         } else {
-            const err = await res.json();
-            alert(err.message || t('admin.bibtex.import_error'));
+            alert('Import fehlgeschlagen');
         }
     };
 
-    if (!user || user.role !== 'admin') return null;
+    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: any) => {
+        setPreviewBooks(prev => prev.map(b => b.tempId === tempId ? { ...b, [field]: value } : b));
+    };
+
+    const toggleAllPreview = (selected: boolean) => {
+        setPreviewBooks(prev => prev.map(b => ({ ...b, selected })));
+    };
 
     return (
-        <div className="flex-grow flex flex-col p-margin-mobile md:p-margin-desktop bg-surface max-w-container-max-width mx-auto w-full gap-8">
-            <h1 className="font-display-lg text-display-lg text-on-surface">{t('admin.title')}</h1>
+        <div className="flex-grow flex flex-col gap-8 p-margin-mobile md:p-margin-desktop bg-surface max-w-7xl mx-auto w-full">
+            <h1 className="font-display-lg text-display-lg text-on-surface">{t('nav.admin')}</h1>
 
-            {message && (
-                <div className="bg-primary-container text-on-primary-container p-4 rounded-lg font-label-md">
-                    {message}
-                </div>
-            )}
-
-            <div className="flex border-b border-outline-variant overflow-x-auto whitespace-nowrap">
-                <button
-                    onClick={() => handleTabChange('single')}
-                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'single' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                >
-                    {t('admin.tabs.edit_book')}
-                </button>
-                <button
-                    onClick={() => handleTabChange('bibtex')}
-                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'bibtex' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                >
-                    {t('admin.tabs.bibtex_import')}
-                </button>
-                <button
-                    onClick={() => handleTabChange('users')}
-                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'users' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                >
-                    {t('admin.tabs.users')}
-                </button>
-                <button
-                    onClick={() => handleTabChange('loans')}
-                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'loans' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                >
-                    {t('admin.tabs.loans')}
-                </button>
-                <button
-                    onClick={() => handleTabChange('pages')}
-                    className={`px-6 py-3 font-label-lg transition-colors ${activeTab === 'pages' ? 'text-primary border-b-2 border-primary' : 'text-on-surface-variant hover:text-primary'}`}
-                >
-                    {t('admin.tabs.pages')}
-                </button>
-            </div>
-
-            <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
-                {activeTab === 'users' ? (
-                    <AdminUsers />
-                ) : activeTab === 'loans' ? (
-                    <AdminLoans />
-                ) : activeTab === 'pages' ? (
-                    <AdminPages />
-                ) : activeTab === 'single' ? (
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Manual Form */}
+                <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm h-fit">
+                    <h2 className="font-headline-md text-headline-md mb-6">
+                        {bookForm.id ? t('admin.books.edit_title') : t('admin.books.add_title')}
+                    </h2>
+                    {message && <div className="bg-secondary-container text-on-secondary-container p-3 rounded mb-4 font-body-sm">{message}</div>}
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.title')}</label>
-                                <input name="title" value={bookForm.title} onChange={handleInputChange} required className="w-full border border-outline-variant rounded p-2" />
+                                <label className="font-label-md block mb-1">{t('admin.books.title')}</label>
+                                <input name="title" required value={bookForm.title} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
                             </div>
                             <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.author')}</label>
-                                <input name="author" value={bookForm.author} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
+                                <label className="font-label-md block mb-1">{t('admin.books.author')}</label>
+                                <input name="author" value={bookForm.author} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.category')}</label>
-                                <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2">
-                                    <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
-                                    <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
-                                    <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_polska')}</option>
-                                    <option value="Dla dzieci">{t('catalog.categories.dzieciece')}</option>
-                                    <option value="Fantasy | Sci-Fi">{t('catalog.categories.fantasy_scifi')}</option>
-                                    <option value="Powieści historyczne">{t('catalog.categories.historyczne')}</option>
-                                    <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
-                                    <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
-                                    <option value="Biografie">{t('catalog.categories.biografie')}</option>
-                                    <option value="Poezja">{t('catalog.categories.poezja')}</option>
-                                    <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
-                                    <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
+                                <label className="font-label-md block mb-1">{t('admin.books.category')}</label>
+                                <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface">
+                                    <option value="Belytrystyka polska">Belytrystyka polska</option>
+                                    <option value="Bilderbuch">Bilderbuch</option>
+                                    <option value="Roman">Roman</option>
+                                    <option value="Sachbuch">Sachbuch</option>
+                                    <option value="Krimi">Krimi</option>
+                                    <option value="Jugendbuch">Jugendbuch</option>
+                                    <option value="Comic">Comic/Graphic Novel</option>
+                                    <option value="Poezja">Poezja</option>
+                                    <option value="Literatura faktu">Literatura faktu</option>
                                 </select>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block font-label-medium mb-1">{t('admin.books.form.year')}</label>
-                                    <input name="publication_year" value={bookForm.publication_year} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
-                                </div>
-                                <div>
-                                    <label className="block font-label-medium mb-1">{t('admin.books.form.publisher')}</label>
-                                    <input name="publisher" value={bookForm.publisher} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
-                                </div>
-                            </div>
                             <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.isbn')}</label>
-                                <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2" />
+                                <label className="font-label-md block mb-1">{t('admin.books.signature')}</label>
+                                <input name="signature" value={bookForm.signature} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface font-mono" placeholder="Auto-generiert wenn leer" />
                             </div>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.signature_optional')}</label>
-                                <input name="signature" value={bookForm.signature} onChange={handleInputChange} placeholder={t('admin.books.form.signature_placeholder')} className="w-full border border-outline-variant rounded p-2 font-mono" />
-                            </div>
-                            <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.description')}</label>
-                                <textarea name="description" value={bookForm.description} onChange={handleInputChange} rows={5} className="w-full border border-outline-variant rounded p-2" />
-                            </div>
-                            <div>
-                                <label className="block font-label-medium mb-1">{t('admin.books.form.cover_image')}</label>
-                                <input type="file" onChange={handleFileChange} accept="image/*" className="w-full" />
-                            </div>
-                            <div className="mt-4 flex gap-4">
-                                <button type="submit" className="bg-primary text-on-primary py-2 px-6 rounded font-label-md hover:bg-primary/90 transition-colors">
-                                    {bookForm.id ? t('admin.books.form.update') : t('admin.books.form.save')}
-                                </button>
-                                {bookForm.id && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })}
-                                        className="bg-surface-variant text-on-surface-variant py-2 px-6 rounded font-label-md hover:bg-surface-variant/80 transition-colors"
-                                    >
-                                        {t('admin.books.form.cancel')}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </form>
-                ) : (
-                    <div className="flex flex-col gap-6">
-                        <div className="flex flex-col gap-2">
-                            <label className="font-label-medium">{t('admin.bibtex.label')}</label>
-                            <textarea
-                                value={bibtex}
-                                onChange={(e) => setBibtex(e.target.value)}
-                                rows={10}
-                                placeholder="@book{...}"
-                                className="w-full border border-outline-variant rounded p-4 font-mono text-sm bg-surface-container-low"
-                            />
-                            <button
-                                onClick={handleBibtexImport}
-                                className="self-start bg-secondary text-on-secondary py-2 px-6 rounded font-label-md hover:bg-secondary/90 transition-colors"
-                            >
-                                {t('admin.bibtex.load_btn')}
-                            </button>
                         </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="font-label-md block mb-1">{t('admin.books.publication_year')}</label>
+                                <input name="publication_year" value={bookForm.publication_year} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                            </div>
+                            <div>
+                                <label className="font-label-md block mb-1">{t('admin.books.publisher')}</label>
+                                <input name="publisher" value={bookForm.publisher} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                            </div>
+                            <div>
+                                <label className="font-label-md block mb-1">{t('admin.books.isbn')}</label>
+                                <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-label-md block mb-1">{t('admin.books.description')}</label>
+                            <textarea name="description" value={bookForm.description} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md h-24 bg-surface" />
+                        </div>
+
+                        <div>
+                            <label className="font-label-md block mb-1">{t('admin.books.cover_image')}</label>
+                            <input type="file" onChange={handleFileChange} className="w-full text-body-sm" />
+                            {typeof bookForm.cover_image === 'string' && (
+                                <p className="text-xs text-on-surface-variant mt-1 italic">Aktuelles Bild: {bookForm.cover_image}</p>
+                            )}
+                        </div>
+
+                        <div className="flex gap-2 mt-2">
+                            <button type="submit" className="flex-grow bg-primary text-on-primary font-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors shadow-sm">
+                                {bookForm.id ? t('admin.books.save_btn') : t('admin.books.add_btn')}
+                            </button>
+                            {bookForm.id && (
+                                <button type="button" onClick={() => setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })} className="px-6 border border-outline rounded-full font-label-lg hover:bg-surface-variant/20 transition-colors">
+                                    Abbrechen
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </div>
+
+                {/* Import Area */}
+                {!bookForm.id && (
+                    <div className="flex flex-col gap-8">
+                        <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="font-headline-md text-headline-md">{t('admin.bibtex.title')}</h2>
+                                <button
+                                    onClick={() => setShowBibtexArea(!showBibtexArea)}
+                                    className="text-primary font-label-md flex items-center gap-1 hover:bg-primary/5 px-3 py-1 rounded-full transition-colors cursor-pointer"
+                                >
+                                    <span className="material-symbols-outlined">{showBibtexArea ? 'close' : 'add'}</span>
+                                    {showBibtexArea ? t('admin.bibtex.cancel') : t('admin.bibtex.add_btn')}
+                                </button>
+                            </div>
+
+                            {showBibtexArea && (
+                                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <textarea
+                                        value={bibtexInput}
+                                        onChange={(e) => setBibtexInput(e.target.value)}
+                                        placeholder={t('admin.bibtex.placeholder')}
+                                        className="w-full border border-outline-variant rounded p-3 font-mono text-xs h-48 bg-surface-container-low mb-4 focus:bg-surface focus:border-primary outline-none transition-all"
+                                    />
+                                    <button
+                                        onClick={handleParseBibtex}
+                                        disabled={!bibtexInput.trim()}
+                                        className="w-full bg-secondary text-on-secondary font-label-lg py-3 rounded-full hover:bg-secondary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {t('admin.bibtex.parse_btn')}
+                                    </button>
+                                </div>
+                            )}
+
+                            {!showBibtexArea && previewBooks.length === 0 && (
+                                <div className="text-center py-10 text-on-surface-variant">
+                                    <span className="material-symbols-outlined text-[48px] opacity-20 mb-2">library_add</span>
+                                    <p className="text-body-md">{t('admin.bibtex.hint')}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Preview Table */}
                         {previewBooks.length > 0 && (
-                            <div className="mt-4 border-t pt-6">
-                                <h3 className="font-headline-small mb-4">{t('admin.bibtex.preview', { count: previewBooks.length })}</h3>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm border-collapse">
-                                        <thead>
-                                            <tr className="bg-surface-container">
-                                                <th className="p-2 border-b text-center"><input type="checkbox" checked={previewBooks.every(b => b.selected)} onChange={(e) => setPreviewBooks(prev => prev.map(b => ({ ...b, selected: e.target.checked })))} /></th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.title')}</th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.author')}</th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.category')}</th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.year')}</th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.isbn')}</th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.details')}</th>
-                                                <th className="p-2 border-b">{t('admin.bibtex.table.actions')}</th>
+                            <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-title-lg text-title-lg">{t('admin.bibtex.preview_title')}</h3>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => toggleAllPreview(true)} className="text-xs font-label-md text-primary hover:underline">{t('admin.bibtex.select_all')}</button>
+                                        <span className="text-outline">|</span>
+                                        <button onClick={() => toggleAllPreview(false)} className="text-xs font-label-md text-primary hover:underline">{t('admin.bibtex.select_none')}</button>
+                                    </div>
+                                </div>
+
+                                <div className="max-h-[600px] overflow-y-auto border border-outline-variant rounded-md">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead className="sticky top-0 bg-surface-container-low shadow-sm z-10">
+                                            <tr className="text-xs font-bold uppercase tracking-wider text-on-surface-variant border-b border-outline-variant">
+                                                <th className="p-3 w-8"></th>
+                                                <th className="p-3">{t('admin.bibtex.table.book')}</th>
+                                                <th className="p-3 w-20 text-center">{t('admin.bibtex.table.year')}</th>
+                                                <th className="p-3 w-32 text-center">{t('admin.bibtex.table.isbn')}</th>
+                                                <th className="p-3">{t('admin.bibtex.table.publisher')}</th>
+                                                <th className="p-3 w-10"></th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody className="divide-y divide-outline-variant">
                                             {previewBooks.map((book) => {
                                                 return (
-                                                    <tr key={book.tempId} className="hover:bg-surface-variant/30">
-                                                        <td className="p-2 border-b text-center">
+                                                    <tr key={book.tempId} className={`hover:bg-surface-variant/10 transition-colors ${!book.selected ? 'opacity-60 bg-surface-container-low' : ''}`}>
+                                                        <td className="p-2 text-center">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={book.selected}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'selected', e.target.checked)}
+                                                                className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer"
                                                             />
                                                         </td>
-                                                        <td className="p-2 border-b align-top">
-                                                            <input
-                                                                value={book.title}
-                                                                onChange={(e) => handlePreviewBookChange(book.tempId, 'title', e.target.value)}
-                                                                className="w-full border border-outline-variant rounded p-1 text-sm font-semibold"
-                                                            />
+                                                        <td className="p-2">
+                                                            <div className="flex flex-col gap-1">
+                                                                <input
+                                                                    value={book.title}
+                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'title', e.target.value)}
+                                                                    placeholder={t('admin.bibtex.table.title')}
+                                                                    className="w-full border-none bg-transparent font-bold text-sm focus:ring-1 focus:ring-primary rounded p-1"
+                                                                />
+                                                                <input
+                                                                    value={book.author}
+                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
+                                                                    placeholder={t('admin.bibtex.table.author')}
+                                                                    className="w-full border-none bg-transparent text-xs text-on-surface-variant focus:ring-1 focus:ring-primary rounded p-1"
+                                                                />
+                                                                <select
+                                                                    value={book.category}
+                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
+                                                                    className="w-full border border-outline-variant rounded p-1 text-[10px] bg-surface-container-low mt-1"
+                                                                >
+                                                                    <option value="Belytrystyka polska">Belytrystyka polska</option>
+                                                                    <option value="Bilderbuch">Bilderbuch</option>
+                                                                    <option value="Roman">Roman</option>
+                                                                    <option value="Sachbuch">Sachbuch</option>
+                                                                    <option value="Krimi">Krimi</option>
+                                                                    <option value="Jugendbuch">Jugendbuch</option>
+                                                                    <option value="Comic">Comic/Graphic Novel</option>
+                                                                    <option value="Poezja">Poezja</option>
+                                                                    <option value="Literatura faktu">Literatura faktu</option>
+                                                                </select>
+                                                            </div>
                                                         </td>
-                                                        <td className="p-2 border-b align-top">
-                                                            <input
-                                                                value={book.author}
-                                                                onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
-                                                                className="w-full border border-outline-variant rounded p-1 text-sm"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2 border-b align-top">
-                                                            <select
-                                                                value={book.category}
-                                                                onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
-                                                                className="w-full border border-outline-variant rounded p-1 text-xs"
-                                                            >
-                                                                <option value="Auf Deutsch">{t('catalog.categories.deutsch')}</option>
-                                                                <option value="Belytrystyka polska">{t('catalog.categories.belytrystyka_polska')}</option>
-                                                                <option value="Belytrystyka zagraniczna">{t('catalog.categories.belytrystyka_polska')}</option>
-                                                                <option value="Dla dzieci">{t('catalog.categories.dzieciece')}</option>
-                                                                <option value="Fantasy | Sci-Fi">{t('catalog.categories.fantasy_scifi')}</option>
-                                                                <option value="Powieści historyczne">{t('catalog.categories.historyczne')}</option>
-                                                                <option value="Kryminał | Thriller">{t('catalog.categories.kryminał_thriller')}</option>
-                                                                <option value="Młodzieżowe | Young Adult">{t('catalog.categories.młodziezowe_young_adult')}</option>
-                                                                <option value="Biografie">{t('catalog.categories.biografie')}</option>
-                                                                <option value="Poezja">{t('catalog.categories.poezja')}</option>
-                                                                <option value="Poradniki | Popularnonaukowe">{t('catalog.categories.poradniki_popularnonaukowe')}</option>
-                                                                <option value="Reportaże | Podróżnicze">{t('catalog.categories.reportaze_podroznicze')}</option>
-                                                            </select>
-                                                        </td>
-                                                        <td className="p-2 border-b align-top text-center">
+                                                        <td className="p-2 align-top text-center">
                                                             <input
                                                                 value={book.publication_year}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'publication_year', e.target.value)}
@@ -415,7 +423,7 @@ const Admin: React.FC = () => {
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm text-center"
                                                             />
                                                         </td>
-                                                        <td className="p-2 border-b align-top text-center">
+                                                        <td className="p-2 align-top text-center">
                                                             <input
                                                                 value={book.isbn}
                                                                 onChange={(e) => handlePreviewBookChange(book.tempId, 'isbn', e.target.value)}
@@ -423,7 +431,7 @@ const Admin: React.FC = () => {
                                                                 className="w-full border border-outline-variant rounded p-1 text-sm font-mono"
                                                             />
                                                         </td>
-                                                        <td className="p-2 border-b align-top">
+                                                        <td className="p-2 align-top">
                                                             <div className="flex flex-col gap-1">
                                                                 <input
                                                                     value={book.publisher}
@@ -439,7 +447,7 @@ const Admin: React.FC = () => {
                                                                 />
                                                             </div>
                                                         </td>
-                                                        <td className="p-2 border-b align-top text-center">
+                                                        <td className="p-2 align-top text-center">
                                                             <button
                                                                 onClick={() => setPreviewBooks(prev => prev.filter(b => b.tempId !== book.tempId))}
                                                                 className="text-error hover:text-error/80 cursor-pointer p-1"

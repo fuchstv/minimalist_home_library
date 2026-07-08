@@ -3,7 +3,7 @@
 require_once 'db.php';
 require_once 'admin_utils.php';
 require_once 'error_utils.php';
-session_start();
+
 
 // Ensure only admins can access
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {

@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../config';
 const Login: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { setUser } = useContext(AuthContext);
+    const { setUser, setCsrfToken } = useContext(AuthContext);
     
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,6 +28,7 @@ const Login: React.FC = () => {
             const data = await response.json();
             if (response.ok) {
                 setUser(data.user);
+                setCsrfToken(data.csrfToken);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 navigate('/');
             } else {

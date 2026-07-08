@@ -1,90 +1,63 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from "../config";
+import { AuthContext } from '../context/AuthContext';
 
 interface Book {
     id: number;
-    category: string;
-    signature?: string;
-    author: string;
     title: string;
-    publication_year: string;
-    publisher: string;
-    isbn: string;
-    description: string;
+    author: string;
+    category: string;
     availability_status: 'available' | 'borrowed';
+    signature: string;
     cover_image?: string;
 }
 
-import { API_BASE_URL } from "../config";
-
 const Katalog: React.FC = () => {
     const { t } = useTranslation();
-    const { user } = useContext(AuthContext);
     const navigate = useNavigate();
+    const { user, csrfToken } = useContext(AuthContext);
+
     const [books, setBooks] = useState<Book[]>([]);
     const [search, setSearch] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
-    
-    // Pagination state
+    const [category, setCategory] = useState('');
+    const [status, setStatus] = useState('');
     const [page, setPage] = useState(1);
-    const [limit] = useState(12);
-    const [totalBooks, setTotalBooks] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalBooks, setTotalBooks] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const limit = 12;
 
     const fetchBooks = useCallback(async () => {
+        setIsLoading(true);
+        const url = `${API_BASE_URL}/api/books?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&status=${status}`;
         try {
-            let url = `${API_BASE_URL}/api/books?limit=${limit}&page=${page}`;
-            if (search) url += `&search=${encodeURIComponent(search)}`;
-            if (categoryFilter) url += `&category=${encodeURIComponent(categoryFilter)}`;
-            if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
-
             const response = await fetch(url, { credentials: 'include' });
-            if (response.ok) {
-                const data = await response.json();
-                setBooks(data.data || []);
-                if (data.meta) {
-                    setTotalBooks(data.meta.total || 0);
-                    setTotalPages(data.meta.totalPages || 1);
-                }
+            const result = await response.json();
+            if (result && result.data) {
+                setBooks(result.data);
+                setTotalPages(result.meta.totalPages);
+                setTotalBooks(result.meta.total);
             }
         } catch (error) {
             console.error("Failed to fetch books", error);
+        } finally {
+            setIsLoading(false);
         }
-    }, [page, limit, search, categoryFilter, statusFilter]);
+    }, [page, search, category, status]);
 
     useEffect(() => {
         fetchBooks();
     }, [fetchBooks]);
 
-    const handleSearchChange = (val: string) => {
-        setSearch(val);
-        setPage(1);
-    };
-
-    const handleCategoryChange = (val: string) => {
-        setCategoryFilter(val);
-        setPage(1);
-    };
-
-    const handleStatusChange = (val: string) => {
-        setStatusFilter(val);
-        setPage(1);
-    };
-
     const getPageNumbers = () => {
         const pages = [];
         const maxVisiblePages = 5;
-        
         let startPage = Math.max(1, page - 2);
-        let endPage = Math.min(totalPages, page + 2);
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
         
-        if (page <= 3) {
-            startPage = 1;
-            endPage = Math.min(totalPages, maxVisiblePages);
-        } else if (page >= totalPages - 2) {
+        if (endPage - startPage < maxVisiblePages - 1) {
             startPage = Math.max(1, totalPages - maxVisiblePages + 1);
             endPage = totalPages;
         }
@@ -102,114 +75,97 @@ const Katalog: React.FC = () => {
         }
 
         try {
+            const headers: HeadersInit = { 'Content-Type': 'application/json' };
+            if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
             const response = await fetch(`${API_BASE_URL}/api/loans`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ book_id: bookId }),
                 credentials: 'include'
             });
-
+            const data = await response.json();
             if (response.ok) {
-                alert(t('catalog.borrow_success'));
+                alert(t('catalog.borrow_success', { date: new Date(data.due_date).toLocaleDateString() }));
                 fetchBooks();
             } else {
-                const error = await response.json();
-                alert(error.message || t('catalog.borrow_error'));
+                alert(data.message || t('catalog.borrow_error'));
             }
-        } catch (error) {
-            console.error("Failed to borrow book", error);
+        } catch {
+            alert(t('catalog.borrow_error'));
         }
     };
 
-    const handleEditBook = (bookId: number) => {
-        // We'll pass the bookId via search params so Admin page can potentially use it,
-        // though for now it just shows the admin panel.
-        navigate(`/admin?editId=${bookId}`);
+    const handleEditBook = (id: number) => {
+        navigate(`/admin?edit=${id}`);
     };
 
     return (
-        <div className="flex-grow">
-            {/* Hero / Header Section */}
-            <header className="bg-primary pt-12 pb-24 px-margin-mobile md:px-margin-desktop text-on-primary">
-                <div className="max-w-4xl">
-                    <h1 className="font-headline-lg text-headline-lg mb-4">{t('catalog.title')}</h1>
-                    <p className="font-body-lg text-body-lg text-on-primary/80 mb-8">
-                        {t('catalog.subtitle')}
-                    </p>
-
-                    {/* Search Bar */}
-                    <div className="relative group max-w-2xl">
-                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+        <div className="flex-grow flex flex-col gap-6 p-margin-mobile md:p-margin-desktop bg-surface max-w-7xl mx-auto w-full">
+            {/* Search and Filters */}
+            <section className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm flex flex-col gap-6">
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="relative flex-grow">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
                         <input
                             type="text"
                             placeholder={t('catalog.search_placeholder')}
                             value={search}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            className="w-full bg-surface text-on-surface py-4 pl-12 pr-4 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-body-md"
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                            className="w-full bg-surface border border-outline-variant rounded-full py-3 pl-11 pr-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                         />
                     </div>
-                </div>
-            </header>
-
-            {/* Filters Section */}
-            <section className="px-margin-mobile md:px-margin-desktop -mt-12 mb-12">
-                <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant flex flex-wrap gap-4 items-end">
-                    <div className="flex flex-col gap-1.5 min-w-[200px]">
-                        <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.filter_category')}</label>
-                        <select 
-                            value={categoryFilter}
-                            onChange={(e) => handleCategoryChange(e.target.value)}
-                            className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
-                        >
-                            <option value="">{t('catalog.all_categories')}</option>
-                            <option value="Auf Deutsch">Auf Deutsch</option>
-                            <option value="Belytrystyka polska">Belytrystyka polska</option>
-                            <option value="Belytrystyka zagraniczna">Belytrystyka zagraniczna</option>
-                            <option value="Dziecięce">Dziecięce</option>
-                            <option value="Fantasy | Sci-fi">Fantasy | Sci-fi</option>
-                            <option value="Historyczne">Historyczne</option>
-                            <option value="Kryminał | Thriller">Kryminał | Thriller</option>
-                            <option value="Młodzieżowe | Young Adult">Młodzieżowe | Young Adult</option>
-                            <option value="Biografie">Biografie</option>
-                            <option value="Poezja">Poezja</option>
-                            <option value="Poradniki | Popularnonaukowe">Poradniki | Popularnonaukowe</option>
-                            <option value="Reportaże | Podróżnicze">Reportaże | Podróżnicze</option>
-                        </select>
+                    <div className="flex flex-wrap gap-3">
+                        <div className="relative">
+                            <select
+                                value={category}
+                                onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+                                className="appearance-none bg-surface border border-outline-variant rounded-full py-3 pl-4 pr-10 font-label-md text-label-md focus:border-primary outline-none cursor-pointer"
+                            >
+                                <option value="">{t('catalog.filter.all_categories')}</option>
+                                <option value="Bilderbuch">Bilderbuch</option>
+                                <option value="Roman">Roman</option>
+                                <option value="Sachbuch">Sachbuch</option>
+                                <option value="Krimi">Krimi</option>
+                                <option value="Jugendbuch">Jugendbuch</option>
+                                <option value="Comic">Comic/Graphic Novel</option>
+                            </select>
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                        </div>
+                        <div className="relative">
+                            <select
+                                value={status}
+                                onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+                                className="appearance-none bg-surface border border-outline-variant rounded-full py-3 pl-4 pr-10 font-label-md text-label-md focus:border-primary outline-none cursor-pointer"
+                            >
+                                <option value="">{t('catalog.filter.all_status')}</option>
+                                <option value="available">{t('catalog.available')}</option>
+                                <option value="borrowed">{t('catalog.borrowed')}</option>
+                            </select>
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                        </div>
                     </div>
-
-                    <div className="flex flex-col gap-1.5 min-w-[160px]">
-                        <label className="font-label-md text-on-surface-variant ml-1">{t('catalog.filter_status')}</label>
-                        <select 
-                            value={statusFilter}
-                            onChange={(e) => handleStatusChange(e.target.value)}
-                            className="bg-surface border border-outline-variant rounded-xl px-4 py-2.5 font-body-sm focus:border-primary focus:outline-none transition-colors"
-                        >
-                            <option value="">{t('catalog.all_status')}</option>
-                            <option value="available">{t('catalog.available')}</option>
-                            <option value="borrowed">{t('catalog.borrowed')}</option>
-                        </select>
-                    </div>
-
-                    <button
-                        onClick={() => {setSearch(''); setCategoryFilter(''); setStatusFilter(''); setPage(1);}}
-                        className="font-label-md text-primary px-4 py-2.5 rounded-xl hover:bg-primary/5 transition-colors ml-auto"
-                    >
-                        {t('catalog.clear_filters')}
-                    </button>
                 </div>
             </section>
 
-            {/* Catalog Grid */}
-            <section className="px-margin-mobile md:px-margin-desktop mb-24">
-                <div className="flex justify-between items-center mb-6 px-1">
-                    <span className="font-label-md text-label-md text-on-surface-variant">
-                        {t('catalog.current_selection')}
-                    </span>
+            {/* Results */}
+            <section className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                    <h2 className="font-title-lg text-title-lg text-on-surface">
+                        {totalBooks} {t('catalog.results_found')}
+                    </h2>
                 </div>
 
-                {books.length === 0 ? (
-                    <div className="text-center py-20 text-on-surface-variant font-body-lg text-body-lg">
-                        {t('catalog.no_books')}
+                {isLoading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary/30 border-t-primary"></div>
+                    </div>
+                ) : books.length === 0 ? (
+                    <div className="bg-surface-container-lowest py-20 text-center rounded-2xl border border-outline-variant border-dashed">
+                        <span className="material-symbols-outlined text-[48px] text-on-surface-variant mb-2">search_off</span>
+                        <p className="text-on-surface-variant font-body-lg text-body-lg">
+                            {t('catalog.no_books')}
+                        </p>
                     </div>
                 ) : (
                     <>

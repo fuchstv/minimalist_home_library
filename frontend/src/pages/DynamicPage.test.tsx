@@ -1,14 +1,23 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import axios from 'axios';
+import axios from '../utils/api';
 import DynamicPage from './DynamicPage';
 import { AuthContext } from '../context/AuthContext';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
 import '@testing-library/jest-dom';
 
-vi.mock('axios');
+vi.mock('../utils/api', () => ({
+    default: {
+        get: vi.fn(),
+        post: vi.fn(),
+        interceptors: {
+            request: { use: vi.fn(), eject: vi.fn() },
+            response: { use: vi.fn(), eject: vi.fn() }
+        }
+    }
+}));
 
 const mockPageData = {
     slug: 'regeln',
@@ -21,7 +30,7 @@ const mockPageData = {
 const renderDynamicPage = (user: { id: number; name: string; email: string; role: string } | null) => {
     return render(
         <I18nextProvider i18n={i18n}>
-            <AuthContext.Provider value={{ user, setUser: () => {}, logout: () => {} }}>
+            <AuthContext.Provider value={{ user, setUser: () => {}, csrfToken: 'mock-token', setCsrfToken: () => {}, logout: () => {} }}>
                 <MemoryRouter initialEntries={['/page/regeln']}>
                     <Routes>
                         <Route path="/page/:slug" element={<DynamicPage />} />
