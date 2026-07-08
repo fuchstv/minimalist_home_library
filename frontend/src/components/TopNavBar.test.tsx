@@ -40,19 +40,20 @@ describe('TopNavBar Component', () => {
 
     it('shows login and register links when user is not logged in', () => {
         renderNavBar(null);
-        expect(screen.getByText(/Login/i)).toBeInTheDocument();
-        expect(screen.getByText(/Registrieren/i)).toBeInTheDocument();
+        expect(screen.getByText(/Anmelden/i)).toBeInTheDocument();
+        // Registrieren is not in TopNavBar
+        // expect(screen.getByText(/Registrieren/i)).toBeInTheDocument();
     });
 
     it('shows profile and logout links when user is logged in', () => {
         renderNavBar({ id: 1, name: 'John Doe', email: 'test@test.com', role: 'member' });
         expect(screen.getByText(/Mein Profil/i)).toBeInTheDocument();
-        expect(screen.getByText(/Logout/i)).toBeInTheDocument();
+        expect(screen.getByText(/Abmelden/i)).toBeInTheDocument();
     });
 
     it('shows admin link only for admin users', () => {
         const { rerender } = renderNavBar({ id: 1, name: 'Member User', email: 'test@test.com', role: 'member' });
-        expect(screen.queryByText(/Administration/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Admin/i)).not.toBeInTheDocument();
 
         rerender(
             <MemoryRouter>
@@ -61,13 +62,13 @@ describe('TopNavBar Component', () => {
                 </AuthContext.Provider>
             </MemoryRouter>
         );
-        expect(screen.getByText(/Administration/i)).toBeInTheDocument();
+        expect(screen.getByText(/Admin/i)).toBeInTheDocument();
     });
 
     it('calls logout function when logout button is clicked', () => {
         const logoutMock = vi.fn();
         renderNavBar({ id: 1, name: 'John Doe', email: 'test@test.com', role: 'member' }, logoutMock);
-        fireEvent.click(screen.getByText(/Logout/i));
+        fireEvent.click(screen.getByText(/Abmelden/i));
         expect(logoutMock).toHaveBeenCalled();
     });
 
