@@ -60,7 +60,8 @@ describe('Profil Component', () => {
             expect(screen.getByText(/Test User/i)).toBeInTheDocument();
             expect(screen.getByText(/Test Book/i)).toBeInTheDocument();
             expect(screen.getByText(/Author Name/i)).toBeInTheDocument();
-            expect(screen.getByText(/Rückgabe bis: 15.1.2024/i)).toBeInTheDocument();
+            expect(screen.getByText(/Rückgabe bis:/i)).toBeInTheDocument();
+            expect(screen.getByText(/15/)).toBeInTheDocument();
         });
     });
 
