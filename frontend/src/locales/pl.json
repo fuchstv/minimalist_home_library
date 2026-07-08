@@ -5,7 +5,7 @@
     "loans": "Wypożyczenia",
     "admin": "Admin",
     "login": "Zaloguj się",
-    "logout": "Wyloguj się",
+    "logout": "Wyloguj",
     "notifications": "Powiadomienia",
     "overdue_loans": "Zaległe wypożyczenia"
   },
@@ -49,6 +49,11 @@
       "prev": "Poprzednia strona",
       "next": "Następna strona",
       "last": "Ostatnia strona"
+    },
+    "results_found": "znalezionych książek",
+    "filter": {
+      "all_categories": "Wszystkie kategorie",
+      "all_status": "Wszystkie statusy"
     }
   },
   "auth": {
@@ -119,7 +124,17 @@
         "update": "Aktualizuj",
         "save": "Zapisz",
         "cancel": "Anuluj"
-      }
+      },
+      "add_title": "Dodaj nową książkę",
+      "edit_title": "Edytuj książkę",
+      "add_btn": "Dodaj",
+      "save_btn": "Zapisz",
+      "year": "Rok",
+      "publisher": "Wydawca",
+      "isbn": "ISBN",
+      "cover_image": "Okładka",
+      "signature_placeholder": "Zostanie wygenerowane automatycznie...",
+      "description": "Opis"
     },
     "bibtex": {
       "label": "Wklej tutaj kod BibTeX",
@@ -140,8 +155,19 @@
         "actions": "Akcje",
         "publisher": "Wydawca",
         "description": "Opis",
-        "remove": "Usuń z listy"
-      }
+        "remove": "Usuń z listy",
+        "book": "Książka"
+      },
+      "title": "Import BibTeX",
+      "add_btn": "Importuj",
+      "cancel": "Anuluj",
+      "placeholder": "Wklej tutaj swój kod BibTeX...",
+      "parse_btn": "Parsuj",
+      "hint": "Wklej kod BibTeX, aby zaimportować wiele książek jednocześnie.",
+      "no_entries_found": "Nie znaleziono wpisów BibTeX.",
+      "preview_title": "Podgląd",
+      "select_all": "Zaznacz wszystko",
+      "select_none": "Odznacz wszystko"
     },
     "users": {
       "title": "Konta użytkowników ({{count}})",

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
+import AdminUsers from './AdminUsers';
+import AdminLoans from './AdminLoans';
+import AdminPages from './AdminPages';
 import { AuthContext } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
 import { parseBibTeX } from '../utils/bibtexParser';
@@ -29,6 +32,7 @@ const Admin: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, csrfToken } = useContext(AuthContext);
+    const [activeTab, setActiveTab] = useState('books');
 
     const [books, setBooks] = useState<any[]>([]);
     const [bookForm, setBookForm] = useState<Book>({
@@ -85,7 +89,6 @@ const Admin: React.FC = () => {
             navigate('/login');
             return;
         }
-                                /* eslint-disable-next-line react-hooks/set-state-in-effect */
         fetchBooks();
     }, [user, navigate, fetchBooks]);
 
@@ -113,7 +116,7 @@ const Admin: React.FC = () => {
         if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
 
         const res = await fetch(url, {
-            method: 'POST', // Use POST for both (multipart/form-data)
+            method: 'POST',
             headers: headers,
             body: formData,
             credentials: 'include'
@@ -122,7 +125,7 @@ const Admin: React.FC = () => {
         if (res.ok) {
             setMessage(bookForm.id ? t('admin.books.update_success') : t('admin.books.create_success'));
             setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null });
-                            fetchBooks();
+            fetchBooks();
             setTimeout(() => setMessage(''), 3000);
         } else {
             const data = await res.json();
@@ -174,7 +177,7 @@ const Admin: React.FC = () => {
                 selected: true,
                 title: entry.title || '',
                 author: entry.author || '',
-                category: 'Belytrystyka polska', // Default
+                category: 'Belytrystyka polska',
                 publication_year: entry.publication_year || '',
                 publisher: entry.publisher || '',
                 isbn: entry.isbn || '',
@@ -208,7 +211,7 @@ const Admin: React.FC = () => {
             const data = await res.json();
             alert(data.message);
             setPreviewBooks(prev => prev.filter(b => !b.selected));
-                            fetchBooks();
+            fetchBooks();
         } else {
             alert('Import fehlgeschlagen');
         }
@@ -226,326 +229,344 @@ const Admin: React.FC = () => {
         <div className="flex-grow flex flex-col gap-8 p-margin-mobile md:p-margin-desktop bg-surface max-w-7xl mx-auto w-full">
             <h1 className="font-display-lg text-display-lg text-on-surface">{t('nav.admin')}</h1>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Manual Form */}
-                <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm h-fit">
-                    <h2 className="font-headline-md text-headline-md mb-6">
-                        {bookForm.id ? t('admin.books.edit_title') : t('admin.books.add_title')}
-                    </h2>
-                    {message && <div className="bg-secondary-container text-on-secondary-container p-3 rounded mb-4 font-body-sm">{message}</div>}
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.title')}</label>
-                                <input name="title" required value={bookForm.title} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
-                            </div>
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.author')}</label>
-                                <input name="author" value={bookForm.author} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
-                            </div>
-                        </div>
+            <div className="flex flex-wrap gap-2 border-b border-outline-variant pb-4">
+                {[
+                    { id: 'books', label: t('admin.tabs.edit_book'), icon: 'book' },
+                    { id: 'users', label: t('admin.tabs.users'), icon: 'group' },
+                    { id: 'loans', label: t('admin.tabs.loans'), icon: 'receipt_long' },
+                    { id: 'pages', label: t('admin.tabs.pages'), icon: 'description' },
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-label-lg transition-all ${
+                            activeTab === tab.id
+                            ? 'bg-primary text-on-primary shadow-md'
+                            : 'text-on-surface-variant hover:bg-surface-variant/20'
+                        }`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.category')}</label>
-                                <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface">
-                                    <option value="Belytrystyka polska">Belytrystyka polska</option>
-                                    <option value="Bilderbuch">Bilderbuch</option>
-                                    <option value="Roman">Roman</option>
-                                    <option value="Sachbuch">Sachbuch</option>
-                                    <option value="Krimi">Krimi</option>
-                                    <option value="Jugendbuch">Jugendbuch</option>
-                                    <option value="Comic">Comic/Graphic Novel</option>
-                                    <option value="Poezja">Poezja</option>
-                                    <option value="Literatura faktu">Literatura faktu</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.signature')}</label>
-                                <input name="signature" value={bookForm.signature} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface font-mono" placeholder="Auto-generiert wenn leer" />
-                            </div>
-                        </div>
+            {activeTab === 'users' && <AdminUsers />}
+            {activeTab === 'loans' && <AdminLoans />}
+            {activeTab === 'pages' && <AdminPages />}
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.publication_year')}</label>
-                                <input name="publication_year" value={bookForm.publication_year} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
-                            </div>
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.publisher')}</label>
-                                <input name="publisher" value={bookForm.publisher} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
-                            </div>
-                            <div>
-                                <label className="font-label-md block mb-1">{t('admin.books.isbn')}</label>
-                                <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="font-label-md block mb-1">{t('admin.books.description')}</label>
-                            <textarea name="description" value={bookForm.description} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md h-24 bg-surface" />
-                        </div>
-
-                        <div>
-                            <label className="font-label-md block mb-1">{t('admin.books.cover_image')}</label>
-                            <input type="file" onChange={handleFileChange} className="w-full text-body-sm" />
-                            {typeof bookForm.cover_image === 'string' && (
-                                <p className="text-xs text-on-surface-variant mt-1 italic">Aktuelles Bild: {bookForm.cover_image}</p>
-                            )}
-                        </div>
-
-                        <div className="flex gap-2 mt-2">
-                            <button type="submit" className="flex-grow bg-primary text-on-primary font-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors shadow-sm">
-                                {bookForm.id ? t('admin.books.save_btn') : t('admin.books.add_btn')}
-                            </button>
-                            {bookForm.id && (
-                                <button type="button" onClick={() => setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })} className="px-6 border border-outline rounded-full font-label-lg hover:bg-surface-variant/20 transition-colors">
-                                    Abbrechen
-                                </button>
-                            )}
-                        </div>
-                    </form>
-                </div>
-
-                {/* Import Area */}
-                {!bookForm.id && (
-                    <div className="flex flex-col gap-8">
-                        <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="font-headline-md text-headline-md">{t('admin.bibtex.title')}</h2>
-                                <button
-                                    onClick={() => setShowBibtexArea(!showBibtexArea)}
-                                    className="text-primary font-label-md flex items-center gap-1 hover:bg-primary/5 px-3 py-1 rounded-full transition-colors cursor-pointer"
-                                >
-                                    <span className="material-symbols-outlined">{showBibtexArea ? 'close' : 'add'}</span>
-                                    {showBibtexArea ? t('admin.bibtex.cancel') : t('admin.bibtex.add_btn')}
-                                </button>
-                            </div>
-
-                            {showBibtexArea && (
-                                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <textarea
-                                        value={bibtexInput}
-                                        onChange={(e) => setBibtexInput(e.target.value)}
-                                        placeholder={t('admin.bibtex.placeholder')}
-                                        className="w-full border border-outline-variant rounded p-3 font-mono text-xs h-48 bg-surface-container-low mb-4 focus:bg-surface focus:border-primary outline-none transition-all"
-                                    />
-                                    <button
-                                        onClick={handleParseBibtex}
-                                        disabled={!bibtexInput.trim()}
-                                        className="w-full bg-secondary text-on-secondary font-label-lg py-3 rounded-full hover:bg-secondary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {t('admin.bibtex.parse_btn')}
-                                    </button>
-                                </div>
-                            )}
-
-                            {!showBibtexArea && previewBooks.length === 0 && (
-                                <div className="text-center py-10 text-on-surface-variant">
-                                    <span className="material-symbols-outlined text-[48px] opacity-20 mb-2">library_add</span>
-                                    <p className="text-body-md">{t('admin.bibtex.hint')}</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Preview Table */}
-                        {previewBooks.length > 0 && (
-                            <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-title-lg text-title-lg">{t('admin.bibtex.preview_title')}</h3>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => toggleAllPreview(true)} className="text-xs font-label-md text-primary hover:underline">{t('admin.bibtex.select_all')}</button>
-                                        <span className="text-outline">|</span>
-                                        <button onClick={() => toggleAllPreview(false)} className="text-xs font-label-md text-primary hover:underline">{t('admin.bibtex.select_none')}</button>
+            {activeTab === 'books' && (
+                <div className="flex flex-col gap-8 animate-in fade-in duration-500">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Manual Form */}
+                        <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm h-fit">
+                            <h2 className="font-headline-md text-headline-md mb-6">
+                                {bookForm.id ? t('admin.books.edit_title') : t('admin.books.add_title')}
+                            </h2>
+                            {message && <div className="bg-secondary-container text-on-secondary-container p-3 rounded mb-4 font-body-sm">{message}</div>}
+                            <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.title')}</label>
+                                        <input name="title" required value={bookForm.title} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.author')}</label>
+                                        <input name="author" value={bookForm.author} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
                                     </div>
                                 </div>
 
-                                <div className="max-h-[600px] overflow-y-auto border border-outline-variant rounded-md">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead className="sticky top-0 bg-surface-container-low shadow-sm z-10">
-                                            <tr className="text-xs font-bold uppercase tracking-wider text-on-surface-variant border-b border-outline-variant">
-                                                <th className="p-3 w-8"></th>
-                                                <th className="p-3">{t('admin.bibtex.table.book')}</th>
-                                                <th className="p-3 w-20 text-center">{t('admin.bibtex.table.year')}</th>
-                                                <th className="p-3 w-32 text-center">{t('admin.bibtex.table.isbn')}</th>
-                                                <th className="p-3">{t('admin.bibtex.table.publisher')}</th>
-                                                <th className="p-3 w-10"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-outline-variant">
-                                            {previewBooks.map((book) => {
-                                                return (
-                                                    <tr key={book.tempId} className={`hover:bg-surface-variant/10 transition-colors ${!book.selected ? 'opacity-60 bg-surface-container-low' : ''}`}>
-                                                        <td className="p-2 text-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={book.selected}
-                                                                onChange={(e) => handlePreviewBookChange(book.tempId, 'selected', e.target.checked)}
-                                                                className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2">
-                                                            <div className="flex flex-col gap-1">
-                                                                <input
-                                                                    value={book.title}
-                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'title', e.target.value)}
-                                                                    placeholder={t('admin.bibtex.table.title')}
-                                                                    className="w-full border-none bg-transparent font-bold text-sm focus:ring-1 focus:ring-primary rounded p-1"
-                                                                />
-                                                                <input
-                                                                    value={book.author}
-                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
-                                                                    placeholder={t('admin.bibtex.table.author')}
-                                                                    className="w-full border-none bg-transparent text-xs text-on-surface-variant focus:ring-1 focus:ring-primary rounded p-1"
-                                                                />
-                                                                <select
-                                                                    value={book.category}
-                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
-                                                                    className="w-full border border-outline-variant rounded p-1 text-[10px] bg-surface-container-low mt-1"
-                                                                >
-                                                                    <option value="Belytrystyka polska">Belytrystyka polska</option>
-                                                                    <option value="Bilderbuch">Bilderbuch</option>
-                                                                    <option value="Roman">Roman</option>
-                                                                    <option value="Sachbuch">Sachbuch</option>
-                                                                    <option value="Krimi">Krimi</option>
-                                                                    <option value="Jugendbuch">Jugendbuch</option>
-                                                                    <option value="Comic">Comic/Graphic Novel</option>
-                                                                    <option value="Poezja">Poezja</option>
-                                                                    <option value="Literatura faktu">Literatura faktu</option>
-                                                                </select>
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-2 align-top text-center">
-                                                            <input
-                                                                value={book.publication_year}
-                                                                onChange={(e) => handlePreviewBookChange(book.tempId, 'publication_year', e.target.value)}
-                                                                placeholder={t('admin.bibtex.table.year')}
-                                                                className="w-full border border-outline-variant rounded p-1 text-sm text-center"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2 align-top text-center">
-                                                            <input
-                                                                value={book.isbn}
-                                                                onChange={(e) => handlePreviewBookChange(book.tempId, 'isbn', e.target.value)}
-                                                                placeholder={t('admin.bibtex.table.isbn')}
-                                                                className="w-full border border-outline-variant rounded p-1 text-sm font-mono"
-                                                            />
-                                                        </td>
-                                                        <td className="p-2 align-top">
-                                                            <div className="flex flex-col gap-1">
-                                                                <input
-                                                                    value={book.publisher}
-                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'publisher', e.target.value)}
-                                                                    placeholder={t('admin.bibtex.table.publisher')}
-                                                                    className="w-full border border-outline-variant rounded p-1 text-xs"
-                                                                />
-                                                                <textarea
-                                                                    value={book.description}
-                                                                    onChange={(e) => handlePreviewBookChange(book.tempId, 'description', e.target.value)}
-                                                                    placeholder={t('admin.bibtex.table.description')}
-                                                                    className="w-full border border-outline-variant rounded p-1 text-xs h-10 resize-y"
-                                                                />
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-2 align-top text-center">
-                                                            <button
-                                                                onClick={() => setPreviewBooks(prev => prev.filter(b => b.tempId !== book.tempId))}
-                                                                className="text-error hover:text-error/80 cursor-pointer p-1"
-                                                                title={t('admin.bibtex.table.remove')}
-                                                            >
-                                                                <span className="material-symbols-outlined text-[18px]">delete</span>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.category')}</label>
+                                        <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface">
+                                            {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
+                                                <option key={key} value={value as string}>{value as string}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.signature')}</label>
+                                        <input name="signature" value={bookForm.signature} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface font-mono" placeholder={t('admin.books.signature_placeholder')} />
+                                    </div>
                                 </div>
 
-                                <div className="mt-4 flex items-center justify-end gap-4">
-                                    <span className="text-body-sm text-on-surface-variant">
-                                        {t('admin.bibtex.selected_count', { selected: previewBooks.filter(b => b.selected).length, total: previewBooks.length })}
-                                    </span>
-                                    <button
-                                        onClick={handleImportSelected}
-                                        className="bg-primary text-on-primary py-2.5 px-6 rounded-md hover:bg-primary/90 transition-colors font-label-md shadow-sm cursor-pointer"
-                                    >
-                                        {t('admin.bibtex.import_btn')}
-                                    </button>
+                                <div className="flex flex-wrap md:flex-nowrap gap-4">
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.year')}</label>
+                                        <input name="publication_year" value={bookForm.publication_year} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.publisher')}</label>
+                                        <input name="publisher" value={bookForm.publisher} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                                    </div>
+                                    <div>
+                                        <label className="font-label-md block mb-1">{t('admin.books.isbn')}</label>
+                                        <input name="isbn" value={bookForm.isbn} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface" />
+                                    </div>
                                 </div>
+
+                                <div>
+                                    <label className="font-label-md block mb-1">{t('admin.books.description')}</label>
+                                    <textarea name="description" value={bookForm.description} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md h-24 bg-surface" />
+                                </div>
+
+                                <div>
+                                    <label className="font-label-md block mb-1">{t('admin.books.cover_image')}</label>
+                                    <input type="file" onChange={handleFileChange} className="w-full text-body-sm" />
+                                    {typeof bookForm.cover_image === 'string' && (
+                                        <p className="text-xs text-on-surface-variant mt-1 italic">Aktuelles Bild: {bookForm.cover_image}</p>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-2 mt-2">
+                                    <button type="submit" className="flex-grow bg-primary text-on-primary font-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors shadow-sm">
+                                        {bookForm.id ? t('admin.books.save_btn') : t('admin.books.add_btn')}
+                                    </button>
+                                    {bookForm.id && (
+                                        <button type="button" onClick={() => setBookForm({ id: null, title: '', author: '', category: 'Belytrystyka polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null })} className="px-6 border border-outline rounded-full font-label-lg hover:bg-surface-variant/20 transition-colors">
+                                            Abbrechen
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Import Area */}
+                        {!bookForm.id && (
+                            <div className="flex flex-col gap-8">
+                                <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h2 className="font-headline-md text-headline-md">{t('admin.bibtex.title')}</h2>
+                                        <button
+                                            onClick={() => setShowBibtexArea(!showBibtexArea)}
+                                            className="text-primary font-label-md flex items-center gap-1 hover:bg-primary/5 px-3 py-1 rounded-full transition-colors cursor-pointer"
+                                        >
+                                            <span className="material-symbols-outlined">{showBibtexArea ? 'close' : 'add'}</span>
+                                            {showBibtexArea ? t('admin.bibtex.cancel') : t('admin.bibtex.add_btn')}
+                                        </button>
+                                    </div>
+
+                                    {showBibtexArea && (
+                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <textarea
+                                                value={bibtexInput}
+                                                onChange={(e) => setBibtexInput(e.target.value)}
+                                                placeholder={t('admin.bibtex.placeholder')}
+                                                className="w-full border border-outline-variant rounded p-3 font-mono text-xs h-48 bg-surface-container-low mb-4 focus:bg-surface focus:border-primary outline-none transition-all"
+                                            />
+                                            <button
+                                                onClick={handleParseBibtex}
+                                                disabled={!bibtexInput.trim()}
+                                                className="w-full bg-secondary text-on-secondary font-label-lg py-3 rounded-full hover:bg-secondary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {t('admin.bibtex.parse_btn')}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {!showBibtexArea && previewBooks.length === 0 && (
+                                        <div className="text-center py-10 text-on-surface-variant">
+                                            <span className="material-symbols-outlined text-[48px] opacity-20 mb-2">library_add</span>
+                                            <p className="text-body-md">{t('admin.bibtex.hint')}</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Preview Table */}
+                                {previewBooks.length > 0 && (
+                                    <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="font-title-lg text-title-lg">{t('admin.bibtex.preview_title')}</h3>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => toggleAllPreview(true)} className="text-xs font-label-md text-primary hover:underline">{t('admin.bibtex.select_all')}</button>
+                                                <span className="text-outline">|</span>
+                                                <button onClick={() => toggleAllPreview(false)} className="text-xs font-label-md text-primary hover:underline">{t('admin.bibtex.select_none')}</button>
+                                            </div>
+                                        </div>
+
+                                        <div className="max-h-[600px] overflow-y-auto border border-outline-variant rounded-md">
+                                            <table className="w-full text-left border-collapse">
+                                                <thead className="sticky top-0 bg-surface-container-low shadow-sm z-10">
+                                                    <tr className="text-xs font-bold uppercase tracking-wider text-on-surface-variant border-b border-outline-variant">
+                                                        <th className="p-3 w-8"></th>
+                                                        <th className="p-3">{t('admin.bibtex.table.book')}</th>
+                                                        <th className="p-3 w-20 text-center">{t('admin.bibtex.table.year')}</th>
+                                                        <th className="p-3 w-32 text-center">{t('admin.bibtex.table.isbn')}</th>
+                                                        <th className="p-3">{t('admin.bibtex.table.publisher')}</th>
+                                                        <th className="p-3 w-10"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-outline-variant">
+                                                    {previewBooks.map((book) => {
+                                                        return (
+                                                            <tr key={book.tempId} className={`hover:bg-surface-variant/10 transition-colors ${!book.selected ? 'opacity-60 bg-surface-container-low' : ''}`}>
+                                                                <td className="p-2 text-center">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={book.selected}
+                                                                        onChange={(e) => handlePreviewBookChange(book.tempId, 'selected', e.target.checked)}
+                                                                        className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer"
+                                                                    />
+                                                                </td>
+                                                                <td className="p-2">
+                                                                    <div className="flex flex-col gap-1">
+                                                                        <input
+                                                                            value={book.title}
+                                                                            onChange={(e) => handlePreviewBookChange(book.tempId, 'title', e.target.value)}
+                                                                            placeholder={t('admin.bibtex.table.title')}
+                                                                            className="w-full border-none bg-transparent font-bold text-sm focus:ring-1 focus:ring-primary rounded p-1"
+                                                                        />
+                                                                        <input
+                                                                            value={book.author}
+                                                                            onChange={(e) => handlePreviewBookChange(book.tempId, 'author', e.target.value)}
+                                                                            placeholder={t('admin.bibtex.table.author')}
+                                                                            className="w-full border-none bg-transparent text-xs text-on-surface-variant focus:ring-1 focus:ring-primary rounded p-1"
+                                                                        />
+                                                                        <select
+                                                                            value={book.category}
+                                                                            onChange={(e) => handlePreviewBookChange(book.tempId, 'category', e.target.value)}
+                                                                            className="w-full border border-outline-variant rounded p-1 text-[10px] bg-surface-container-low mt-1"
+                                                                        >
+                                                                            {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
+                                                                                <option key={key} value={value as string}>{value as string}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="p-2 align-top text-center">
+                                                                    <input
+                                                                        value={book.publication_year}
+                                                                        onChange={(e) => handlePreviewBookChange(book.tempId, 'publication_year', e.target.value)}
+                                                                        placeholder={t('admin.bibtex.table.year')}
+                                                                        className="w-full border border-outline-variant rounded p-1 text-sm text-center"
+                                                                    />
+                                                                </td>
+                                                                <td className="p-2 align-top text-center">
+                                                                    <input
+                                                                        value={book.isbn}
+                                                                        onChange={(e) => handlePreviewBookChange(book.tempId, 'isbn', e.target.value)}
+                                                                        placeholder={t('admin.bibtex.table.isbn')}
+                                                                        className="w-full border border-outline-variant rounded p-1 text-sm font-mono"
+                                                                    />
+                                                                </td>
+                                                                <td className="p-2 align-top">
+                                                                    <div className="flex flex-col gap-1">
+                                                                        <input
+                                                                            value={book.publisher}
+                                                                            onChange={(e) => handlePreviewBookChange(book.tempId, 'publisher', e.target.value)}
+                                                                            placeholder={t('admin.bibtex.table.publisher')}
+                                                                            className="w-full border border-outline-variant rounded p-1 text-xs"
+                                                                        />
+                                                                        <textarea
+                                                                            value={book.description}
+                                                                            onChange={(e) => handlePreviewBookChange(book.tempId, 'description', e.target.value)}
+                                                                            placeholder={t('admin.bibtex.table.description')}
+                                                                            className="w-full border border-outline-variant rounded p-1 text-xs h-10 resize-y"
+                                                                        />
+                                                                    </div>
+                                                                </td>
+                                                                <td className="p-2 align-top text-center">
+                                                                    <button
+                                                                        onClick={() => setPreviewBooks(prev => prev.filter(b => b.tempId !== book.tempId))}
+                                                                        className="text-error hover:text-error/80 cursor-pointer p-1"
+                                                                        title={t('admin.bibtex.table.remove')}
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div className="mt-4 flex items-center justify-end gap-4">
+                                            <span className="text-body-sm text-on-surface-variant">
+                                                {t('admin.bibtex.selected_count', { selected: previewBooks.filter(b => b.selected).length, total: previewBooks.length })}
+                                            </span>
+                                            <button
+                                                onClick={handleImportSelected}
+                                                className="bg-primary text-on-primary py-2.5 px-6 rounded-md hover:bg-primary/90 transition-colors font-label-md shadow-sm cursor-pointer"
+                                            >
+                                                {t('admin.bibtex.import_btn')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
-                )}
-            </div>
 
-            <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-                    <h2 className="font-headline-md text-headline-md">{t('admin.books.inventory')}</h2>
-                    <div className="relative max-w-sm w-full">
-                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-                        <input
-                            type="text"
-                            placeholder={t('admin.books.search_placeholder')}
-                            value={search}
-                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                            className="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-full text-body-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        />
-                    </div>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="border-b">
-                                <th className="p-2 font-label-md">{t('admin.books.signature')}</th>
-                                <th className="p-2 font-label-md">{t('admin.books.title')}</th>
-                                <th className="p-2 font-label-md">{t('admin.books.author')}</th>
-                                <th className="p-2 font-label-md text-right">{t('admin.books.actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {books.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} className="p-4 text-center text-on-surface-variant">{t('admin.books.no_books')}</td>
-                                </tr>
-                            ) : (
-                                books.map(b => (
-                                    <tr key={b.id} className="border-b hover:bg-surface-variant">
-                                        <td className="p-2 font-body-sm whitespace-nowrap">{b.signature || b.id}</td>
-                                        <td className="p-2 font-body-sm">{b.title}</td>
-                                        <td className="p-2 font-body-sm">{b.author}</td>
-                                        <td className="p-2 font-body-sm text-right whitespace-nowrap">
-                                            <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.books.edit')}</button>
-                                            <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.books.delete')}</button>
-                                        </td>
+                    <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+                            <h2 className="font-headline-md text-headline-md">{t('admin.books.inventory')}</h2>
+                            <div className="relative max-w-sm w-full">
+                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                                <input
+                                    type="text"
+                                    placeholder={t('admin.books.search_placeholder')}
+                                    value={search}
+                                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                                    className="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-full text-body-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                />
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="p-2 font-label-md">{t('admin.books.signature')}</th>
+                                        <th className="p-2 font-label-md">{t('admin.books.title')}</th>
+                                        <th className="p-2 font-label-md">{t('admin.books.author')}</th>
+                                        <th className="p-2 font-label-md text-right">{t('admin.books.actions')}</th>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                </thead>
+                                <tbody>
+                                    {books.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="p-4 text-center text-on-surface-variant">{t('admin.books.no_books')}</td>
+                                        </tr>
+                                    ) : (
+                                        books.map(b => (
+                                            <tr key={b.id} className="border-b hover:bg-surface-variant">
+                                                <td className="p-2 font-body-sm whitespace-nowrap">{b.signature || b.id}</td>
+                                                <td className="p-2 font-body-sm">{b.title}</td>
+                                                <td className="p-2 font-body-sm">{b.author}</td>
+                                                <td className="p-2 font-body-sm text-right whitespace-nowrap">
+                                                    <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.books.edit')}</button>
+                                                    <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.books.delete')}</button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                {totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-2 mt-6">
-                        <button
-                            disabled={page === 1}
-                            onClick={() => setPage(p => Math.max(p - 1, 1))}
-                            className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant disabled:opacity-30"
-                        >
-                            <span className="material-symbols-outlined text-sm">chevron_left</span>
-                        </button>
-                        <span className="text-body-sm">{t('admin.books.page_of', { page: page, total: totalPages })}</span>
-                        <button
-                            disabled={page === totalPages}
-                            onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-                            className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant disabled:opacity-30"
-                        >
-                            <span className="material-symbols-outlined text-sm">chevron_right</span>
-                        </button>
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-2 mt-6">
+                                <button
+                                    disabled={page === 1}
+                                    onClick={() => setPage(p => Math.max(p - 1, 1))}
+                                    className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant disabled:opacity-30"
+                                >
+                                    <span className="material-symbols-outlined text-sm">chevron_left</span>
+                                </button>
+                                <span className="text-body-sm">{t('admin.books.page_of', { page: page, total: totalPages })}</span>
+                                <button
+                                    disabled={page === totalPages}
+                                    onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+                                    className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-variant disabled:opacity-30"
+                                >
+                                    <span className="material-symbols-outlined text-sm">chevron_right</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -49,6 +49,11 @@
       "prev": "Vorherige Seite",
       "next": "Nächste Seite",
       "last": "Letzte Seite"
+    },
+    "results_found": "Bücher gefunden",
+    "filter": {
+      "all_categories": "Alle Kategorien",
+      "all_status": "Alle Status"
     }
   },
   "auth": {
@@ -119,7 +124,17 @@
         "update": "Aktualisieren",
         "save": "Speichern",
         "cancel": "Abbrechen"
-      }
+      },
+      "add_title": "Neues Buch hinzufügen",
+      "edit_title": "Buch bearbeiten",
+      "add_btn": "Hinzufügen",
+      "save_btn": "Speichern",
+      "year": "Jahr",
+      "publisher": "Verlag",
+      "isbn": "ISBN",
+      "cover_image": "Cover",
+      "signature_placeholder": "Wird automatisch generiert...",
+      "description": "Beschreibung"
     },
     "bibtex": {
       "label": "BibTeX-Code hier einfügen",
@@ -140,8 +155,19 @@
         "actions": "Aktionen",
         "publisher": "Verlag",
         "description": "Beschreibung",
-        "remove": "Aus Liste entfernen"
-      }
+        "remove": "Aus Liste entfernen",
+        "book": "Buch"
+      },
+      "title": "BibTeX Import",
+      "add_btn": "Importieren",
+      "cancel": "Abbrechen",
+      "placeholder": "Füge hier deinen BibTeX-Code ein...",
+      "parse_btn": "Parsen",
+      "hint": "Füge BibTeX-Code ein, um mehrere Bücher gleichzeitig zu importieren.",
+      "no_entries_found": "Keine BibTeX-Einträge gefunden.",
+      "preview_title": "Vorschau",
+      "select_all": "Alle auswählen",
+      "select_none": "Keine auswählen"
     },
     "users": {
       "title": "Nutzerkonten ({{count}})",
