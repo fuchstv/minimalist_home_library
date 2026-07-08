@@ -2,13 +2,14 @@
 // backend/admin.php
 require_once 'db.php';
 require_once 'admin_utils.php';
+require_once 'error_utils.php';
 session_start();
 
 // Ensure only admins can access
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     http_response_code(403);
     echo json_encode(["message" => "Forbidden: Admin access required"]);
-    return;
+    die();
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -29,7 +30,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             if (!isset($input['books']) || !is_array($input['books'])) {
                 http_response_code(400);
                 echo json_encode(["message" => "Invalid input format. Expected an array of books."]);
-                return;
+                die();
             }
 
             try {
@@ -72,10 +73,9 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 if ($pdo->inTransaction()) {
                     $pdo->rollBack();
                 }
-                http_response_code(400);
-                echo json_encode(["message" => "Failed to import books: " . $e->getMessage()]);
+                handleException($e, "Failed to import books");
             }
-            return;
+            die();
         }
 
         // Update or Create book
@@ -101,7 +101,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             if (!in_array($mimeType, $allowedMimeTypes) || !in_array($extension, $allowedExtensions)) {
                 http_response_code(400);
                 echo json_encode(["message" => "Invalid file type. Only JPG, PNG, GIF, and WEBP are allowed."]);
-                return;
+                die();
             }
             $uploadDir = __DIR__ . '/uploads/';
             if (!is_dir($uploadDir)) {
@@ -155,15 +155,18 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            http_response_code(400);
-            echo json_encode(["message" => "Failed to save book: " . $e->getMessage()]);
+            handleException($e, "Failed to save book");
         }
     } elseif ($method == 'DELETE') {
         if (isset($parts[2]) && is_numeric($parts[2])) {
-            $id = $parts[2];
-            $stmt = $pdo->prepare("DELETE FROM books WHERE id = ?");
-            $stmt->execute([$id]);
-            echo json_encode(["message" => "Book deleted"]);
+            try {
+                $id = $parts[2];
+                $stmt = $pdo->prepare("DELETE FROM books WHERE id = ?");
+                $stmt->execute([$id]);
+                echo json_encode(["message" => "Book deleted"]);
+            } catch (\Exception $e) {
+                handleException($e, "Failed to delete book");
+            }
         } else {
             http_response_code(400);
             echo json_encode(["message" => "Invalid ID"]);

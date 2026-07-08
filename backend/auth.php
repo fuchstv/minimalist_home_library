@@ -1,6 +1,7 @@
 <?php
 // backend/auth.php
 require_once 'db.php';
+require_once 'error_utils.php';
 session_start();
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -10,28 +11,32 @@ if ($method == 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (strpos($path, '/auth/login') !== false) {
-        $email = $data['email'] ?? '';
-        $password = $data['password'] ?? '';
+        try {
+            $email = $data['email'] ?? '';
+            $password = $data['password'] ?? '';
 
-        $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
+            $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['password_hash'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_role'] = $user['role'];
-            echo json_encode([
-                "message" => "Login successful",
-                "user" => [
-                    "id" => $user['id'],
-                    "name" => $user['name'],
-                    "email" => $user['email'],
-                    "role" => $user['role']
-                ]
-            ]);
-        } else {
-            http_response_code(401);
-            echo json_encode(["message" => "Invalid credentials"]);
+            if ($user && password_verify($password, $user['password_hash'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_role'] = $user['role'];
+                echo json_encode([
+                    "message" => "Login successful",
+                    "user" => [
+                        "id" => $user['id'],
+                        "name" => $user['name'],
+                        "email" => $user['email'],
+                        "role" => $user['role']
+                    ]
+                ]);
+            } else {
+                http_response_code(401);
+                echo json_encode(["message" => "Invalid credentials"]);
+            }
+        } catch (\Exception $e) {
+            handleException($e, "Login failed");
         }
     } elseif (strpos($path, '/auth/register') !== false) {
         $name = $data['name'] ?? '';
@@ -59,9 +64,13 @@ if ($method == 'POST') {
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, phone, data_consent, rules_consent, role) VALUES (?, ?, ?, ?, ?, ?, 'member')");
             $stmt->execute([$name, $email, $hash, $phone, $acceptData ? 1 : 0, $acceptRules ? 1 : 0]);
             echo json_encode(["message" => "User registered successfully"]);
-        } catch (\PDOException $e) {
-            http_response_code(400);
-            echo json_encode(["message" => "Email already exists or invalid data"]);
+        } catch (\Exception $e) {
+            if ($e instanceof PDOException && $e->getCode() == 23000) {
+                 http_response_code(400);
+                 echo json_encode(["message" => "Email already exists"]);
+            } else {
+                 handleException($e, "Registration failed");
+            }
         }
     } elseif (strpos($path, '/auth/logout') !== false) {
         session_destroy();
@@ -69,14 +78,18 @@ if ($method == 'POST') {
     }
 } elseif ($method == 'GET' && strpos($path, '/auth/me') !== false) {
     if (isset($_SESSION['user_id'])) {
-        $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE id = ?");
-        $stmt->execute([$_SESSION['user_id']]);
-        $user = $stmt->fetch();
-        if ($user) {
-            echo json_encode(["user" => $user]);
-        } else {
-            http_response_code(401);
-            echo json_encode(["message" => "Not authenticated"]);
+        try {
+            $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $user = $stmt->fetch();
+            if ($user) {
+                echo json_encode(["user" => $user]);
+            } else {
+                http_response_code(401);
+                echo json_encode(["message" => "Not authenticated"]);
+            }
+        } catch (\Exception $e) {
+            handleException($e, "Failed to fetch user info");
         }
     } else {
         http_response_code(401);

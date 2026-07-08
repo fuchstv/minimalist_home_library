@@ -8,28 +8,32 @@ $method = $_SERVER['REQUEST_METHOD'];
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['message' => 'Unauthorized']);
-    exit;
+    die();
 }
 $user_id = $_SESSION['user_id'];
 
 if ($method == 'GET') {
     // Get loans for the current user
-    $query = "
-        SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
-               CASE
-                   WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
-                   ELSE l.status
-               END as status,
-               b.title, b.author, b.isbn, b.location
-        FROM loans l
-        JOIN books b ON l.book_id = b.id
-        WHERE l.user_id = ? AND l.status != 'returned'
-        ORDER BY l.loan_date DESC
-    ";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([$user_id]);
-    $loans = $stmt->fetchAll();
-    echo json_encode(["data" => $loans]);
+    try {
+        $query = "
+            SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
+                   CASE
+                       WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
+                       ELSE l.status
+                   END as status,
+                   b.title, b.author, b.isbn, b.location
+            FROM loans l
+            JOIN books b ON l.book_id = b.id
+            WHERE l.user_id = ? AND l.status != 'returned'
+            ORDER BY l.loan_date DESC
+        ";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$user_id]);
+        $loans = $stmt->fetchAll();
+        echo json_encode(["data" => $loans]);
+    } catch (\Exception $e) {
+        handleException($e, "Failed to fetch loans");
+    }
 
 } elseif ($method == 'POST') {
     // Borrow a book
@@ -74,10 +78,11 @@ if ($method == 'GET') {
             $pdo->commit();
             echo json_encode(["message" => "Book successfully borrowed.", "due_date" => $due_date]);
 
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            http_response_code(400);
-            echo json_encode(["message" => $e->getMessage()]);
+        } catch (\Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            handleException($e, "An error occurred while borrowing the book");
         }
     }
 } elseif ($method == 'PUT') {
@@ -122,10 +127,11 @@ if ($method == 'GET') {
             $pdo->commit();
             echo json_encode(["message" => $message]);
 
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            http_response_code(400);
-            echo json_encode(["message" => $e->getMessage()]);
+        } catch (\Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            handleException($e, "An error occurred while updating the loan");
         }
     }
 } else {

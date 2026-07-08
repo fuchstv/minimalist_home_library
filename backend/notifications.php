@@ -2,6 +2,7 @@
 // backend/notifications.php
 session_start();
 require_once 'db.php';
+require_once 'error_utils.php';
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
@@ -25,7 +26,6 @@ if (!isset($_SESSION['user_id'])) {
 
         echo json_encode(["count" => $count]);
     } catch (\Exception $e) {
-        http_response_code(500);
-        echo json_encode(["message" => "Internal Server Error: " . $e->getMessage()]);
+        sendGenericError($e, "Internal Server Error");
     }
 }

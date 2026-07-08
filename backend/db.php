@@ -1,5 +1,7 @@
 <?php
 // backend/db.php
+require_once 'error_utils.php';
+
 $host = getenv('DB_HOST') ?: 'localhost';
 $db   = getenv('DB_NAME') ?: 'library_db';
 $user = getenv('DB_USER') ?: 'root';
@@ -16,6 +18,6 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    echo json_encode(["error" => "Database connection failed: " . $e->getMessage()]);
-    exit;
+    handleDbError($e, "Database connection failed");
+    die();
 }
