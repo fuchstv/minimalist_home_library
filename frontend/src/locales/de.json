@@ -91,8 +91,8 @@
   "notifications": {
     "title": "Benachrichtigungen",
     "none": "Keine neuen Benachrichtigungen.",
-    "mark_read": "Als gelesen markieren",
-    "mark_all_read": "Alle als gelesen markieren"
+    "mark_read": "Gelesen & Löschen",
+    "mark_all_read": "Alle löschen"
   },
   "admin": {
     "title": "Administrator Bereich",

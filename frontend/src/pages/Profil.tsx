@@ -93,13 +93,13 @@ const Profil: React.FC = () => {
         }
     };
 
-    const markAsRead = async (id?: number) => {
+    const dismissNotification = async (id?: number) => {
         try {
             const headers: HeadersInit = { 'Content-Type': 'application/json' };
             if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
 
             const res = await fetch(`${API_BASE_URL}/api/notifications`, {
-                method: 'PUT',
+                method: 'DELETE',
                 headers: headers,
                 body: JSON.stringify({ id }),
                 credentials: 'include'
@@ -109,7 +109,7 @@ const Profil: React.FC = () => {
                 fetchNotifications();
             }
         } catch (error) {
-            console.error("Error marking notification as read:", error);
+            console.error("Error dismissing notification:", error);
         }
     };
 
@@ -123,8 +123,8 @@ const Profil: React.FC = () => {
             <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="font-headline-md text-headline-md">{t('notifications.title') || 'Benachrichtigungen'}</h2>
-                    {notifications.some(n => !n.is_read) && (
-                        <button onClick={() => markAsRead()} className="text-primary font-label-md hover:underline">
+                    {notifications.length > 0 && (
+                        <button onClick={() => dismissNotification()} className="text-primary font-label-md hover:underline">
                             {t('notifications.mark_all_read') || 'Alle als gelesen markieren'}
                         </button>
                     )}
@@ -136,14 +136,16 @@ const Profil: React.FC = () => {
                 ) : (
                     <div className="flex flex-col gap-3">
                         {notifications.map(n => (
-                            <div key={n.id} className={`p-4 rounded-lg border ${n.is_read ? 'bg-surface border-outline-variant opacity-60' : 'bg-primary-container/10 border-primary/20 shadow-sm'}`}>
+                            <div key={n.id} className="p-4 rounded-lg border bg-primary-container/10 border-primary/20 shadow-sm transition-all hover:bg-primary-container/20">
                                 <div className="flex justify-between gap-4">
-                                    <p className={`font-body-md ${!n.is_read ? 'font-bold' : ''}`}>{n.message}</p>
-                                    {!n.is_read && (
-                                        <button onClick={() => markAsRead(n.id)} className="text-primary material-symbols-outlined" title={t('notifications.mark_read') || 'Als gelesen markieren'}>
-                                            check_circle
-                                        </button>
-                                    )}
+                                    <p className="font-body-md font-bold text-on-surface">{n.message}</p>
+                                    <button
+                                        onClick={() => dismissNotification(n.id)}
+                                        className="text-primary material-symbols-outlined hover:scale-110 transition-transform"
+                                        title={t('notifications.mark_read') || 'Als gelesen markieren'}
+                                    >
+                                        check_circle
+                                    </button>
                                 </div>
                                 <span className="text-[10px] text-on-surface-variant mt-2 block">
                                     {new Date(n.created_at).toLocaleString()}

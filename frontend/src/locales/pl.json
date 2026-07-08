@@ -91,8 +91,8 @@
   "notifications": {
     "title": "Powiadomienia",
     "none": "Brak nowych powiadomień.",
-    "mark_read": "Oznacz jako przeczytane",
-    "mark_all_read": "Oznacz wszystkie jako przeczytane"
+    "mark_read": "Przeczytane i usuń",
+    "mark_all_read": "Usuń wszystkie"
   },
   "admin": {
     "title": "Panel administratora",
