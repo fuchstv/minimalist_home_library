@@ -4,8 +4,13 @@ session_start();
 require_once 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
-// Resolve user ID: check session first, then fallback to GET/POST parameter, default to 2
-$user_id = $_SESSION['user_id'] ?? (isset($_GET['user_id']) ? (int)$_GET['user_id'] : 2);
+
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['message' => 'Unauthorized']);
+    exit;
+}
+$user_id = $_SESSION['user_id'];
 
 if ($method == 'GET') {
     // Get loans for the current user
