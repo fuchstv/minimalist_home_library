@@ -292,7 +292,7 @@ const Admin: React.FC = () => {
                 <div className="flex flex-col gap-8 animate-in fade-in duration-500">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Manual Form */}
-                        <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm h-fit">
+                        <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-lg border border-outline-variant shadow-sm h-fit">
                             <h2 className="font-headline-md text-headline-md mb-6">
                                 {bookForm.id ? t('admin.books.edit_title') : t('admin.books.add_title')}
                             </h2>
@@ -396,7 +396,7 @@ const Admin: React.FC = () => {
                         {/* Import Area */}
                         {!bookForm.id && (
                             <div className="flex flex-col gap-8">
-                                <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+                                <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-lg border border-outline-variant shadow-sm">
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="font-headline-md text-headline-md">{t('admin.bibtex.title')}</h2>
                                         <button
@@ -436,7 +436,7 @@ const Admin: React.FC = () => {
 
                                 {/* Preview Table */}
                                 {previewBooks.length > 0 && (
-                                    <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-lg border border-outline-variant shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                                         <div className="flex items-center justify-between mb-4">
                                             <h3 className="font-title-lg text-title-lg">{t('admin.bibtex.preview_title')}</h3>
                                             <div className="flex gap-2">
@@ -461,7 +461,7 @@ const Admin: React.FC = () => {
                                                 <tbody className="divide-y divide-outline-variant">
                                                     {previewBooks.map((book) => {
                                                         return (
-                                                            <tr key={book.tempId} className={`hover:bg-surface-variant/10 transition-colors ${!book.selected ? 'opacity-60 bg-surface-container-low' : ''}`}>
+                                                            <tr key={book.tempId} className={`hover:bg-surface-variant/10 transition-colors ${!book.selected ? 'opacity-60 bg-surface-container-low dark:bg-white/5' : ''}`}>
                                                                 <td className="p-2 text-center">
                                                                     <input
                                                                         type="checkbox"
@@ -560,7 +560,7 @@ const Admin: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+                    <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-lg border border-outline-variant shadow-sm">
                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
                             <h2 className="font-headline-md text-headline-md">{t('admin.books.inventory')}</h2>
                             <div className="relative max-w-sm w-full">

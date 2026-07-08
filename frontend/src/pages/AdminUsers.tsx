@@ -190,7 +190,7 @@ const AdminUsers: React.FC = () => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Column 1: Users List */}
-            <div className="lg:col-span-1 bg-surface-container-lowest p-5 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+            <div className="lg:col-span-1 bg-surface-container-low dark:bg-white/10 p-5 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
                 <h2 className="font-headline-sm text-headline-sm flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">group</span>
                     {t('admin.users.title', { count: filteredUsers.length })}
@@ -253,7 +253,7 @@ const AdminUsers: React.FC = () => {
                 {selectedUser ? (
                     <div className="flex flex-col gap-6">
                         {/* Selected User Overview */}
-                        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div className="flex flex-col gap-1.5">
                                 <h2 className="font-headline-md text-headline-md">{selectedUser.name}</h2>
                                 <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
@@ -279,7 +279,7 @@ const AdminUsers: React.FC = () => {
 
                         {/* Edit User Mode */}
                         {editingUser && (
-                            <form onSubmit={handleUpdateUser} className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                            <form onSubmit={handleUpdateUser} className="bg-surface-container-low dark:bg-white/10 p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
                                 <h3 className="font-title-lg text-title-lg pb-2 border-b border-outline-variant">{t('admin.users.edit_title')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -371,7 +371,7 @@ const AdminUsers: React.FC = () => {
                         )}
 
                         {/* Lending Utility (Buch ausleihen) */}
-                        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                        <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
                             <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">bookmark_add</span>
                                 {t('admin.users.lend.title', { name: selectedUser.name })}
@@ -439,7 +439,7 @@ const AdminUsers: React.FC = () => {
                         </div>
 
                         {/* Active & Past Loans */}
-                        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
+                        <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-4">
                             <h3 className="font-title-lg text-title-lg pb-1.5 border-b border-outline-variant">{t("admin.users.loans.title")}</h3>
                             {userLoans.length === 0 ? (
                                 <p className="text-on-surface-variant text-center py-6">{t("admin.users.loans.no_loans")}</p>
@@ -516,7 +516,7 @@ const AdminUsers: React.FC = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant shadow-sm flex flex-col items-center justify-center text-center text-on-surface-variant min-h-[400px]">
+                    <div className="bg-surface-container-low dark:bg-white/10 p-10 rounded-xl border border-outline-variant shadow-sm flex flex-col items-center justify-center text-center text-on-surface-variant min-h-[400px]">
                         <span className="material-symbols-outlined text-[64px] text-primary/40 mb-3">account_box</span>
                         <h3 className="font-headline-sm text-headline-sm mb-1 text-on-surface">{t("admin.users.no_user_selected")}</h3>
                         <p className="max-w-xs text-body-md">{t("admin.users.select_user_hint")}</p>

@@ -54,6 +54,7 @@ const DynamicPage: React.FC = () => {
 
         if (slug) {
             fetchPage();
+
             setIsEditing(false);
             setMessage('');
         }
@@ -133,7 +134,7 @@ const DynamicPage: React.FC = () => {
     if (isEditing) {
         return (
             <div className="flex-grow p-margin-mobile md:p-margin-desktop bg-surface">
-                <div className="max-w-5xl mx-auto bg-surface-container-lowest p-6 md:p-8 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-6">
+                <div className="max-w-5xl mx-auto bg-surface-container-low dark:bg-white/10 p-6 md:p-8 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-outline-variant pb-4 gap-4">
                         <div>
                             <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider">Editor</span>
@@ -164,8 +165,8 @@ const DynamicPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* German Version */}
-                        <div className="flex flex-col gap-5 bg-surface-container-low/30 p-5 rounded-lg border border-outline-variant/50">
-                            <h3 className="font-headline-sm text-headline-sm text-secondary border-b border-outline-variant/30 pb-2">Deutsch (DE)</h3>
+                        <div className="flex flex-col gap-5 bg-surface-container-low dark:bg-white/5/30 p-5 rounded-lg border border-outline-variant dark:border-outline/50">
+                            <h3 className="font-headline-sm text-headline-sm text-secondary border-b border-outline-variant dark:border-outline/30 pb-2">Deutsch (DE)</h3>
                             <div>
                                 <label htmlFor="edit_title_de" className="font-label-sm block mb-1.5 text-on-surface-variant">Titel (DE)</label>
                                 <input
@@ -173,7 +174,7 @@ const DynamicPage: React.FC = () => {
                                     type="text"
                                     value={editTitleDe}
                                     onChange={e => setEditTitleDe(e.target.value)}
-                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md bg-surface-container-lowest focus:outline-primary/70 shadow-sm"
+                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md bg-surface-container-low dark:bg-white/10 focus:outline-primary/70 shadow-sm"
                                 />
                             </div>
                             <div className="flex-grow flex flex-col">
@@ -182,14 +183,14 @@ const DynamicPage: React.FC = () => {
                                     id="edit_content_de"
                                     value={editContentDe}
                                     onChange={e => setEditContentDe(e.target.value)}
-                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md min-h-[300px] lg:min-h-[400px] font-mono bg-surface-container-lowest focus:outline-primary/70 shadow-sm resize-y"
+                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md min-h-[300px] lg:min-h-[400px] font-mono bg-surface-container-low dark:bg-white/10 focus:outline-primary/70 shadow-sm resize-y"
                                 />
                             </div>
                         </div>
 
                         {/* Polish Version */}
-                        <div className="flex flex-col gap-5 bg-surface-container-low/30 p-5 rounded-lg border border-outline-variant/50">
-                            <h3 className="font-headline-sm text-headline-sm text-secondary border-b border-outline-variant/30 pb-2">Polnisch (PL)</h3>
+                        <div className="flex flex-col gap-5 bg-surface-container-low dark:bg-white/5/30 p-5 rounded-lg border border-outline-variant dark:border-outline/50">
+                            <h3 className="font-headline-sm text-headline-sm text-secondary border-b border-outline-variant dark:border-outline/30 pb-2">Polnisch (PL)</h3>
                             <div>
                                 <label htmlFor="edit_title_pl" className="font-label-sm block mb-1.5 text-on-surface-variant">Titel (PL)</label>
                                 <input
@@ -197,7 +198,7 @@ const DynamicPage: React.FC = () => {
                                     type="text"
                                     value={editTitlePl}
                                     onChange={e => setEditTitlePl(e.target.value)}
-                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md bg-surface-container-lowest focus:outline-primary/70 shadow-sm"
+                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md bg-surface-container-low dark:bg-white/10 focus:outline-primary/70 shadow-sm"
                                 />
                             </div>
                             <div className="flex-grow flex flex-col">
@@ -206,7 +207,7 @@ const DynamicPage: React.FC = () => {
                                     id="edit_content_pl"
                                     value={editContentPl}
                                     onChange={e => setEditContentPl(e.target.value)}
-                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md min-h-[300px] lg:min-h-[400px] font-mono bg-surface-container-lowest focus:outline-primary/70 shadow-sm resize-y"
+                                    className="w-full border border-outline-variant rounded-md p-3 text-body-md min-h-[300px] lg:min-h-[400px] font-mono bg-surface-container-low dark:bg-white/10 focus:outline-primary/70 shadow-sm resize-y"
                                 />
                             </div>
                         </div>
@@ -218,7 +219,7 @@ const DynamicPage: React.FC = () => {
 
     return (
         <div className="flex-grow p-margin-mobile md:p-margin-desktop bg-surface">
-            <div className="max-w-3xl mx-auto bg-surface-container-lowest p-8 rounded-lg border border-outline-variant shadow-sm relative">
+            <div className="max-w-3xl mx-auto bg-surface-container-low dark:bg-white/10 p-8 rounded-lg border border-outline-variant shadow-sm relative">
                 {message && (
                     <div className="mb-6 p-4 rounded-md text-body-sm shadow-sm bg-secondary-container text-on-secondary-container border border-secondary/20">
                         {message}

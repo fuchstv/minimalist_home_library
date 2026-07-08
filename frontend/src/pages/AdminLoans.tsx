@@ -78,7 +78,7 @@ const AdminLoans: React.FC = () => {
     });
 
     return (
-        <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-6">
+        <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h2 className="font-headline-sm text-headline-sm flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">book</span>

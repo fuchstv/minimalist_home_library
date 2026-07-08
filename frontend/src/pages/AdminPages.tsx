@@ -67,7 +67,7 @@ const AdminPages: React.FC = () => {
             </div>
 
             {selectedPage && (
-                <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-4">
+                <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-4">
                     <h2 className="font-headline-sm text-headline-sm mb-2">{t('admin.pages.edit_title', { slug: selectedPage.slug })}</h2>
 
                     {
