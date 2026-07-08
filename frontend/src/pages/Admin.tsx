@@ -5,6 +5,7 @@ import AdminUsers from './AdminUsers';
 import AdminLoans from './AdminLoans';
 import AdminPages from './AdminPages';
 import { AuthContext } from '../context/AuthContext';
+import CategoryDisplay from '../components/CategoryDisplay';
 import { API_BASE_URL } from '../config';
 import { parseBibTeX } from '../utils/bibtexParser';
 
@@ -314,7 +315,7 @@ const Admin: React.FC = () => {
                                         <label className="font-label-md block mb-1">{t('admin.books.category')}</label>
                                         <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface">
                                             {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
-                                                <option key={key} value={value as string}>{value as string}</option>
+                                                <option key={key} value={key}>{value as string}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -490,7 +491,7 @@ const Admin: React.FC = () => {
                                                                             className="w-full border border-outline-variant rounded p-1 text-[10px] bg-surface-container-low mt-1"
                                                                         >
                                                                             {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
-                                                                                <option key={key} value={value as string}>{value as string}</option>
+                                                                                <option key={key} value={key}>{value as string}</option>
                                                                             ))}
                                                                         </select>
                                                                     </div>
@@ -581,13 +582,14 @@ const Admin: React.FC = () => {
                                         <th className="p-2 font-label-md">{t('admin.books.signature')}</th>
                                         <th className="p-2 font-label-md">{t('admin.books.title')}</th>
                                         <th className="p-2 font-label-md">{t('admin.books.author')}</th>
+                                        <th className="p-2 font-label-md">{t('admin.books.category')}</th>
                                         <th className="p-2 font-label-md text-right">{t('admin.books.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {books.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="p-4 text-center text-on-surface-variant">{t('admin.books.no_books')}</td>
+                                            <td colSpan={5} className="p-4 text-center text-on-surface-variant">{t('admin.books.no_books')}</td>
                                         </tr>
                                     ) : (
                                         books.map(b => (
@@ -595,6 +597,7 @@ const Admin: React.FC = () => {
                                                 <td className="p-2 font-body-sm whitespace-nowrap">{b.signature || b.id}</td>
                                                 <td className="p-2 font-body-sm">{b.title}</td>
                                                 <td className="p-2 font-body-sm">{b.author}</td>
+                                                <td className="p-2 font-body-sm"><CategoryDisplay categoryKey={b.category} /></td>
                                                 <td className="p-2 font-body-sm text-right whitespace-nowrap">
                                                     <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.books.edit')}</button>
                                                     <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.books.delete')}</button>
