@@ -57,6 +57,8 @@ if (matchPath($request_uri, '/pages')) {
     require 'books.php';
 } elseif (matchPath($request_uri, '/loans')) {
     require 'loans.php';
+} elseif (matchPath($request_uri, '/reservations')) {
+    require 'reservations.php';
 } elseif (matchPath($request_uri, '/auth')) {
     require 'auth.php';
 } elseif (matchPath($request_uri, '/notifications')) {

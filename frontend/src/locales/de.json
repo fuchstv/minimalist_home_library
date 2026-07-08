@@ -23,6 +23,8 @@
     "current_selection": "Aktuelle Auswahl",
     "borrow_btn": "Ausleihen",
     "reserve_btn": "Vormerken",
+    "reserve_success": "Buch wurde erfolgreich vorgemerkt! Wir benachrichtigen dich, sobald es wieder verfügbar ist.",
+    "reserve_error": "Fehler beim Vormerken des Buches.",
     "no_books": "Keine Bücher gefunden.",
     "clear_filters": "Filter löschen",
     "borrow_success": "Buch erfolgreich ausgeliehen!",
@@ -85,6 +87,12 @@
     "section3_content": "Bitte gehen Sie sorgsam mit den ausgeliehenen Büchern um. Bei Beschädigung oder Verlust ist Ersatz zu leisten.",
     "section4_title": "Rückgabe",
     "section4_content": "Bücher sind fristgerecht während der Öffnungszeiten des SprachCafés zurückzugeben."
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "none": "Keine neuen Benachrichtigungen.",
+    "mark_read": "Als gelesen markieren",
+    "mark_all_read": "Alle als gelesen markieren"
   },
   "admin": {
     "title": "Administrator Bereich",

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from "../config";
 
 interface Loan {
     id: number;
@@ -13,41 +14,60 @@ interface Loan {
     status: string;
 }
 
-import { API_BASE_URL } from "../config";
+interface Notification {
+    id: number;
+    message: string;
+    is_read: boolean;
+    created_at: string;
+}
 
 const Profil: React.FC = () => {
     const { t } = useTranslation();
     const { user, csrfToken } = useContext(AuthContext);
     const navigate = useNavigate();
     const [loans, setLoans] = useState<Loan[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchLoans = useCallback(async () => {
         if (!user) return;
-        setLoading(true);
         try {
-            // Fetch loans for this user
             const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
-                // Even if backend filters, we filter here too for extra safety
                 const activeLoans = (data.data || []).filter((l: Loan) => l.status !== 'returned');
                 setLoans(activeLoans);
             }
         } catch (error) {
             console.error("Error fetching loans:", error);
-        } finally {
-            setLoading(false);
         }
     }, [user]);
 
-    useEffect(() => {
+    const fetchNotifications = useCallback(async () => {
+        if (!user) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/notifications`, { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setNotifications(data.data || []);
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    }, [user]);
+
+    const fetchAllData = useCallback(() => {
         if (!user) {
             navigate('/login');
-        } else {
-            fetchLoans();
+            return;
         }
-    }, [user, navigate, fetchLoans]);
+        setLoading(true);
+        Promise.all([fetchLoans(), fetchNotifications()]).finally(() => setLoading(false));
+    }, [user, navigate, fetchLoans, fetchNotifications]);
+
+    useEffect(() => {
+        fetchAllData();
+    }, [fetchAllData]);
 
     const handleReturn = async (loanId: number) => {
         try {
@@ -73,12 +93,67 @@ const Profil: React.FC = () => {
         }
     };
 
+    const markAsRead = async (id?: number) => {
+        try {
+            const headers: HeadersInit = { 'Content-Type': 'application/json' };
+            if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
+            const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+                method: 'PUT',
+                headers: headers,
+                body: JSON.stringify({ id }),
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                fetchNotifications();
+            }
+        } catch (error) {
+            console.error("Error marking notification as read:", error);
+        }
+    };
+
     if (!user) return null;
 
     return (
         <div className="flex-grow flex flex-col p-margin-mobile md:p-margin-desktop bg-surface max-w-container-max-width mx-auto w-full gap-8">
             <h1 className="font-display-lg text-display-lg text-on-surface">{t('nav.profile')} - {user.name}</h1>
             
+            {/* Notifications Section */}
+            <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="font-headline-md text-headline-md">{t('notifications.title') || 'Benachrichtigungen'}</h2>
+                    {notifications.some(n => !n.is_read) && (
+                        <button onClick={() => markAsRead()} className="text-primary font-label-md hover:underline">
+                            {t('notifications.mark_all_read') || 'Alle als gelesen markieren'}
+                        </button>
+                    )}
+                </div>
+                {loading ? (
+                    <p className="text-on-surface-variant">Lädt...</p>
+                ) : notifications.length === 0 ? (
+                    <p className="text-on-surface-variant">{t('notifications.none') || 'Keine Benachrichtigungen.'}</p>
+                ) : (
+                    <div className="flex flex-col gap-3">
+                        {notifications.map(n => (
+                            <div key={n.id} className={`p-4 rounded-lg border ${n.is_read ? 'bg-surface border-outline-variant opacity-60' : 'bg-primary-container/10 border-primary/20 shadow-sm'}`}>
+                                <div className="flex justify-between gap-4">
+                                    <p className={`font-body-md ${!n.is_read ? 'font-bold' : ''}`}>{n.message}</p>
+                                    {!n.is_read && (
+                                        <button onClick={() => markAsRead(n.id)} className="text-primary material-symbols-outlined" title={t('notifications.mark_read') || 'Als gelesen markieren'}>
+                                            check_circle
+                                        </button>
+                                    )}
+                                </div>
+                                <span className="text-[10px] text-on-surface-variant mt-2 block">
+                                    {new Date(n.created_at).toLocaleString()}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
             <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
                 <h2 className="font-headline-md text-headline-md mb-4">{t('nav.loans')}</h2>
                 {loading ? (
