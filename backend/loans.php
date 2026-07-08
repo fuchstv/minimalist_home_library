@@ -1,6 +1,6 @@
 <?php
 // backend/loans.php
-session_start();
+
 require_once 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];

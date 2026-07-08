@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
 import { AuthContext } from '../context/AuthContext';
 

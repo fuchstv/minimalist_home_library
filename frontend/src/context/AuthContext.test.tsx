@@ -29,10 +29,7 @@ describe('AuthContext', () => {
         vi.clearAllMocks();
 
         // Mock global fetch
-        mockFetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: async () => ({ message: 'Logged out successfully' })
-        });
+        mockFetch = vi.fn();
         globalThis.fetch = mockFetch;
     });
 
@@ -46,11 +43,26 @@ describe('AuthContext', () => {
         const initialUser = { id: 1, name: 'Initial User', email: 'initial@example.com', role: 'member' };
         localStorage.setItem('user', JSON.stringify(initialUser));
 
-        render(
-            <AuthProvider>
-                <TestComponent />
-            </AuthProvider>
-        );
+        mockFetch.mockImplementation((url) => {
+            if (url.includes('/api/auth/me')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: async () => ({ user: initialUser, csrfToken: 'mock-token' })
+                });
+            }
+            return Promise.resolve({
+                ok: true,
+                json: async () => ({ message: 'Logged out successfully' })
+            });
+        });
+
+        await act(async () => {
+            render(
+                <AuthProvider>
+                    <TestComponent />
+                </AuthProvider>
+            );
+        });
 
         // Verify initial state
         expect(screen.getByTestId('user')).toHaveTextContent('Initial User');
@@ -70,6 +82,10 @@ describe('AuthContext', () => {
         expect(removeItemSpy).toHaveBeenCalledWith('user');
 
         // 3. Verify fetch is called with correct parameters
-        expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+        expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/auth/logout`, expect.objectContaining({
+            method: 'POST',
+            credentials: 'include',
+            headers: expect.objectContaining({ 'X-CSRF-Token': 'mock-token' })
+        }));
     });
 });

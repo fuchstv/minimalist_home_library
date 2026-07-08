@@ -17,7 +17,7 @@ import { API_BASE_URL } from "../config";
 
 const Profil: React.FC = () => {
     const { t } = useTranslation();
-    const { user } = useContext(AuthContext);
+    const { user, csrfToken } = useContext(AuthContext);
     const navigate = useNavigate();
     const [loans, setLoans] = useState<Loan[]>([]);
     const [loading, setLoading] = useState(true);
@@ -51,9 +51,12 @@ const Profil: React.FC = () => {
 
     const handleReturn = async (loanId: number) => {
         try {
+            const headers: HeadersInit = { 'Content-Type': 'application/json' };
+            if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
             const res = await fetch(`${API_BASE_URL}/api/loans`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ action: 'return', loan_id: loanId }),
                 credentials: 'include'
             });
