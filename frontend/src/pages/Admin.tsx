@@ -314,7 +314,7 @@ const Admin: React.FC = () => {
                                         <label className="font-label-md block mb-1">{t('admin.books.category')}</label>
                                         <select name="category" value={bookForm.category} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface">
                                             {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
-                                                <option key={key} value={value as string}>{value as string}</option>
+                                                <option key={key} value={key}>{value as string}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -490,7 +490,7 @@ const Admin: React.FC = () => {
                                                                             className="w-full border border-outline-variant rounded p-1 text-[10px] bg-surface-container-low mt-1"
                                                                         >
                                                                             {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
-                                                                                <option key={key} value={value as string}>{value as string}</option>
+                                                                                <option key={key} value={key}>{value as string}</option>
                                                                             ))}
                                                                         </select>
                                                                     </div>
