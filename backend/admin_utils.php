@@ -1,18 +1,18 @@
 <?php
 function getCategoryAbbreviation($category) {
     $map = [
-        'Auf Deutsch' => 'AD',
-        'Belytrystyka polska' => 'BP',
-        'Belytrystyka zagraniczna' => 'BZ',
-        'Biografie' => 'BI',
-        'Dziecięce' => 'DZ',
-        'Fantasy | Sci-fi' => 'FS',
-        'Historyczne' => 'HI',
-        'Kryminał | Thriller' => 'KT',
-        'Młodzieżowe | Young Adult' => 'MY',
-        'Poezja' => 'PO',
-        'Poradniki | Popularnonaukowe' => 'PP',
-        'Reportaże | Podróżnicze' => 'RP'
+        'deutsch' => 'AD',
+        'belytrystyka_polska' => 'BP',
+        'belytrystyka_zagraniczna' => 'BZ',
+        'biografie' => 'BI',
+        'dzieciece' => 'DZ',
+        'fantasy_scifi' => 'FS',
+        'historyczne' => 'HI',
+        'kryminal_thriller' => 'KT',
+        'mlodziezowe_young_adult' => 'MY',
+        'poezja' => 'PO',
+        'poradniki_popularnonaukowe' => 'PP',
+        'reportaze_podroznicze' => 'RP'
     ];
     return $map[$category] ?? strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $category), 0, 2));
 }

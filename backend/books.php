@@ -53,9 +53,9 @@ if ($method == 'GET') {
 
             if ($category) {
                 // Using LIKE for category because CSV categories are broad
-                $query .= " AND category LIKE ?";
-                $countQuery .= " AND category LIKE ?";
-                $params[] = "%$category%";
+                $query .= " AND category = ?";
+                $countQuery .= " AND category = ?";
+                $params[] = $category;
             }
 
             if ($status) {
