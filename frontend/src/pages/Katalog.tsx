@@ -123,12 +123,9 @@ const Katalog: React.FC = () => {
                                 className="appearance-none bg-surface border border-outline-variant rounded-full py-3 pl-4 pr-10 font-label-md text-label-md focus:border-primary outline-none cursor-pointer"
                             >
                                 <option value="">{t('catalog.filter.all_categories')}</option>
-                                <option value="Bilderbuch">Bilderbuch</option>
-                                <option value="Roman">Roman</option>
-                                <option value="Sachbuch">Sachbuch</option>
-                                <option value="Krimi">Krimi</option>
-                                <option value="Jugendbuch">Jugendbuch</option>
-                                <option value="Comic">Comic/Graphic Novel</option>
+                                {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
+                                    <option key={key} value={value as string}>{value as string}</option>
+                                ))}
                             </select>
                             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
                         </div>
