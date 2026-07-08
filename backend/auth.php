@@ -52,6 +52,12 @@ if ($method == 'POST') {
             return;
         }
 
+        if (strlen($password) < 8) {
+            http_response_code(400);
+            echo json_encode(["message" => "Password must be at least 8 characters long"]);
+            return;
+        }
+
         if (!$acceptData || !$acceptRules) {
             http_response_code(400);
             echo json_encode(["message" => "Data and rules agreements are mandatory"]);
@@ -98,7 +104,4 @@ if ($method == 'POST') {
         http_response_code(401);
         echo json_encode(["message" => "Not authenticated"]);
     }
-} else {
-    http_response_code(405);
-    echo json_encode(["message" => "Method not allowed"]);
 }

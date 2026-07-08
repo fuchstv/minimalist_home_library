@@ -62,6 +62,27 @@ describe('Register Component', () => {
     });
   });
 
+  it('shows error if password is too short', async () => {
+    renderRegister();
+
+    fireEvent.change(screen.getByLabelText(/Name/i), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText(/E-Mail Adresse/i), { target: { value: 'john@example.com' } });
+    fireEvent.change(screen.getByLabelText(/Telefonnummer/i), { target: { value: '123456789' } });
+    fireEvent.change(screen.getByLabelText(/Passwort/i), { target: { value: 'short' } });
+
+    // Checkboxes
+    const checkboxes = screen.getAllByRole('checkbox');
+    fireEvent.click(checkboxes[0]); // Data consent
+    fireEvent.click(checkboxes[1]); // Rules consent
+
+    fireEvent.click(screen.getByRole('button', { name: /Konto erstellen/i }));
+
+    await waitFor(() => {
+        expect(screen.getByText(/Das Passwort muss mindestens 8 Zeichen lang sein/i)).toBeInTheDocument();
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it('shows error if checkboxes are not checked even if fields are filled', async () => {
     renderRegister();
 

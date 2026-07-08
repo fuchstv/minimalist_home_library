@@ -20,6 +20,11 @@ const Register: React.FC = () => {
         e.preventDefault();
         setError('');
         
+        if (password.length < 8) {
+            setError(t("auth.password_too_short"));
+            return;
+        }
+
         if (!acceptData || !acceptRules) {
             setError(t('auth.accept_terms_error'));
             return;
@@ -91,6 +96,7 @@ const Register: React.FC = () => {
                         <label htmlFor="password" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.password')}</label>
                         <input 
                             id="password"
+                            minLength={8}
                             type="password" 
                             required
                             value={password}
