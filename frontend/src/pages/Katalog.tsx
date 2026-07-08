@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from "../config";
 import { AuthContext } from '../context/AuthContext';
+import CategoryDisplay from '../components/CategoryDisplay';
 
 interface Book {
     id: number;
@@ -152,7 +153,7 @@ const Katalog: React.FC = () => {
                             >
                                 <option value="">{t('catalog.filter.all_categories')}</option>
                                 {Object.entries(t('catalog.categories', { returnObjects: true })).map(([key, value]) => (
-                                    <option key={key} value={value as string}>{value as string}</option>
+                                    <option key={key} value={key}>{value as string}</option>
                                 ))}
                             </select>
                             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant dark:text-surface-variant">expand_more</span>
