@@ -228,17 +228,12 @@
       "update_error": "Fehler beim Bearbeiten der Ausleihe."
     },
     "pages": {
-      "loading": "Laden...",
-      "save_success": "Seite erfolgreich gespeichert!",
-      "save_error": "Fehler beim Speichern.",
-      "edit_title": "Seite bearbeiten: {{slug}}",
-      "german": "Deutsch",
-      "polish": "Polnisch",
-      "title_de": "Titel (DE)",
-      "content_de": "Inhalt (DE)",
-      "title_pl": "Titel (PL)",
-      "content_pl": "Inhalt (PL)",
-      "save_btn": "Speichern"
+      "slugs": {
+        "announcement": "Ankündigung",
+        "regeln": "Regeln",
+        "datenschutz": "Datenschutz",
+        "impressum": "Impressum"
+      }
     }
   }
 }

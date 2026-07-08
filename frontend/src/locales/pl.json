@@ -228,17 +228,12 @@
       "update_error": "Błąd podczas edycji wypożyczenia."
     },
     "pages": {
-      "loading": "Ładowanie...",
-      "save_success": "Strona zapisana pomyślnie!",
-      "save_error": "Błąd podczas zapisywania.",
-      "edit_title": "Edytuj stronę: {{slug}}",
-      "german": "Niemiecki",
-      "polish": "Polski",
-      "title_de": "Tytuł (DE)",
-      "content_de": "Treść (DE)",
-      "title_pl": "Tytuł (PL)",
-      "content_pl": "Treść (PL)",
-      "save_btn": "Zapisz"
+      "slugs": {
+        "announcement": "Ogłoszenie",
+        "regeln": "Regulamin",
+        "datenschutz": "Ochrona danych",
+        "impressum": "Impressum"
+      }
     }
   }
 }

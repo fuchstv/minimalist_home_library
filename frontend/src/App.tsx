@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import AnnouncementBanner from './components/AnnouncementBanner';
 import TopNavBar from './components/TopNavBar';
 import Katalog from './pages/Katalog';
 import Login from './pages/Login';
@@ -13,6 +14,7 @@ function App() {
     <AuthProvider>
     <Router>
       <div className="flex flex-col min-h-screen">
+        <AnnouncementBanner />
         <TopNavBar />
         <main className="flex-grow flex flex-col w-full">
           <Routes>
