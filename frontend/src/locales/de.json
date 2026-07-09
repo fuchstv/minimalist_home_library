@@ -246,6 +246,13 @@
           "return_success": "Leihfrist erfolgreich zurückgegeben.",
           "error": "Fehler bei der Ausleihe-Aktion."
         }
+      },
+      "blocked": "Gesperrt",
+      "is_blocked_label": "Konto vorübergehend sperren",
+      "status_blocked": "GESPERRT",
+      "errors": {
+        "blocked": "Ihr Konto ist gesperrt. Bitte kontaktieren Sie den Administrator.",
+        "fee_unpaid": "Sie müssen die Mitgliedsgebühr bezahlen, bevor Sie Bücher ausleihen oder reservieren können."
       }
     },
     "loans": {
@@ -289,5 +296,13 @@
         "impressum": "Impressum"
       }
     }
+  },
+  "profile": {
+    "status": "Kontostatus",
+    "fee_status": "Mitgliedsgebühr",
+    "paid": "Bezahlt",
+    "unpaid": "Offen",
+    "account_active": "Aktiv",
+    "account_blocked": "Gesperrt"
   }
 }

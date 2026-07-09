@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255),
     phone VARCHAR(20),
-    fee_paid BOOLEAN DEFAULT FALSE,
+    fee_paid BOOLEAN DEFAULT FALSE, is_blocked BOOLEAN DEFAULT FALSE,
     data_consent BOOLEAN DEFAULT FALSE,
     rules_consent BOOLEAN DEFAULT FALSE,
     role ENUM('member', 'admin') DEFAULT 'member',

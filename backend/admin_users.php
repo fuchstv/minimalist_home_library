@@ -38,7 +38,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
     if (count($parts) === 2) {
         if ($method === 'GET') {
             try {
-                $stmt = $pdo->query("SELECT id, name, email, phone, fee_paid, data_consent, rules_consent, role, created_at FROM users ORDER BY name ASC");
+                $stmt = $pdo->query("SELECT id, name, email, phone, fee_paid, is_blocked, data_consent, rules_consent, role, created_at FROM users ORDER BY name ASC");
                 $users = $stmt->fetchAll();
                 echo json_encode(["data" => $users]);
             } catch (\Exception $e) {
@@ -183,7 +183,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
         if (count($parts) === 3) {
             if ($method === 'GET') {
                 try {
-                    $stmt = $pdo->prepare("SELECT id, name, email, phone, fee_paid, data_consent, rules_consent, role, created_at FROM users WHERE id = ?");
+                    $stmt = $pdo->prepare("SELECT id, name, email, phone, fee_paid, is_blocked, data_consent, rules_consent, role, created_at FROM users WHERE id = ?");
                     $stmt->execute([$user_id]);
                     $user = $stmt->fetch();
                     if ($user) {
@@ -204,6 +204,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                 $phone = $input['phone'] ?? '';
                 $role = $input['role'] ?? 'member';
                 $fee_paid = isset($input['fee_paid']) ? (int)$input['fee_paid'] : 0;
+                $is_blocked = isset($input['is_blocked']) ? (int)$input['is_blocked'] : 0;
                 $data_consent = isset($input['data_consent']) ? (int)$input['data_consent'] : 0;
                 $rules_consent = isset($input['rules_consent']) ? (int)$input['rules_consent'] : 0;
                 
@@ -214,8 +215,8 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                 }
                 
                 try {
-                    $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, phone = ?, role = ?, fee_paid = ?, data_consent = ?, rules_consent = ? WHERE id = ?");
-                    $stmt->execute([$name, $email, $phone, $role, $fee_paid, $data_consent, $rules_consent, $user_id]);
+                    $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, phone = ?, role = ?, fee_paid = ?, is_blocked = ?, data_consent = ?, rules_consent = ? WHERE id = ?");
+                    $stmt->execute([$name, $email, $phone, $role, $fee_paid, $is_blocked, $data_consent, $rules_consent, $user_id]);
                     echo json_encode(["message" => "User updated successfully."]);
                 } catch (\Exception $e) {
                     handleException($e, "Failed to update user");

@@ -6,6 +6,8 @@ interface User {
     name: string;
     email: string;
     role: string;
+    fee_paid?: number;
+    is_blocked?: number;
 }
 
 interface AuthContextType {

@@ -43,6 +43,18 @@ if ($method === 'GET') {
     try {
         $pdo->beginTransaction();
 
+        // Check if user is blocked or has not paid fee
+        $stmt = $pdo->prepare("SELECT fee_paid, is_blocked FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user_status = $stmt->fetch();
+
+        if (!$user_status || $user_status['is_blocked']) {
+            throw new Exception("Your account is blocked. Please contact the administrator.");
+        }
+        if (!$user_status['fee_paid']) {
+            throw new Exception("You must pay the membership fee before reserving books.");
+        }
+
         // Check if book exists and is borrowed
         $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ? FOR UPDATE");
         $stmt->execute([$book_id]);
