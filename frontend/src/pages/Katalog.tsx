@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from "../config";
 import { AuthContext } from '../context/AuthContext';
-import CategoryDisplay from '../components/CategoryDisplay';
 
 interface Book {
     id: number;
