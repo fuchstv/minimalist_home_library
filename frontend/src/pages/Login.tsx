@@ -41,7 +41,7 @@ const Login: React.FC = () => {
 
     return (
         <div className="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-surface">
-            <div className="bg-surface-container-lowest p-8 rounded-lg border border-outline-variant w-full max-w-md shadow-sm">
+            <div className="bg-surface-container-low dark:bg-white/10 p-8 rounded-lg border border-outline-variant w-full max-w-md shadow-sm">
                 <h1 className="font-headline-lg text-headline-lg text-on-surface mb-6 text-center">{t('auth.login_title')}</h1>
                 
                 {error && <div className="bg-error-container text-on-error-container p-3 rounded mb-4 font-body-sm text-body-sm">{error}</div>}

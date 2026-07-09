@@ -66,6 +66,7 @@ const Profil: React.FC = () => {
     }, [user, navigate, fetchLoans, fetchNotifications]);
 
     useEffect(() => {
+
         fetchAllData();
     }, [fetchAllData]);
 
@@ -184,7 +185,7 @@ const Profil: React.FC = () => {
                 )}
             </div>
 
-            <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+            <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-lg border border-outline-variant shadow-sm">
                 <h2 className="font-headline-md text-headline-md mb-4">{t('nav.loans')}</h2>
                 {loading ? (
                     <p className="text-on-surface-variant">Lädt...</p>
