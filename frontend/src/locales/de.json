@@ -303,6 +303,8 @@
     "paid": "Bezahlt",
     "unpaid": "Offen",
     "account_active": "Aktiv",
-    "account_blocked": "Gesperrt"
+    "account_blocked": "Gesperrt",
+    "no_active_loans": "Du hast derzeit keine Bücher ausgeliehen.",
+    "no_history": "Keine vergangenen Ausleihen."
   }
 }

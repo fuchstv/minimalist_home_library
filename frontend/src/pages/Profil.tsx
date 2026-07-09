@@ -32,11 +32,10 @@ const Profil: React.FC = () => {
     const fetchLoans = useCallback(async () => {
         if (!user) return;
         try {
-            const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}`, { credentials: 'include' });
+            const res = await fetch(`${API_BASE_URL}/api/loans?user_id=${user.id}&history=true`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
-                const activeLoans = (data.data || []).filter((l: Loan) => l.status !== 'returned');
-                setLoans(activeLoans);
+                setLoans(data.data || []);
             }
         } catch (error) {
             console.error("Error fetching loans:", error);
@@ -188,11 +187,11 @@ const Profil: React.FC = () => {
                 <h2 className="font-headline-md text-headline-md mb-4">{t('nav.loans')}</h2>
                 {loading ? (
                     <p className="text-on-surface-variant">Lädt...</p>
-                ) : loans.length === 0 ? (
-                    <p className="text-on-surface-variant">Du hast derzeit keine Bücher ausgeliehen.</p>
+                ) : loans.filter(l => l.status !== 'returned').length === 0 ? (
+                    <p className="text-on-surface-variant">{t('profile.no_active_loans')}</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {loans.map(loan => (
+                        {loans.filter(l => l.status !== 'returned').map(loan => (
                             <div key={loan.id} className="border border-outline-variant rounded-lg p-4 flex flex-col gap-2 relative">
                                 {loan.status === 'overdue' && (
                                     <span className="absolute top-2 right-2 bg-error text-on-error text-[10px] uppercase font-bold px-2 py-1 rounded">Überfällig</span>
@@ -213,6 +212,39 @@ const Profil: React.FC = () => {
                                 </button>
                             </div>
                         ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant shadow-sm">
+                <h2 className="font-headline-md text-headline-md mb-4">{t('admin.users.loans.title')}</h2>
+                {loading ? (
+                    <p className="text-on-surface-variant">Lädt...</p>
+                ) : loans.filter(l => l.status === 'returned').length === 0 ? (
+                    <p className="text-on-surface-variant">{t('profile.no_history')}</p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-body-sm">
+                            <thead>
+                                <tr className="border-b border-outline-variant">
+                                    <th className="p-2">{t('admin.users.loans.table.book')}</th>
+                                    <th className="p-2">{t('admin.users.loans.table.loan_date')}</th>
+                                    <th className="p-2">{t('admin.users.loans.table.return_date')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loans.filter(l => l.status === 'returned').map(loan => (
+                                    <tr key={loan.id} className="border-b border-outline-variant/50">
+                                        <td className="p-2">
+                                            <div className="font-bold">{loan.title}</div>
+                                            <div className="text-xs text-on-surface-variant">{loan.author}</div>
+                                        </td>
+                                        <td className="p-2">{new Date(loan.loan_date).toLocaleDateString()}</td>
+                                        <td className="p-2">{loan.return_date ? new Date(loan.return_date).toLocaleDateString() : '-'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>

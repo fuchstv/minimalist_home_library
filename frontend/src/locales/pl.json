@@ -303,6 +303,8 @@
     "paid": "Opłacona",
     "unpaid": "Nieopłacona",
     "account_active": "Aktywne",
-    "account_blocked": "Zablokowane"
+    "account_blocked": "Zablokowane",
+    "no_active_loans": "Obecnie nie masz wypożyczonych żadnych książek.",
+    "no_history": "Brak historii wypożyczeń."
   }
 }

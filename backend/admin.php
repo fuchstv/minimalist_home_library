@@ -157,6 +157,25 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             }
             handleException($e, "Failed to save book");
         }
+    } elseif ($method == 'GET') {
+        if (isset($parts[2]) && is_numeric($parts[2]) && isset($parts[3]) && $parts[3] === 'loans') {
+            try {
+                $book_id = (int)$parts[2];
+                $stmt = $pdo->prepare("
+                    SELECT l.*, u.name as user_name, u.email as user_email
+                    FROM loans l
+                    JOIN users u ON l.user_id = u.id
+                    WHERE l.book_id = ?
+                    ORDER BY l.loan_date DESC
+                ");
+                $stmt->execute([$book_id]);
+                $loans = $stmt->fetchAll();
+                echo json_encode(["data" => $loans]);
+            } catch (\Exception $e) {
+                handleException($e, "Failed to fetch book loans");
+            }
+            die();
+        }
     } elseif ($method == 'DELETE') {
         if (isset($parts[2]) && is_numeric($parts[2])) {
             try {
