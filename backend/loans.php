@@ -16,6 +16,8 @@ $user_id = $_SESSION['user_id'];
 if ($method == 'GET') {
     // Get loans for the current user
     try {
+        $showHistory = isset($_GET['history']) && $_GET['history'] === 'true';
+        $statusFilter = $showHistory ? "" : " AND l.status != 'returned'";
         $query = "
             SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
                    CASE
@@ -25,7 +27,7 @@ if ($method == 'GET') {
                    b.title, b.author, b.isbn, b.location
             FROM loans l
             JOIN books b ON l.book_id = b.id
-            WHERE l.user_id = ? AND l.status != 'returned'
+            WHERE l.user_id = ?" . $statusFilter . "
             ORDER BY l.loan_date DESC
         ";
         $stmt = $pdo->prepare($query);

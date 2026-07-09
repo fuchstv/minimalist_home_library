@@ -1,3 +1,16 @@
+interface Loan {
+    id: number;
+    book_id: number;
+    user_id: number;
+    loan_date: string;
+    due_date: string;
+    return_date: string | null;
+    status: string;
+    title?: string;
+    author?: string;
+    user_name?: string;
+    user_email?: string;
+}
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -51,6 +64,10 @@ const Admin: React.FC = () => {
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [selectedBookLoans, setSelectedBookLoans] = useState<Loan[]>([]);
+    const [showLoansModal, setShowLoansModal] = useState(false);
+    const [loadingLoans, setLoadingLoans] = useState(false);
+    const [historyBookTitle, setHistoryBookTitle] = useState('');
     const [totalPages, setTotalPages] = useState(1);
     const [message, setMessage] = useState('');
     const [isLookingUp, setIsLookingUp] = useState(false);
@@ -61,6 +78,23 @@ const Admin: React.FC = () => {
     const [bibtexInput, setBibtexInput] = useState('');
     const [previewBooks, setPreviewBooks] = useState<PreviewBook[]>([]);
     const [showBibtexArea, setShowBibtexArea] = useState(false);
+
+    const handleEdit = (book: any) => {
+        setBookForm({
+            id: book.id,
+            title: book.title || '',
+            author: book.author || '',
+            category: book.category || 'belytrystyka_polska',
+            publication_year: book.publication_year || '',
+            publisher: book.publisher || '',
+            isbn: book.isbn || '',
+            description: book.description || '',
+            signature: book.signature || '',
+            cover_image: book.cover_image || null
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
 
     const fetchBooks = useCallback(async () => {
         try {
@@ -86,6 +120,7 @@ const Admin: React.FC = () => {
             console.error('Error fetching books:', error);
         }
     }, [page, search, location.search, navigate]);
+
 
     useEffect(() => {
         if (!user || user.role !== 'admin') {
@@ -167,20 +202,22 @@ const Admin: React.FC = () => {
         }
     };
 
-    const handleEdit = (book: any) => {
-        setBookForm({
-            id: book.id,
-            title: book.title || '',
-            author: book.author || '',
-            category: book.category || 'belytrystyka_polska',
-            publication_year: book.publication_year || '',
-            publisher: book.publisher || '',
-            isbn: book.isbn || '',
-            description: book.description || '',
-            signature: book.signature || '',
-            cover_image: book.cover_image || null
-        });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const handleShowHistory = async (bookId: number, title: string) => {
+        setHistoryBookTitle(title);
+        setShowLoansModal(true);
+        setLoadingLoans(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/admin/books/${bookId}/loans`, { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setSelectedBookLoans(data.data || []);
+            }
+        } catch (error) {
+            console.error("Error fetching book history:", error);
+        } finally {
+            setLoadingLoans(false);
+        }
     };
 
     const handleDelete = async (id: number) => {
@@ -599,6 +636,7 @@ const Admin: React.FC = () => {
                                                 <td className="p-2 font-body-sm">{b.author}</td>
                                                 <td className="p-2 font-body-sm"><CategoryDisplay categoryKey={b.category} /></td>
                                                 <td className="p-2 font-body-sm text-right whitespace-nowrap">
+                                                    <button onClick={() => handleShowHistory(b.id, b.title)} className="text-secondary font-label-sm hover:underline mr-3">{t('admin.users.loans.title')}</button>
                                                     <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.books.edit')}</button>
                                                     <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.books.delete')}</button>
                                                 </td>
@@ -628,6 +666,50 @@ const Admin: React.FC = () => {
                                 </button>
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+            {showLoansModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-surface rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden text-on-surface">
+                        <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container">
+                            <h3 className="font-headline-sm text-headline-sm line-clamp-1">{t('admin.users.loans.title')}: {historyBookTitle}</h3>
+                            <button onClick={() => setShowLoansModal(false)} className="material-symbols-outlined">close</button>
+                        </div>
+                        <div className="p-4 overflow-y-auto">
+                            {loadingLoans ? (
+                                <p className="text-center py-4">{t('admin.pages.loading')}</p>
+                            ) : selectedBookLoans.length === 0 ? (
+                                <p className="text-center py-4">{t('admin.loans.no_loans')}</p>
+                            ) : (
+                                <table className="w-full text-left text-body-sm">
+                                    <thead>
+                                        <tr className="border-b border-outline-variant font-bold">
+                                            <th className="p-2">{t('admin.loans.table.user_details')}</th>
+                                            <th className="p-2">{t('admin.loans.table.loan_date')}</th>
+                                            <th className="p-2">{t('admin.loans.table.return_date')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {selectedBookLoans.map(loan => (
+                                            <tr key={loan.id} className="border-b border-outline-variant/50">
+                                                <td className="p-2">
+                                                    <div className="font-bold">{loan.user_name}</div>
+                                                    <div className="text-xs text-on-surface-variant">{loan.user_email}</div>
+                                                </td>
+                                                <td className="p-2">{new Date(loan.loan_date).toLocaleDateString()}</td>
+                                                <td className="p-2">{loan.return_date ? new Date(loan.return_date).toLocaleDateString() : '-'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                        <div className="p-4 border-t border-outline-variant text-right">
+                            <button onClick={() => setShowLoansModal(false)} className="bg-primary text-on-primary px-4 py-2 rounded-md font-label-md">
+                                {t('admin.books.form.cancel')}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
