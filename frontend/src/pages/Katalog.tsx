@@ -247,7 +247,7 @@ const Katalog: React.FC = () => {
                                     </div>
                                     {/* Book Info */}
                                     <div className="p-5 flex flex-col flex-grow">
-                                        <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.signature ? book.signature + " | " : ""}{book.category}</span>
+                                        <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.signature ? book.signature + " | " : ""}<CategoryDisplay categoryKey={book.category} /></span>
                                         <h3 className="font-title-md text-title-md text-on-surface dark:text-inverse-on-surface mb-1 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                                             {book.title}
                                         </h3>
