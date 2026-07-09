@@ -11,6 +11,7 @@ interface Loan {
     author: string;
     loan_date: string;
     due_date: string;
+    return_date: string | null;
     status: string;
 }
 

@@ -14,7 +14,9 @@ const mockUser = {
     id: 1,
     name: 'Test User',
     email: 'test@test.com',
-    role: 'member'
+    role: 'member',
+    fee_paid: true,
+    is_blocked: false
 };
 
 const renderProfil = (user: any) => {
@@ -79,6 +81,37 @@ describe('Profil Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText(/Überfällig/i)).toBeInTheDocument();
+        });
+    });
+
+    it('renders loan history with return dates', async () => {
+        const mockLoans = [
+            {
+                id: 3,
+                book_id: 103,
+                title: 'History Book',
+                author: 'Past Author',
+                loan_date: '2023-11-01',
+                due_date: '2023-11-15',
+                return_date: '2023-11-10',
+                status: 'returned'
+            }
+        ];
+
+        (fetch as any).mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: mockLoans }),
+        });
+
+        renderProfil(mockUser);
+
+        await waitFor(() => {
+            expect(screen.getByText(/History Book/i)).toBeInTheDocument();
+            // Check if return date is present in some common format
+            const returnDateElement = screen.getByText((content) => {
+                return content.includes('11/10/2023') || content.includes('10.11.2023');
+            });
+            expect(returnDateElement).toBeInTheDocument();
         });
     });
 });
