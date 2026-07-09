@@ -14,7 +14,7 @@ if ($method == 'POST') {
             $email = $data['email'] ?? '';
             $password = $data['password'] ?? '';
 
-            $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role FROM users WHERE email = ?");
+            $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role, fee_paid, is_blocked FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -27,7 +27,9 @@ if ($method == 'POST') {
                         "id" => $user['id'],
                         "name" => $user['name'],
                         "email" => $user['email'],
-                        "role" => $user['role']
+                        "role" => $user['role'],
+                        "fee_paid" => $user['fee_paid'],
+                        "is_blocked" => $user['is_blocked']
                     ],
                     "csrfToken" => generateCsrfToken()
                 ]);
@@ -85,7 +87,7 @@ if ($method == 'POST') {
 } elseif ($method == 'GET' && strpos($path, '/auth/me') !== false) {
     if (isset($_SESSION['user_id'])) {
         try {
-            $stmt = $pdo->prepare("SELECT id, name, email, role FROM users WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT id, name, email, role, fee_paid, is_blocked FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             $user = $stmt->fetch();
             if ($user) {

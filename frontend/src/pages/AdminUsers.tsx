@@ -12,6 +12,7 @@ interface User {
     fee_paid: number;
     data_consent: number;
     rules_consent: number;
+    is_blocked: number;
     created_at: string;
 }
 
@@ -228,6 +229,11 @@ const AdminUsers: React.FC = () => {
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${u.fee_paid ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-error-container text-on-error-container'}`}>
                                         {u.fee_paid ? t('admin.users.fee_paid') : t('admin.users.fee_unpaid')}
                                     </span>
+                                    {u.is_blocked === 1 && (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 uppercase">
+                                            {t('admin.users.status_blocked')}
+                                        </span>
+                                    )}
                                 </div>
                             </button>
                         ))
@@ -331,6 +337,15 @@ const AdminUsers: React.FC = () => {
                                             className="h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary"
                                         />
                                         {t('admin.users.fee_label')}
+                                    </label>
+                                    <label className="flex items-center gap-3 font-body-md select-none cursor-pointer text-red-600 dark:text-red-400 font-bold">
+                                        <input
+                                            type="checkbox"
+                                            checked={editingUser.is_blocked === 1}
+                                            onChange={e => setEditingUser({ ...editingUser, is_blocked: e.target.checked ? 1 : 0 })}
+                                            className="h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary"
+                                        />
+                                        {t('admin.users.is_blocked_label')}
                                     </label>
                                     <label className="flex items-center gap-3 font-body-sm text-on-surface-variant select-none cursor-pointer">
                                         <input 

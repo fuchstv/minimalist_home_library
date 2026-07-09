@@ -119,6 +119,34 @@ const Profil: React.FC = () => {
         <div className="flex-grow flex flex-col p-margin-mobile md:p-margin-desktop bg-surface max-w-container-max-width mx-auto w-full gap-8">
             <h1 className="font-display-lg text-display-lg text-on-surface">{t('nav.profile')} - {user.name}</h1>
             
+            <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col md:flex-row gap-8">
+                <div className="flex-1">
+                    <h2 className="font-headline-sm text-headline-sm mb-4">{t('profile.status')}</h2>
+                    <div className="flex flex-wrap gap-4">
+                        <div className="bg-surface p-4 rounded-lg border border-outline-variant flex-1 min-w-[200px]">
+                            <p className="text-body-sm text-on-surface-variant uppercase font-bold mb-1">{t('profile.fee_status')}</p>
+                            <div className="flex items-center gap-2">
+                                <span className={`material-symbols-outlined ${user.fee_paid ? 'text-green-600' : 'text-amber-600'}`}>
+                                    {user.fee_paid ? 'check_circle' : 'error'}
+                                </span>
+                                <span className="font-title-md">{user.fee_paid ? t('profile.paid') : t('profile.unpaid')}</span>
+                            </div>
+                            {!user.fee_paid && <p className="text-body-sm text-on-surface-variant mt-2">{t('rules.section1_content')}</p>}
+                        </div>
+                        <div className="bg-surface p-4 rounded-lg border border-outline-variant flex-1 min-w-[200px]">
+                            <p className="text-body-sm text-on-surface-variant uppercase font-bold mb-1">Account</p>
+                            <div className="flex items-center gap-2">
+                                <span className={`material-symbols-outlined ${user.is_blocked ? 'text-red-600' : 'text-green-600'}`}>
+                                    {user.is_blocked ? 'block' : 'check_circle'}
+                                </span>
+                                <span className="font-title-md">{user.is_blocked ? t('profile.account_blocked') : t('profile.account_active')}</span>
+                            </div>
+                            {user.is_blocked === 1 && <p className="text-body-sm text-red-600 mt-2">{t('admin.users.errors.blocked')}</p>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Notifications Section */}
             <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm">
                 <div className="flex justify-between items-center mb-4">

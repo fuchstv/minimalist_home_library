@@ -75,6 +75,15 @@ const Katalog: React.FC = () => {
             return;
         }
 
+        if (user.is_blocked) {
+            alert(t('admin.users.errors.blocked'));
+            return;
+        }
+        if (!user.fee_paid && user.role !== 'admin') {
+            alert(t('admin.users.errors.fee_unpaid'));
+            return;
+        }
+
         try {
             const headers: HeadersInit = { "Content-Type": "application/json" };
             if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
@@ -100,6 +109,15 @@ const Katalog: React.FC = () => {
     const handleBorrow = async (bookId: number) => {
         if (!user) {
             navigate('/login');
+            return;
+        }
+
+        if (user.is_blocked) {
+            alert(t('admin.users.errors.blocked'));
+            return;
+        }
+        if (!user.fee_paid && user.role !== 'admin') {
+            alert(t('admin.users.errors.fee_unpaid'));
             return;
         }
 

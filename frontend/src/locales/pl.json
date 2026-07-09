@@ -246,6 +246,13 @@
           "return_success": "Książka została pomyślnie zwrócona.",
           "error": "Błąd podczas akcji wypożyczenia."
         }
+      },
+      "blocked": "Zablokowany",
+      "is_blocked_label": "Tymczasowo zablokuj konto",
+      "status_blocked": "ZABLOKOWANY",
+      "errors": {
+        "blocked": "Twoje konto jest zablokowane. Skontaktuj się z administratorem.",
+        "fee_unpaid": "Musisz opłacić składkę członkowską, zanim będziesz mógł wypożyczać lub rezerwować książki."
       }
     },
     "loans": {
@@ -289,5 +296,13 @@
         "impressum": "Impressum"
       }
     }
+  },
+  "profile": {
+    "status": "Status konta",
+    "fee_status": "Składka członkowska",
+    "paid": "Opłacona",
+    "unpaid": "Nieopłacona",
+    "account_active": "Aktywne",
+    "account_blocked": "Zablokowane"
   }
 }

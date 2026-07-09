@@ -47,6 +47,18 @@ if ($method == 'GET') {
     } else {
         $pdo->beginTransaction();
         try {
+            // Check if user is blocked or has not paid fee
+            $stmt = $pdo->prepare("SELECT fee_paid, is_blocked FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user_status = $stmt->fetch();
+
+            if (!$user_status || $user_status['is_blocked']) {
+                throw new Exception("Your account is blocked. Please contact the administrator.");
+            }
+            if (!$user_status['fee_paid']) {
+                throw new Exception("You must pay the membership fee before borrowing books.");
+            }
+
             // Check active loans count (max 3)
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM loans WHERE user_id = ? AND status != 'returned'");
             $stmt->execute([$user_id]);
