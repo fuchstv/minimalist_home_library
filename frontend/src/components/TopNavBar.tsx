@@ -9,6 +9,7 @@ const TopNavBar: React.FC = () => {
     const { t, i18n } = useTranslation();
     const { user, logout } = useContext(AuthContext);
     const [notificationCount, setNotificationCount] = useState(0);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleLanguage = () => {
         const newLang = i18n.language === 'de' ? 'pl' : 'de';
@@ -38,6 +39,11 @@ const TopNavBar: React.FC = () => {
             setNotificationCount(0);
         }
     }, [user]);
+
+    // Close menu on navigation
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [location.pathname]);
 
     const notificationLink = user?.role === 'admin' ? '/admin?tab=loans' : '/ausleihen';
 
@@ -105,10 +111,75 @@ const TopNavBar: React.FC = () => {
                         </Link>
                     )}
 
-                    <button aria-label="Menü" className="md:hidden text-on-surface-variant">
-                        <span className="material-symbols-outlined">menu</span>
+                    <button aria-label="Menü" className="md:hidden text-on-surface-variant p-2 -mr-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                        <span className="material-symbols-outlined">{isMenuOpen ? "close" : "menu"}</span>
                     </button>
                 </div>
+            </div>
+
+            {/* Mobile Menu Backdrop */}
+            {isMenuOpen && (
+                <div
+                    className="md:hidden fixed inset-0 top-16 bg-black/20 backdrop-blur-[2px] z-40 transition-opacity duration-200"
+                    onClick={() => setIsMenuOpen(false)}
+                />
+            )}
+
+            {/* Mobile Menu Content */}
+            <div className={`md:hidden absolute top-16 left-0 w-full bg-surface dark:bg-inverse-surface shadow-lg z-50 border-t border-outline-variant transition-all duration-300 origin-top ${isMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+                <ul className="flex flex-col p-4 gap-2">
+                    <li>
+                        <Link
+                            to="/"
+                            className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                            {t('nav.catalog')}
+                        </Link>
+                    </li>
+                    {user && (
+                        <>
+                            <li>
+                                <Link
+                                    to="/profil"
+                                    className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/profil' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                                    {t('nav.profile')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/ausleihen"
+                                    className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/ausleihen' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                                    {t('nav.loans')}
+                                </Link>
+                            </li>
+                            {user.role === 'admin' && (
+                                <li>
+                                    <Link
+                                        to="/admin"
+                                        className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/admin' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                                        {t('nav.admin')}
+                                    </Link>
+                                </li>
+                            )}
+                        </>
+                    )}
+                    <li className="border-t border-outline-variant mt-2 pt-2">
+                        {user ? (
+                            <button
+                                onClick={logout}
+                                className="w-full text-left py-3 px-4 rounded-lg font-body-md text-on-surface-variant hover:bg-surface-variant transition-colors"
+                            >
+                                {t('nav.logout')}
+                            </button>
+                        ) : (
+                            <Link
+                                to="/login"
+                                className="block py-3 px-4 rounded-lg font-body-md text-on-surface-variant hover:bg-surface-variant transition-colors"
+                            >
+                                {t('nav.login')}
+                            </Link>
+                        )}
+                    </li>
+                </ul>
             </div>
         </nav>
     );
