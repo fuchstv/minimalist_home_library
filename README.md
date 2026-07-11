@@ -8,22 +8,25 @@ Die Anwendung ist als Progressive Web App (PWA) konzipiert, vollständig zweispr
 *   **Frontend:** React (TypeScript), Vite, Tailwind CSS v4
 *   **Backend:** PHP 8.4 REST-API
 *   **Datenbank:** MySQL 8.0
-*   **Infrastruktur:** Docker & Docker Compose
+*   **Infrastruktur:** Docker & Docker Compose, Caddy (Reverse Proxy)
 
 ## Features
 *   **Bilingualer Katalog:** Durchsuchbarer Buchbestand mit Filtern für Kategorien und Status. Umschaltbar zwischen Deutsch und Polnisch.
 *   **Nutzerbereich:** Registrierung, Login und eine Übersicht der aktuell ausgeliehenen Bücher inklusive Fälligkeitsdatum.
 *   **Ausleihe-Logik:** Self-Service Ausleihe und Rückgabe von Büchern.
-*   **Admin-Dashboard:** Verwaltungsoberfläche für den Buchbestand, inkl. Anlage neuer Bücher und Upload von Cover-Bildern.
+*   **Reservierungen:** Bücher können reserviert werden, falls sie gerade ausgeliehen sind.
+*   **Benachrichtigungen:** Automatisches System für Infos zu Leihfristen und Abholbereitschaft.
+*   **CMS (Seitenverwaltung):** Admins können dynamische Inhaltsseiten (z. B. Impressum, Regeln) direkt in der App erstellen und bearbeiten.
+*   **Admin-Dashboard:** Vollständige Verwaltung von Büchern (inkl. ISBN-Suche & Cover-Upload), Nutzern (Blockieren, Status-Updates), Leihvorgängen und Inhalten.
+*   **Sicherheit:** CSRF-Schutz, Session-basiertes Auth-System und sichere Passwort-Validierung.
 *   **PWA Ready:** Kann auf mobilen Endgeräten wie eine native App installiert werden.
 
-
-
 ## Projektstruktur
-*   `/backend` - Die PHP REST-API (`index.php`, `books.php`, `loans.php`, `auth.php`, `admin.php`).
+*   `/backend` - Die PHP REST-API (`index.php`, `books.php`, `loans.php`, `auth.php`, `admin.php`, `pages.php`, `notifications.php`).
 *   `/database` - SQL-Scripte (`01_schema.sql`, `02_import.sql`) für die Initialisierung.
 *   `/frontend` - Die React-Anwendung (Vite).
 *   `docker-compose.yml` - Konfiguration der lokalen Umgebung.
+*   `Caddyfile` - Konfiguration für den Caddy Reverse Proxy (Produktion).
 
 ## Lokale Entwicklung
 
@@ -57,6 +60,13 @@ npm run dev
 3. Gehe in die Datenbank `library_db` -> Tabelle `users` und ändere die `role` deines neuen Nutzers von `member` auf `admin`.
 4. Logge dich im Frontend ein und navigiere zum `/admin`-Dashboard.
 
+## Datenbank-Migrationen
+Bei Updates an der Datenbankstruktur in bestehenden Installationen sollten die Migrationsskripte im `/backend`-Ordner verwendet werden:
+```bash
+# Beispiel: Ausführen einer Migration im Backend-Container
+docker exec -it library_backend php /var/www/html/migrate_blocked_status.php
+```
+
 ## Daten-Import
 Der initiale Buchbestand wurde aus einer CSV-Datei importiert. Das zugehörige Skript `generate_sql.js` (Root-Verzeichnis) kann genutzt werden, um aus CSV-Dateien neue SQL-Insert-Befehle zu generieren.
 
@@ -69,9 +79,9 @@ Dieses Projekt wurde für den internen Gebrauch des SprachCafé Polnisch e.V. en
 Dieses Projekt ist für das Deployment auf **Amazon Lightsail** optimiert. Detaillierte Anweisungen zur Einrichtung von Containern oder einer VPS-Instanz finden Sie im [LIGHTSAIL_DEPLOYMENT.md](./LIGHTSAIL_DEPLOYMENT.md).
 
 ### Render
-Dieses Projekt ist auch für das Deployment auf **Render** vorbereitet.
+Dieses Projekt ist auch für das Deployment auf **Render** vorbereitet (siehe `render.yaml`).
 
-### Backend (Web Service)
+#### Backend (Web Service)
 1. Erstelle einen neuen **Web Service** auf Render.
 2. Verbinde dein Repository.
 3. Wähle `Docker` als Environment.
@@ -79,9 +89,9 @@ Dieses Projekt ist auch für das Deployment auf **Render** vorbereitet.
 5. Füge folgende Umgebungsvariablen hinzu:
    - `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` (deine MySQL Zugangsdaten)
    - `ALLOWED_ORIGINS` (deine Frontend URL, z.B. `https://hausbibliothek.onrender.com`)
-6. (Optional) Füge ein **Disk** hinzu, um Bilder im `/var/www/html/uploads` Verzeichnis persistent zu speichern.
+6. (Starter-Plan oder höher) Füge ein **Disk** hinzu (`mountPath: /var/www/html/uploads`), um Bilder persistent zu speichern.
 
-### Frontend (Static Site)
+#### Frontend (Static Site)
 1. Erstelle eine neue **Static Site** auf Render.
 2. Verbinde dein Repository.
 3. Build Command: `cd frontend && npm install && npm run build`
