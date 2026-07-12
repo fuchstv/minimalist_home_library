@@ -39,9 +39,19 @@ function notifyBookAvailable($pdo, $book_id) {
     if (!empty($reservations)) {
         $stmt = $pdo->query("SELECT id FROM users WHERE role = 'admin'");
         $admins = $stmt->fetchAll();
-        foreach ($admins as $admin) {
+
+        if (!empty($admins)) {
             $msg = "Das Buch '$bookTitle' ($signature) wurde zurückgegeben und ist nun wieder verfügbar. Es lagen Vormerkungen vor.";
-            createNotification($pdo, $admin['id'], $msg);
+            $placeholders = [];
+            $values = [];
+            foreach ($admins as $admin) {
+                $placeholders[] = "(?, ?)";
+                $values[] = $admin['id'];
+                $values[] = $msg;
+            }
+            $sql = "INSERT INTO notifications (user_id, message) VALUES " . implode(", ", $placeholders);
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($values);
         }
     }
 }
