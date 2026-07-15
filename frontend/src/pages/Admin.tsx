@@ -33,6 +33,7 @@ interface Book {
     description: string;
     signature: string;
     cover_image: File | string | null;
+    availability_status?: 'available' | 'borrowed';
 }
 
 interface PreviewBook extends Omit<Book, 'id' | 'cover_image'> {
@@ -59,7 +60,8 @@ const Admin: React.FC = () => {
         isbn: '',
         description: '',
         signature: '',
-        cover_image: null
+        cover_image: null,
+        availability_status: 'available'
     });
 
     const [search, setSearch] = useState('');
@@ -90,7 +92,8 @@ const Admin: React.FC = () => {
             isbn: book.isbn || '',
             description: book.description || '',
             signature: book.signature || '',
-            cover_image: book.cover_image || null
+            cover_image: book.cover_image || null,
+            availability_status: book.availability_status || 'available'
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -162,7 +165,7 @@ const Admin: React.FC = () => {
 
         if (res.ok) {
             setMessage(bookForm.id ? t('admin.books.update_success') : t('admin.books.create_success'));
-            setBookForm({ id: null, title: '', author: '', category: 'belytrystyka_polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null });
+            setBookForm({ id: null, title: '', author: '', category: 'belytrystyka_polska', publication_year: '', publisher: '', isbn: '', description: '', signature: '', cover_image: null, availability_status: 'available' });
             fetchBooks();
             setTimeout(() => setMessage(''), 3000);
         } else {
@@ -395,6 +398,14 @@ const Admin: React.FC = () => {
                                 </div>
 
                                 <div>
+                                    <label className="font-label-md block mb-1">{t('admin.books.availability')}</label>
+                                    <select name="availability_status" value={bookForm.availability_status || 'available'} onChange={handleInputChange} className="w-full border border-outline-variant rounded p-2 text-body-md bg-surface">
+                                        <option value="available">{t('admin.books.available')}</option>
+                                        <option value="borrowed">{t('admin.books.borrowed')}</option>
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label className="font-label-md block mb-1">{t("admin.books.cover_image")}</label>
                                     <div className="flex items-center gap-3">
                                         <button
@@ -620,13 +631,14 @@ const Admin: React.FC = () => {
                                         <th className="p-2 font-label-md">{t('admin.books.title')}</th>
                                         <th className="p-2 font-label-md">{t('admin.books.author')}</th>
                                         <th className="p-2 font-label-md">{t('admin.books.category')}</th>
+                                        <th className="p-2 font-label-md">{t('admin.books.availability')}</th>
                                         <th className="p-2 font-label-md text-right">{t('admin.books.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {books.length === 0 ? (
                                         <tr>
-                                            <td colSpan={5} className="p-4 text-center text-on-surface-variant">{t('admin.books.no_books')}</td>
+                                            <td colSpan={6} className="p-4 text-center text-on-surface-variant">{t('admin.books.no_books')}</td>
                                         </tr>
                                     ) : (
                                         books.map(b => (
@@ -635,6 +647,15 @@ const Admin: React.FC = () => {
                                                 <td className="p-2 font-body-sm">{b.title}</td>
                                                 <td className="p-2 font-body-sm">{b.author}</td>
                                                 <td className="p-2 font-body-sm"><CategoryDisplay categoryKey={b.category} /></td>
+                                                <td className="p-2 font-body-sm">
+                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-label-sm ${
+                                                        b.availability_status === 'available'
+                                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                                    }`}>
+                                                        {b.availability_status === 'available' ? t('admin.books.available') : t('admin.books.borrowed')}
+                                                    </span>
+                                                </td>
                                                 <td className="p-2 font-body-sm text-right whitespace-nowrap">
                                                     <button onClick={() => handleShowHistory(b.id, b.title)} className="text-secondary font-label-sm hover:underline mr-3">{t('admin.users.loans.title')}</button>
                                                     <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.books.edit')}</button>

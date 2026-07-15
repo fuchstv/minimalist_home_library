@@ -151,7 +151,10 @@
       "isbn_looking_up": "Suche...",
       "browse": "Durchsuchen",
       "no_file_selected": "Keine Datei ausgewählt",
-      "lookup_success": "Buchdaten gefunden!"
+      "lookup_success": "Buchdaten gefunden!",
+      "availability": "Verfügbarkeit",
+      "available": "Verfügbar",
+      "borrowed": "Ausgeliehen"
     },
     "bibtex": {
       "label": "BibTeX-Code hier einfügen",

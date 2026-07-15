@@ -89,6 +89,10 @@ if (strpos($request_uri, '/admin/pages') !== false) {
         $isbn = $_POST['isbn'] ?? '';
         $description = $_POST['description'] ?? '';
         $signature = $_POST['signature'] ?? '';
+        $availability_status = $_POST['availability_status'] ?? 'available';
+        if ($availability_status !== 'available' && $availability_status !== 'borrowed') {
+            $availability_status = 'available';
+        }
         
         $cover_image = null;
         if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
@@ -124,9 +128,14 @@ if (strpos($request_uri, '/admin/pages') !== false) {
             }
 
             if ($id) {
+                // Get old availability status
+                $stmtOld = $pdo->prepare("SELECT availability_status FROM books WHERE id = ?");
+                $stmtOld->execute([$id]);
+                $oldStatus = $stmtOld->fetchColumn();
+
                 // Update
-                $sql = "UPDATE books SET title = ?, author = ?, category = ?, publication_year = ?, publisher = ?, isbn = ?, description = ?, signature = ?";
-                $params = [$title, $author, $category, $publication_year, $publisher, $isbn, $description, $signature];
+                $sql = "UPDATE books SET title = ?, author = ?, category = ?, publication_year = ?, publisher = ?, isbn = ?, description = ?, signature = ?, availability_status = ?";
+                $params = [$title, $author, $category, $publication_year, $publisher, $isbn, $description, $signature, $availability_status];
 
                 if ($cover_image) {
                     $sql .= ", cover_image = ?";
@@ -139,14 +148,21 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($params);
                 $pdo->commit();
+
+                // If status changed to available, notify
+                if ($oldStatus === 'borrowed' && $availability_status === 'available') {
+                    require_once 'notification_utils.php';
+                    notifyBookAvailable($pdo, $id);
+                }
+
                 echo json_encode(["message" => "Book updated successfully", "id" => $id]);
             } else {
                 // Create
                 if (empty($signature)) {
                     $signature = generateSignature($pdo, $category);
                 }
-                $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, cover_image, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $cover_image, $signature]);
+                $stmt = $pdo->prepare("INSERT INTO books (title, author, category, publication_year, publisher, isbn, description, cover_image, signature, availability_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$title, $author, $category, $publication_year, $publisher, $isbn, $description, $cover_image, $signature, $availability_status]);
                 $newId = $pdo->lastInsertId();
                 $pdo->commit();
                 echo json_encode(["message" => "Book created successfully", "id" => $newId, "signature" => $signature]);
