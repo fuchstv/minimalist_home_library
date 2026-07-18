@@ -10,12 +10,49 @@ const TopNavBar: React.FC = () => {
     const { user, logout } = useContext(AuthContext);
     const [notificationCount, setNotificationCount] = useState(0);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+        if (typeof window !== 'undefined') {
+            return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        }
+        return 'light';
+    });
 
     const toggleLanguage = () => {
         const newLang = i18n.language === 'de' ? 'pl' : 'de';
         i18n.changeLanguage(newLang);
         localStorage.setItem('language', newLang);
     };
+
+    const toggleTheme = () => {
+        const nextTheme = theme === 'dark' ? 'light' : 'dark';
+        if (nextTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+        setTheme(nextTheme);
+    };
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !window.matchMedia) return;
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (e: MediaQueryListEvent) => {
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    document.documentElement.classList.add('dark');
+                    setTheme('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    setTheme('light');
+                }
+            }
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
     useEffect(() => {
         if (user) {
@@ -96,6 +133,17 @@ const TopNavBar: React.FC = () => {
                             </span>
                         </Link>
                     )}
+
+                    <button
+                        onClick={toggleTheme}
+                        className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-surface-variant hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
+                        title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
+                        aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
+                    >
+                        <span className="material-symbols-outlined text-[18px]">
+                            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
 
                     <button onClick={toggleLanguage} className="font-label-md text-label-md bg-surface-container-low text-on-surface hover:bg-surface-variant px-3 py-1.5 rounded-full transition-colors border border-outline-variant">
                         {i18n.language.toUpperCase()}

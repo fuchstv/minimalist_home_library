@@ -7,6 +7,13 @@
     <meta name="theme-color" content="#fdf9f6" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <title>SprachCafé Polnisch Bibliothek</title>
+    <script>
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -7,7 +7,9 @@
     "login": "Zaloguj się",
     "logout": "Wyloguj",
     "notifications": "Powiadomienia",
-    "overdue_loans": "Zaległe wypożyczenia"
+    "overdue_loans": "Zaległe wypożyczenia",
+    "dark_mode": "Tryb ciemny",
+    "light_mode": "Tryb jasny"
   },
   "catalog": {
     "title": "Domowa biblioteka SprachCafé Polnisch",

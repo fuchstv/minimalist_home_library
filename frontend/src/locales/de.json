@@ -7,7 +7,9 @@
     "login": "Anmelden",
     "logout": "Abmelden",
     "notifications": "Benachrichtigungen",
-    "overdue_loans": "Überfällige Ausleihen"
+    "overdue_loans": "Überfällige Ausleihen",
+    "dark_mode": "Dunkelmodus",
+    "light_mode": "Hellmodus"
   },
   "catalog": {
     "title": "Hausbibliothek des SprachCafé Polnisch",

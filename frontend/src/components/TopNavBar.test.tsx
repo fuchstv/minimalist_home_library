@@ -102,4 +102,16 @@ describe('TopNavBar Component', () => {
         fireEvent.click(menuButton);
         expect(screen.getByText('menu')).toBeInTheDocument();
     });
+
+    it('toggles dark mode when theme button is clicked', () => {
+        renderNavBar(null);
+        const toggleButton = screen.getByLabelText(/Dunkelmodus/i);
+        expect(toggleButton).toBeInTheDocument();
+
+        fireEvent.click(toggleButton);
+        expect(document.documentElement.classList.contains('dark')).toBe(true);
+
+        fireEvent.click(screen.getByLabelText(/Hellmodus/i));
+        expect(document.documentElement.classList.contains('dark')).toBe(false);
+    });
 });
