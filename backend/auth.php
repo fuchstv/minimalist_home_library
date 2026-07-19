@@ -19,7 +19,11 @@ if ($method == 'POST') {
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password_hash'])) {
-                session_regenerate_id(true);
+                if (!session_regenerate_id(true)) {
+                    http_response_code(500);
+                    echo json_encode(["message" => "Login failed"]);
+                    return;
+                }
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_role'] = $user['role'];
                 echo json_encode([
