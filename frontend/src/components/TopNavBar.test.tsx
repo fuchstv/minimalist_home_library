@@ -105,13 +105,14 @@ describe('TopNavBar Component', () => {
 
     it('toggles dark mode when theme button is clicked', () => {
         renderNavBar(null);
-        const toggleButton = screen.getByLabelText(/Dunkelmodus/i);
-        expect(toggleButton).toBeInTheDocument();
+        const toggleButtons = screen.getAllByLabelText(/Dunkelmodus/i);
+        expect(toggleButtons.length).toBeGreaterThan(0);
 
-        fireEvent.click(toggleButton);
+        fireEvent.click(toggleButtons[0]);
         expect(document.documentElement.classList.contains('dark')).toBe(true);
 
-        fireEvent.click(screen.getByLabelText(/Hellmodus/i));
+        const lightModeButtons = screen.getAllByLabelText(/Hellmodus/i);
+        fireEvent.click(lightModeButtons[0]);
         expect(document.documentElement.classList.contains('dark')).toBe(false);
     });
 });

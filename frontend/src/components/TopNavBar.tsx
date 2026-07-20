@@ -136,7 +136,7 @@ const TopNavBar: React.FC = () => {
 
                     <button
                         onClick={toggleTheme}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-surface-variant hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
+                        className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-surface-variant hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
                         title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
                         aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
                     >
@@ -145,7 +145,7 @@ const TopNavBar: React.FC = () => {
                         </span>
                     </button>
 
-                    <button onClick={toggleLanguage} className="font-label-md text-label-md bg-surface-container-low text-on-surface hover:bg-surface-variant px-3 py-1.5 rounded-full transition-colors border border-outline-variant">
+                    <button onClick={toggleLanguage} className="hidden sm:block font-label-md text-label-md bg-surface-container-low text-on-surface hover:bg-surface-variant px-3 py-1.5 rounded-full transition-colors border border-outline-variant">
                         {i18n.language.toUpperCase()}
                     </button>
                     
@@ -210,6 +210,27 @@ const TopNavBar: React.FC = () => {
                             )}
                         </>
                     )}
+
+                    {/* Mobile theme and language toggles */}
+                    <li className="border-t border-outline-variant mt-2 pt-4 flex items-center justify-between px-4 sm:hidden">
+                        <span className="font-body-md text-on-surface-variant dark:text-surface-variant">{t('nav.theme')}</span>
+                        <button
+                            onClick={toggleTheme}
+                            className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-surface-variant hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
+                            title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
+                            aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
+                        >
+                            <span className="material-symbols-outlined text-[18px]">
+                                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                            </span>
+                        </button>
+                    </li>
+                    <li className="flex items-center justify-between px-4 pb-2 sm:hidden">
+                        <span className="font-body-md text-on-surface-variant dark:text-surface-variant">{t('nav.language')}</span>
+                        <button onClick={toggleLanguage} className="font-label-md text-label-md bg-surface-container-low text-on-surface hover:bg-surface-variant px-3 py-1.5 rounded-full transition-colors border border-outline-variant">
+                            {i18n.language.toUpperCase()}
+                        </button>
+                    </li>
                     <li className="border-t border-outline-variant mt-2 pt-2">
                         {user ? (
                             <button

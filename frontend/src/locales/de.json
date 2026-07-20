@@ -9,7 +9,9 @@
     "notifications": "Benachrichtigungen",
     "overdue_loans": "Überfällige Ausleihen",
     "dark_mode": "Dunkelmodus",
-    "light_mode": "Hellmodus"
+    "light_mode": "Hellmodus",
+    "theme": "Design",
+    "language": "Sprache"
   },
   "catalog": {
     "title": "Hausbibliothek des SprachCafé Polnisch",
