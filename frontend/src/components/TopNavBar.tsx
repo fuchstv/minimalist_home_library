@@ -85,7 +85,7 @@ const TopNavBar: React.FC = () => {
     const notificationLink = user?.role === 'admin' ? '/admin?tab=loans' : '/ausleihen';
 
     return (
-        <nav className="bg-surface dark:bg-inverse-surface sticky top-0 w-full z-50 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+        <nav className="bg-surface sticky top-0 w-full z-50 shadow-[0_1px_4px_rgba(0,0,0,0.03)] border-b border-outline-variant/30">
             <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto h-16">
                 <Link to="/" className="flex items-center gap-2">
                     <img alt="SprachCafé Polnisch Logo" className="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1tr_UrLa-6nVxJXC8Pdq_B7aQTIi15JttYzPHsKr-qF17H8OoX7Dcn4C2RbZaOgqPU9TZs-PuGrPpsltPL2rCQQdQbk86aaDrmKyUaGhpv8zwFj8vs7QzdfdsYEu5xLk4zw3wZ1TWc1DUT__-XAzaonhX-iljPPQzwySJaH4Bh0-7toNrMHUjAlea3PPsEUTAgC9MQ2VPm803FTkH97OX8zGzuDeh7O8CYtmoPzHaUqtVafAYoAuBLgjw-21t4DyQXhn8ul9q81w"/>
@@ -174,7 +174,7 @@ const TopNavBar: React.FC = () => {
             )}
 
             {/* Mobile Menu Content */}
-            <div className={`md:hidden absolute top-16 left-0 w-full bg-surface dark:bg-inverse-surface shadow-lg z-50 border-t border-outline-variant transition-all duration-300 origin-top ${isMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+            <div className={`md:hidden absolute top-16 left-0 w-full bg-surface shadow-lg z-50 border-t border-outline-variant transition-all duration-300 origin-top ${isMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
                 <ul className="flex flex-col p-4 gap-2">
                     <li>
                         <Link
