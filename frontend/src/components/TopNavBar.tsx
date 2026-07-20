@@ -93,25 +93,25 @@ const TopNavBar: React.FC = () => {
 
                 <ul className="hidden md:flex items-center gap-8 h-full">
                     <li className="h-full flex items-center">
-                        <Link to="/" className={`font-body-md text-body-md h-full flex items-center opacity-80 transition-all duration-200 ${location.pathname === '/' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
+                        <Link to="/" className={`font-body-md text-body-md h-full flex items-center opacity-80 transition-all duration-200 ${location.pathname === '/' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
                             {t('nav.catalog')}
                         </Link>
                     </li>
                     {user && (
                         <>
                             <li className="h-full flex items-center">
-                                <Link to="/profil" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/profil' ? 'text-primary border-b-2 border-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
+                                <Link to="/profil" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/profil' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
                                     {t('nav.profile')}
                                 </Link>
                             </li>
                             <li className="h-full flex items-center">
-                                <Link to="/ausleihen" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/ausleihen' ? 'text-primary border-b-2 border-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
+                                <Link to="/ausleihen" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/ausleihen' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
                                     {t('nav.loans')}
                                 </Link>
                             </li>
                             {user.role === 'admin' && (
                                 <li className="h-full flex items-center">
-                                    <Link to="/admin" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/admin' ? 'text-primary border-b-2 border-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
+                                    <Link to="/admin" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/admin' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
                                         {t('nav.admin')}
                                     </Link>
                                 </li>
@@ -136,7 +136,7 @@ const TopNavBar: React.FC = () => {
 
                     <button
                         onClick={toggleTheme}
-                        className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-surface-variant hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
+                        className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-on-surface hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
                         title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
                         aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
                     >
@@ -213,10 +213,10 @@ const TopNavBar: React.FC = () => {
 
                     {/* Mobile theme and language toggles */}
                     <li className="border-t border-outline-variant mt-2 pt-4 flex items-center justify-between px-4 sm:hidden">
-                        <span className="font-body-md text-on-surface-variant dark:text-surface-variant">{t('nav.theme')}</span>
+                        <span className="font-body-md text-on-surface-variant dark:text-on-surface-variant">{t('nav.theme')}</span>
                         <button
                             onClick={toggleTheme}
-                            className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-surface-variant hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
+                            className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-low dark:bg-white/10 text-on-surface dark:text-on-surface hover:bg-surface-variant dark:hover:bg-white/20 border border-outline-variant dark:border-outline/30 transition-colors"
                             title={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
                             aria-label={theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
                         >
@@ -226,7 +226,7 @@ const TopNavBar: React.FC = () => {
                         </button>
                     </li>
                     <li className="flex items-center justify-between px-4 pb-2 sm:hidden">
-                        <span className="font-body-md text-on-surface-variant dark:text-surface-variant">{t('nav.language')}</span>
+                        <span className="font-body-md text-on-surface-variant dark:text-on-surface-variant">{t('nav.language')}</span>
                         <button onClick={toggleLanguage} className="font-label-md text-label-md bg-surface-container-low text-on-surface hover:bg-surface-variant px-3 py-1.5 rounded-full transition-colors border border-outline-variant">
                             {i18n.language.toUpperCase()}
                         </button>

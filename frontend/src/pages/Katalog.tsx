@@ -153,7 +153,7 @@ const Katalog: React.FC = () => {
             <section className="bg-surface-container-low dark:bg-white/10 p-6 rounded-2xl border border-outline-variant dark:border-outline shadow-sm flex flex-col gap-6">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="relative flex-grow">
-                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-surface-variant">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-on-surface-variant">search</span>
                         <input
                             type="text"
                             placeholder={t('catalog.search_placeholder')}
@@ -174,7 +174,7 @@ const Katalog: React.FC = () => {
                                     <option key={key} value={key}>{value as string}</option>
                                 ))}
                             </select>
-                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant dark:text-surface-variant">expand_more</span>
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant dark:text-on-surface-variant">expand_more</span>
                         </div>
                         <div className="relative">
                             <select
@@ -186,7 +186,7 @@ const Katalog: React.FC = () => {
                                 <option value="available">{t('catalog.available')}</option>
                                 <option value="borrowed">{t('catalog.borrowed')}</option>
                             </select>
-                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant dark:text-surface-variant">expand_more</span>
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant dark:text-on-surface-variant">expand_more</span>
                         </div>
                     </div>
                 </div>
@@ -206,8 +206,8 @@ const Katalog: React.FC = () => {
                     </div>
                 ) : books.length === 0 ? (
                     <div className="bg-surface-container-low dark:bg-white/10 py-20 text-center rounded-2xl border border-outline-variant dark:border-outline border-dashed">
-                        <span className="material-symbols-outlined text-[48px] text-on-surface-variant dark:text-surface-variant mb-2">search_off</span>
-                        <p className="text-on-surface-variant dark:text-surface-variant font-body-lg text-body-lg">
+                        <span className="material-symbols-outlined text-[48px] text-on-surface-variant dark:text-on-surface-variant mb-2">search_off</span>
+                        <p className="text-on-surface-variant dark:text-on-surface-variant font-body-lg text-body-lg">
                             {t('catalog.no_books')}
                         </p>
                     </div>
@@ -229,7 +229,7 @@ const Katalog: React.FC = () => {
                                                     {t('catalog.available')}
                                                 </span>
                                             ) : (
-                                                <span className="bg-surface-variant text-on-surface-variant dark:text-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant dark:border-outline shadow-sm">
+                                                <span className="bg-surface-variant text-on-surface-variant dark:text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full border border-outline-variant dark:border-outline shadow-sm">
                                                     {t('catalog.borrowed')}
                                                 </span>
                                             )}
@@ -248,10 +248,10 @@ const Katalog: React.FC = () => {
                                     {/* Book Info */}
                                     <div className="p-5 flex flex-col flex-grow">
                                         <span className="font-label-sm text-label-sm text-primary mb-2 uppercase tracking-wider">{book.signature ? book.signature + " | " : ""}<CategoryDisplay categoryKey={book.category} /></span>
-                                        <h3 className="font-title-md text-title-md text-on-surface dark:text-inverse-on-surface mb-1 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                                        <h3 className="font-title-md text-title-md text-on-surface mb-1 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                                             {book.title}
                                         </h3>
-                                        <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant mb-4 line-clamp-1">
+                                        <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-on-surface-variant mb-4 line-clamp-1">
                                             von {book.author}
                                         </p>
                                         
@@ -275,7 +275,7 @@ const Katalog: React.FC = () => {
                         {/* Pagination UI */}
                         {totalPages > 1 && (
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-12 pt-6 border-t border-outline-variant dark:border-outline w-full">
-                                <span className="font-body-sm text-body-sm text-on-surface-variant dark:text-surface-variant">
+                                <span className="font-body-sm text-body-sm text-on-surface-variant dark:text-on-surface-variant">
                                     {t('catalog.pagination.showing', {
                                         start: (page - 1) * limit + 1,
                                         end: Math.min(page * limit, totalBooks),
@@ -287,7 +287,7 @@ const Katalog: React.FC = () => {
                                     <button 
                                         disabled={page === 1}
                                         onClick={() => setPage(1)}
-                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
                                         title={t('catalog.pagination.first')}
                                     >
                                         <span className="material-symbols-outlined">first_page</span>
@@ -295,7 +295,7 @@ const Katalog: React.FC = () => {
                                     <button 
                                         disabled={page === 1}
                                         onClick={() => setPage(p => Math.max(p - 1, 1))}
-                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
                                         title={t('catalog.pagination.prev')}
                                     >
                                         <span className="material-symbols-outlined">chevron_left</span>
@@ -305,7 +305,7 @@ const Katalog: React.FC = () => {
                                         <button
                                             key={pageNum}
                                             onClick={() => setPage(pageNum)}
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md transition-all ${page === pageNum ? 'bg-primary text-on-primary font-bold shadow-sm' : 'text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40'}`}
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center font-label-md text-label-md transition-all ${page === pageNum ? 'bg-primary text-on-primary font-bold shadow-sm' : 'text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40'}`}
                                         >
                                             {pageNum}
                                         </button>
@@ -314,7 +314,7 @@ const Katalog: React.FC = () => {
                                     <button 
                                         disabled={page === totalPages}
                                         onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
                                         title={t('catalog.pagination.next')}
                                     >
                                         <span className="material-symbols-outlined">chevron_right</span>
@@ -322,7 +322,7 @@ const Katalog: React.FC = () => {
                                     <button 
                                         disabled={page === totalPages}
                                         onClick={() => setPage(totalPages)}
-                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
+                                        className="w-10 h-10 rounded-full border border-outline-variant dark:border-outline flex items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant/20 dark:hover:bg-surface-variant/40 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-all"
                                         title={t('catalog.pagination.last')}
                                     >
                                         <span className="material-symbols-outlined">last_page</span>
