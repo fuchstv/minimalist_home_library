@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import AnnouncementBanner from './components/AnnouncementBanner';
 import TopNavBar from './components/TopNavBar';
+import ForcePasswordChangeModal from './components/ForcePasswordChangeModal';
 import Katalog from './pages/Katalog';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,6 +17,7 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <AnnouncementBanner />
         <TopNavBar />
+        <ForcePasswordChangeModal />
         <main className="flex-grow flex flex-col w-full">
           <Routes>
             <Route path="/" element={<Katalog />} />

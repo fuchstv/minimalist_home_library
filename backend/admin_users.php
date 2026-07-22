@@ -38,7 +38,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
     if (count($parts) === 2) {
         if ($method === 'GET') {
             try {
-                $stmt = $pdo->query("SELECT id, name, email, phone, fee_paid, is_blocked, data_consent, rules_consent, role, created_at FROM users ORDER BY name ASC");
+                $stmt = $pdo->query("SELECT id, name, email, phone, fee_paid, is_blocked, must_change_password, data_consent, rules_consent, role, created_at FROM users ORDER BY name ASC");
                 $users = $stmt->fetchAll();
                 echo json_encode(["data" => $users]);
             } catch (\Exception $e) {
@@ -51,6 +51,28 @@ if (isset($parts[1]) && $parts[1] === 'users') {
     // /admin/users/{id}
     if (count($parts) >= 3 && is_numeric($parts[2])) {
         $user_id = (int)$parts[2];
+
+        // /admin/users/{id}/reset-password
+        if (isset($parts[3]) && $parts[3] === 'reset-password') {
+            if ($method === 'POST') {
+                try {
+                    $chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+                    $tempPassword = 'Tmp-' . substr(str_shuffle($chars), 0, 6);
+                    $hash = password_hash($tempPassword, PASSWORD_DEFAULT);
+                    
+                    $stmt = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 1 WHERE id = ?");
+                    $stmt->execute([$hash, $user_id]);
+                    
+                    echo json_encode([
+                        "message" => "Password reset successfully",
+                        "temp_password" => $tempPassword
+                    ]);
+                } catch (\Exception $e) {
+                    handleException($e, "Failed to reset password");
+                }
+                return;
+            }
+        }
         
         // /admin/users/{id}/loans
         if (isset($parts[3]) && $parts[3] === 'loans') {
@@ -183,7 +205,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
         if (count($parts) === 3) {
             if ($method === 'GET') {
                 try {
-                    $stmt = $pdo->prepare("SELECT id, name, email, phone, fee_paid, is_blocked, data_consent, rules_consent, role, created_at FROM users WHERE id = ?");
+                    $stmt = $pdo->prepare("SELECT id, name, email, phone, fee_paid, is_blocked, must_change_password, data_consent, rules_consent, role, created_at FROM users WHERE id = ?");
                     $stmt->execute([$user_id]);
                     $user = $stmt->fetch();
                     if ($user) {

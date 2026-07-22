@@ -14,7 +14,7 @@ if ($method == 'POST') {
             $email = $data['email'] ?? '';
             $password = $data['password'] ?? '';
 
-            $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role, fee_paid, is_blocked FROM users WHERE email = ?");
+            $stmt = $pdo->prepare("SELECT id, name, email, password_hash, role, fee_paid, is_blocked, must_change_password FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -29,12 +29,13 @@ if ($method == 'POST') {
                 echo json_encode([
                     "message" => "Login successful",
                     "user" => [
-                        "id" => $user['id'],
+                        "id" => (int)$user['id'],
                         "name" => $user['name'],
                         "email" => $user['email'],
                         "role" => $user['role'],
-                        "fee_paid" => $user['fee_paid'],
-                        "is_blocked" => $user['is_blocked']
+                        "fee_paid" => (int)$user['fee_paid'],
+                        "is_blocked" => (int)$user['is_blocked'],
+                        "must_change_password" => (int)($user['must_change_password'] ?? 0)
                     ],
                     "csrfToken" => generateCsrfToken()
                 ]);
@@ -44,6 +45,26 @@ if ($method == 'POST') {
             }
         } catch (\Exception $e) {
             handleException($e, "Login failed");
+        }
+    } elseif (strpos($path, '/auth/change-password') !== false) {
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(["message" => "Not authenticated"]);
+            return;
+        }
+        $newPassword = $data['new_password'] ?? ($data['password'] ?? '');
+        if (strlen($newPassword) < 8) {
+            http_response_code(400);
+            echo json_encode(["message" => "Password must be at least 8 characters long"]);
+            return;
+        }
+        try {
+            $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?");
+            $stmt->execute([$hash, $_SESSION['user_id']]);
+            echo json_encode(["message" => "Password changed successfully"]);
+        } catch (\Exception $e) {
+            handleException($e, "Failed to change password");
         }
     } elseif (strpos($path, '/auth/register') !== false) {
         $name = $data['name'] ?? '';
@@ -92,10 +113,14 @@ if ($method == 'POST') {
 } elseif ($method == 'GET' && strpos($path, '/auth/me') !== false) {
     if (isset($_SESSION['user_id'])) {
         try {
-            $stmt = $pdo->prepare("SELECT id, name, email, role, fee_paid, is_blocked FROM users WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT id, name, email, role, fee_paid, is_blocked, must_change_password FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             $user = $stmt->fetch();
             if ($user) {
+                $user['id'] = (int)$user['id'];
+                $user['fee_paid'] = (int)$user['fee_paid'];
+                $user['is_blocked'] = (int)$user['is_blocked'];
+                $user['must_change_password'] = (int)($user['must_change_password'] ?? 0);
                 echo json_encode([
                     "user" => $user,
                     "csrfToken" => generateCsrfToken()

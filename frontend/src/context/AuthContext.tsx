@@ -8,6 +8,7 @@ interface User {
     role: string;
     fee_paid?: number;
     is_blocked?: number;
+    must_change_password?: boolean | number;
 }
 
 interface AuthContextType {

@@ -13,6 +13,7 @@ interface User {
     data_consent: number;
     rules_consent: number;
     is_blocked: number;
+    must_change_password?: number;
     created_at: string;
 }
 
@@ -43,6 +44,7 @@ const AdminUsers: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [userLoans, setUserLoans] = useState<Loan[]>([]);
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [tempPasswordModal, setTempPasswordModal] = useState<{ show: boolean; password: string; copied: boolean }>({ show: false, password: '', copied: false });
     
     // Lending state
     const [bookSearch, setBookSearch] = useState('');
@@ -181,6 +183,25 @@ const AdminUsers: React.FC = () => {
         }
     };
 
+    const handleResetPassword = async () => {
+        if (!selectedUser) return;
+        if (!window.confirm(t('admin.users.reset_password_confirm'))) return;
+
+        try {
+            const res = await axios.post(`${API_BASE_URL}/api/admin/users/${selectedUser.id}/reset-password`, {}, { withCredentials: true });
+            const tempPass = res.data.temp_password;
+            setTempPasswordModal({ show: true, password: tempPass, copied: false });
+            setMessage(t('admin.users.temp_password_title'));
+            fetchUsers();
+            setSelectedUser(prev => prev ? { ...prev, must_change_password: 1 } : null);
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error: any) {
+            console.error('Error resetting password:', error);
+            setErrorMsg(error.response?.data?.message || t('admin.users.update_error'));
+            setTimeout(() => setErrorMsg(''), 4000);
+        }
+    };
+
     // Filter users
     const filteredUsers = users.filter(user => 
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -234,6 +255,11 @@ const AdminUsers: React.FC = () => {
                                             {t('admin.users.status_blocked')}
                                         </span>
                                     )}
+                                    {u.must_change_password === 1 && (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 uppercase">
+                                            {t('admin.users.must_change_password_badge')}
+                                        </span>
+                                    )}
                                 </div>
                             </button>
                         ))
@@ -272,7 +298,15 @@ const AdminUsers: React.FC = () => {
                                     )}
                                 </p>
                             </div>
-                            <div className="flex gap-2.5">
+                            <div className="flex flex-wrap gap-2.5">
+                                <button 
+                                    onClick={handleResetPassword}
+                                    className="border border-amber-500/50 hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 py-2 px-4 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer"
+                                    title={t('admin.users.reset_password_btn')}
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">lock_reset</span>
+                                    {t('admin.users.reset_password_btn')}
+                                </button>
                                 <button 
                                     onClick={() => setEditingUser(selectedUser)}
                                     className="border border-outline hover:bg-surface-variant/30 text-on-surface py-2 px-5 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer"
@@ -538,6 +572,49 @@ const AdminUsers: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {tempPasswordModal.show && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-surface-container-low dark:bg-zinc-800 p-6 rounded-xl border border-outline-variant max-w-md w-full shadow-2xl flex flex-col gap-4">
+                        <div className="flex items-center gap-2.5 text-primary font-headline-sm">
+                            <span className="material-symbols-outlined text-[28px]">key</span>
+                            <h3 className="text-title-lg font-bold text-on-surface">{t('admin.users.temp_password_title')}</h3>
+                        </div>
+                        <p className="text-body-md text-on-surface-variant leading-relaxed">
+                            {t('admin.users.temp_password_hint')}
+                        </p>
+
+                        <div className="flex items-center gap-2 bg-surface p-3.5 rounded-lg border border-outline-variant">
+                            <span className="font-mono font-bold text-lg text-primary tracking-wider flex-grow text-center select-all">
+                                {tempPasswordModal.password}
+                            </span>
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(tempPasswordModal.password);
+                                    setTempPasswordModal(prev => ({ ...prev, copied: true }));
+                                    setTimeout(() => setTempPasswordModal(prev => ({ ...prev, copied: false })), 2000);
+                                }}
+                                className="bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold px-3 py-1.5 rounded transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-sm">
+                                    {tempPasswordModal.copied ? 'check' : 'content_copy'}
+                                </span>
+                                {tempPasswordModal.copied ? t('admin.users.temp_password_copied') : t('admin.users.temp_password_copy')}
+                            </button>
+                        </div>
+
+                        <div className="flex justify-end mt-2">
+                            <button
+                                type="button"
+                                onClick={() => setTempPasswordModal({ show: false, password: '', copied: false })}
+                                className="bg-primary text-on-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

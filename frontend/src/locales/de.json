@@ -78,7 +78,17 @@
     "rules_link": "Regeln der Bibliothek",
     "rules_consent_2": "gelesen und akzeptiere diese.",
     "accept_terms_error": "Bitte akzeptieren Sie die Datenschutzbestimmungen und Bibliotheksregeln.",
-    "password_too_short": "Das Passwort muss mindestens 8 Zeichen lang sein."
+    "password_too_short": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+    "forgot_password_link": "Passwort vergessen?",
+    "forgot_password_help_title": "Passwort zurücksetzen",
+    "forgot_password_help_text": "Haben Sie Ihr Passwort vergessen? Bitte wenden Sie sich an das Bibliotheksteam oder den Administrator. Ein Administrator kann ein neues temporäres Passwort für Ihr Konto generieren, das Sie bei der nächsten Anmeldung ändern müssen.",
+    "must_change_password_title": "Passwortänderung erforderlich",
+    "must_change_password_subtitle": "Sie haben sich mit einem temporären Passwort angemeldet. Aus Sicherheitsgründen müssen Sie vor der Fortsetzung ein neues Passwort vergeben.",
+    "new_password": "Neues Passwort",
+    "confirm_password": "Passwort bestätigen",
+    "change_password_submit": "Neues Passwort speichern",
+    "change_password_success": "Passwort erfolgreich geändert!",
+    "password_mismatch": "Die Passwörter stimmen nicht überein."
   },
   "rules": {
     "title": "Bibliotheksregeln",
@@ -217,6 +227,13 @@
       "update_success": "Benutzerkonto erfolgreich aktualisiert!",
       "update_error": "Fehler beim Aktualisieren des Benutzers.",
       "load_error": "Fehler beim Laden der Benutzerliste.",
+      "reset_password_btn": "Passwort zurücksetzen",
+      "reset_password_confirm": "Möchten Sie ein temporäres Passwort für diesen Nutzer generieren?",
+      "temp_password_title": "Temporäres Passwort generiert",
+      "temp_password_hint": "Teilen Sie dieses temporäre Passwort dem Nutzer mit. Er wird beim nächsten Login aufgefordert, ein neues Passwort einzugeben.",
+      "temp_password_copy": "Kopieren",
+      "temp_password_copied": "Kopiert!",
+      "must_change_password_badge": "Passwort zurückgesetzt",
       "no_user_selected": "Kein Nutzer ausgewählt",
       "select_user_hint": "Wählen Sie einen Nutzer aus der linken Spalte aus, um Details anzuzeigen, das Konto zu bearbeiten, Leifristen zu verlängern oder Bücher auszuleihen.",
       "lend": {

@@ -78,7 +78,17 @@
     "rules_link": "regulamin biblioteki",
     "rules_consent_2": ".",
     "accept_terms_error": "Proszę zaakceptować politykę prywatności i regulamin biblioteki.",
-    "password_too_short": "Hasło musi mieć co najmniej 8 znaków."
+    "password_too_short": "Hasło musi mieć co najmniej 8 znaków.",
+    "forgot_password_link": "Zapomniałeś hasła?",
+    "forgot_password_help_title": "Resetowanie hasła",
+    "forgot_password_help_text": "Zapomniałeś hasła? Skontaktuj się z zespołem biblioteki lub administratorem. Administrator może wygenerować nowe tymczasowe hasło dla Twojego konta, które musisz zmienić przy następnym logowaniu.",
+    "must_change_password_title": "Wymagana zmiana hasła",
+    "must_change_password_subtitle": "Zalogowałeś się przy użyciu tymczasowego hasła. Ze względów bezpieczeństwa musisz ustawić nowe hasło przed kontynuowaniem.",
+    "new_password": "Nowe hasło",
+    "confirm_password": "Potwierdź nowe hasło",
+    "change_password_submit": "Zapisz nowe hasło",
+    "change_password_success": "Hasło zostało pomyślnie zmienione!",
+    "password_mismatch": "Hasła nie są identyczne."
   },
   "rules": {
     "title": "Regulamin biblioteki",
@@ -217,6 +227,13 @@
       "update_success": "Konto użytkownika zaktualizowane pomyślnie!",
       "update_error": "Błąd podczas aktualizacji użytkownika.",
       "load_error": "Błąd podczas ładowania listy użytkowników.",
+      "reset_password_btn": "Resetuj hasło",
+      "reset_password_confirm": "Czy chcesz wygenerować tymczasowe hasło dla tego użytkownika?",
+      "temp_password_title": "Wygenerowano tymczasowe hasło",
+      "temp_password_hint": "Przekaż to tymczasowe hasło użytkownikowi. Przy następnym logowaniu zostanie poproszony o ustawienie nowego hasła.",
+      "temp_password_copy": "Kopiuj",
+      "temp_password_copied": "Skopiowano!",
+      "must_change_password_badge": "Hasło zresetowane",
       "no_user_selected": "Nie wybrano użytkownika",
       "select_user_hint": "Wybierz użytkownika z lewej kolumny, aby wyświetlić szczegóły, edytować konto, przedłużyć termin zwrotu lub wypożyczyć książki.",
       "lend": {

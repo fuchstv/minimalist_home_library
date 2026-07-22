@@ -12,6 +12,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [showHelpModal, setShowHelpModal] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,8 +49,9 @@ const Login: React.FC = () => {
                 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div>
-                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.email')}</label>
+                        <label htmlFor="email" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.email')}</label>
                         <input 
+                            id="email"
                             type="email" 
                             required
                             value={email}
@@ -58,14 +60,25 @@ const Login: React.FC = () => {
                         />
                     </div>
                     <div>
-                        <label className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.password')}</label>
+                        <label htmlFor="password" className="font-label-md text-label-md text-on-surface-variant mb-1 block">{t('auth.password')}</label>
                         <input 
+                            id="password"
                             type="password" 
                             required
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             className="w-full border border-outline-variant rounded p-3 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
                         />
+                        <div className="mt-1.5 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setShowHelpModal(true)}
+                                className="text-xs font-label-sm text-primary hover:underline transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-[14px]">help_outline</span>
+                                {t('auth.forgot_password_link')}
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" className="w-full bg-primary text-on-primary font-label-lg text-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors mt-2">
                         {t('auth.submit_login')}
@@ -77,6 +90,29 @@ const Login: React.FC = () => {
                     <Link to="/register" className="font-label-sm text-label-sm text-primary hover:underline">{t('auth.submit_register')}</Link>
                 </div>
             </div>
+
+            {showHelpModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-surface-container-low dark:bg-zinc-800 p-6 rounded-xl border border-outline-variant max-w-md w-full shadow-2xl flex flex-col gap-4">
+                        <div className="flex items-center gap-2.5 text-primary font-headline-sm">
+                            <span className="material-symbols-outlined text-[28px]">lock_reset</span>
+                            <h3 className="text-title-lg font-bold text-on-surface">{t('auth.forgot_password_help_title')}</h3>
+                        </div>
+                        <p className="text-body-md text-on-surface-variant leading-relaxed">
+                            {t('auth.forgot_password_help_text')}
+                        </p>
+                        <div className="flex justify-end mt-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowHelpModal(false)}
+                                className="bg-primary text-on-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
