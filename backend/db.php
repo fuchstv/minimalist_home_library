@@ -17,7 +17,14 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
+    // Ensure database migrations/columns are up to date
+    try {
+        $pdo->exec("ALTER TABLE users ADD COLUMN must_change_password BOOLEAN DEFAULT FALSE AFTER is_blocked");
+    } catch (\PDOException $e) {
+        // Ignore duplicate column name error if column already exists
+    }
 } catch (\PDOException $e) {
     handleDbError($e, "Database connection failed");
     die();
 }
+
