@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
+import { logger } from '../utils/logger';
+
 
 interface PageData {
     slug: string;
@@ -25,7 +27,7 @@ const AdminPages: React.FC = () => {
             setPages(response.data);
             setLoading(false);
         } catch (error) {
-            console.error('Error fetching pages:', error);
+            logger.error('Error fetching pages:', error);
             setLoading(false);
         }
     }, []);
@@ -44,7 +46,7 @@ const AdminPages: React.FC = () => {
                             fetchPages();
             setTimeout(() => setMessage(''), 3000);
         } catch (error) {
-            console.error('Error saving page:', error);
+            logger.error('Error saving page:', error);
             setMessage(t('admin.pages.save_error'));
             setIsError(true);
         }

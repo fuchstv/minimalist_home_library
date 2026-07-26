@@ -21,6 +21,8 @@ import { AuthContext } from '../context/AuthContext';
 import CategoryDisplay from '../components/CategoryDisplay';
 import { API_BASE_URL } from '../config';
 import { parseBibTeX } from '../utils/bibtexParser';
+import { logger } from '../utils/logger';
+
 
 interface Book {
     id: number | null;
@@ -120,7 +122,7 @@ const Admin: React.FC = () => {
                 }
             }
         } catch (error) {
-            console.error('Error fetching books:', error);
+            logger.error('Error fetching books:', error);
         }
     }, [page, search, location.search, navigate]);
 
@@ -198,7 +200,7 @@ const Admin: React.FC = () => {
                 alert(t("admin.books.isbn_not_found"));
             }
         } catch (error) {
-            console.error("Open Library lookup failed:", error);
+            logger.error("Open Library lookup failed:", error);
             alert(t("admin.books.isbn_error"));
         } finally {
             setIsLookingUp(false);
@@ -217,7 +219,7 @@ const Admin: React.FC = () => {
                 setSelectedBookLoans(data.data || []);
             }
         } catch (error) {
-            console.error("Error fetching book history:", error);
+            logger.error("Error fetching book history:", error);
         } finally {
             setLoadingLoans(false);
         }
@@ -263,7 +265,7 @@ const Admin: React.FC = () => {
             setShowBibtexArea(false);
         } catch (e) {
             alert(t('admin.bibtex.parse_error'));
-            console.error(e);
+            logger.error(e);
         }
     };
 

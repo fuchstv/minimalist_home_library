@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
 import { AuthContext } from '../context/AuthContext';
+import { logger } from '../utils/logger';
+
 
 interface PageData {
     slug: string;
@@ -45,7 +47,7 @@ const DynamicPage: React.FC = () => {
                 }
                 setError(null);
             } catch (err) {
-                console.error('Error fetching page:', err);
+                logger.error('Error fetching page:', err);
                 setError('Page not found');
             } finally {
                 setLoading(false);
@@ -90,7 +92,7 @@ const DynamicPage: React.FC = () => {
             setIsEditing(false);
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
-            console.error('Error saving page:', err);
+            logger.error('Error saving page:', err);
             setMessage('Fehler beim Speichern der Seite.');
         } finally {
             setIsSaving(false);

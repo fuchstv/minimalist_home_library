@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
+import { logger } from '../utils/logger';
+
 
 interface GlobalLoan {
     id: number;
@@ -34,7 +36,7 @@ const AdminLoans: React.FC = () => {
             setLoans(res.data.data || []);
         } catch (error) {
 
-            console.error('Error fetching global loans:', error);
+            logger.error('Error fetching global loans:', error);
             setErrorMsg(t('admin.loans.load_error'));
         }
     }, [t]);
@@ -56,7 +58,7 @@ const AdminLoans: React.FC = () => {
         } catch (error) {
             /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
             const err = error as any;
-            console.error('Error modifying loan:', error);
+            logger.error('Error modifying loan:', error);
             setErrorMsg(err.response?.data?.message || t('admin.loans.update_error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }

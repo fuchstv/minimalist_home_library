@@ -20,6 +20,8 @@ interface AuthContextType {
 }
 
 import { API_BASE_URL } from "../config";
+import { logger } from '../utils/logger';
+
 
 export const AuthContext = createContext<AuthContextType>({
     user: null,
@@ -52,7 +54,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({ children }) => {
                 localStorage.removeItem('user');
             }
         } catch (error) {
-            console.error("Auth check failed", error);
+            logger.error("Auth check failed", error);
         }
     }, []);
 
