@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_BASE_URL } from '../config';
+import { logger } from '../utils/logger';
+
 
 interface PageData {
     content_de: string;
@@ -25,7 +27,7 @@ const AnnouncementBanner: React.FC = () => {
                     }
                 }
             } catch (error) {
-                console.error("Failed to fetch announcement", error);
+                logger.error("Failed to fetch announcement", error);
             }
         };
 

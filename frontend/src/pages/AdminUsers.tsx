@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
+import { logger } from '../utils/logger';
+
 
 interface User {
     id: number;
@@ -62,7 +64,7 @@ const AdminUsers: React.FC = () => {
             const res = await axios.get(`${API_BASE_URL}/api/admin/users`, { withCredentials: true });
             setUsers(res.data.data || []);
         } catch (error) {
-            console.error('Error fetching users:', error);
+            logger.error('Error fetching users:', error);
             setErrorMsg(t('admin.users.load_error'));
         }
     }, [t]);
@@ -78,7 +80,7 @@ const AdminUsers: React.FC = () => {
             const res = await axios.get(`${API_BASE_URL}/api/admin/users/${userId}/loans`, { withCredentials: true });
             setUserLoans(res.data.data || []);
         } catch (error) {
-            console.error('Error fetching user loans:', error);
+            logger.error('Error fetching user loans:', error);
         }
     }, []);
 
@@ -113,7 +115,7 @@ const AdminUsers: React.FC = () => {
             setEditingUser(null);
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
-            console.error('Error updating user:', error);
+            logger.error('Error updating user:', error);
             setErrorMsg(error.response?.data?.message || t('admin.users.update_error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }
@@ -131,7 +133,7 @@ const AdminUsers: React.FC = () => {
             const res = await axios.get(`${API_BASE_URL}/api/books?limit=10&search=${encodeURIComponent(query)}&status=available`, { withCredentials: true });
             setFoundBooks(res.data.data || []);
         } catch (error) {
-            console.error('Error searching books:', error);
+            logger.error('Error searching books:', error);
         }
     }, []);
 
@@ -160,7 +162,7 @@ const AdminUsers: React.FC = () => {
             
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
-            console.error('Error lending book:', error);
+            logger.error('Error lending book:', error);
             setErrorMsg(error.response?.data?.message || t('admin.users.lend.error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }
@@ -177,7 +179,7 @@ const AdminUsers: React.FC = () => {
             fetchUserLoans(selectedUser.id);
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
-            console.error('Error modifying loan:', error);
+            logger.error('Error modifying loan:', error);
             setErrorMsg(error.response?.data?.message || t('admin.users.loans.actions.error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }
@@ -196,7 +198,7 @@ const AdminUsers: React.FC = () => {
             setSelectedUser(prev => prev ? { ...prev, must_change_password: 1 } : null);
             setTimeout(() => setMessage(''), 3000);
         } catch (error: any) {
-            console.error('Error resetting password:', error);
+            logger.error('Error resetting password:', error);
             setErrorMsg(error.response?.data?.message || t('admin.users.update_error'));
             setTimeout(() => setErrorMsg(''), 4000);
         }

@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from "../config";
+import { logger } from '../utils/logger';
+
 
 interface Loan {
     id: number;
@@ -39,7 +41,7 @@ const Profil: React.FC = () => {
                 setLoans(data.data || []);
             }
         } catch (error) {
-            console.error("Error fetching loans:", error);
+            logger.error("Error fetching loans:", error);
         }
     }, [user]);
 
@@ -52,7 +54,7 @@ const Profil: React.FC = () => {
                 setNotifications(data.data || []);
             }
         } catch (error) {
-            console.error("Error fetching notifications:", error);
+            logger.error("Error fetching notifications:", error);
         }
     }, [user]);
 
@@ -110,7 +112,7 @@ const Profil: React.FC = () => {
                 fetchNotifications();
             }
         } catch (error) {
-            console.error("Error dismissing notification:", error);
+            logger.error("Error dismissing notification:", error);
         }
     };
 

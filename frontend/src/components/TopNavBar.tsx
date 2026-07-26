@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { API_BASE_URL } from "../config";
+import { logger } from '../utils/logger';
+
 
 const TopNavBar: React.FC = () => {
     const location = useLocation();
@@ -64,7 +66,7 @@ const TopNavBar: React.FC = () => {
                         setNotificationCount(data.count || 0);
                     }
                 } catch (error) {
-                    console.error("Failed to fetch notifications", error);
+                    logger.error("Failed to fetch notifications", error);
                 }
             };
 

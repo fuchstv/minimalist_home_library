@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from "../config";
 import { AuthContext } from '../context/AuthContext';
 import CategoryDisplay from '../components/CategoryDisplay';
+import { logger } from '../utils/logger';
+
 
 interface Book {
     id: number;
@@ -42,7 +44,7 @@ const Katalog: React.FC = () => {
                 setTotalBooks(result.meta.total);
             }
         } catch (error) {
-            console.error("Failed to fetch books", error);
+            logger.error("Failed to fetch books", error);
         } finally {
             setIsLoading(false);
         }
