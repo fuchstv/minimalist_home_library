@@ -51,7 +51,7 @@ const Admin: React.FC = () => {
     const { user, csrfToken } = useContext(AuthContext);
     const [activeTab, setActiveTab] = useState('books');
 
-    const [books, setBooks] = useState<any[]>([]);
+    const [books, setBooks] = useState<Book[]>([]);
     const [bookForm, setBookForm] = useState<Book>({
         id: null,
         title: '',
@@ -83,7 +83,7 @@ const Admin: React.FC = () => {
     const [previewBooks, setPreviewBooks] = useState<PreviewBook[]>([]);
     const [showBibtexArea, setShowBibtexArea] = useState(false);
 
-    const handleEdit = (book: any) => {
+    const handleEdit = (book: Book) => {
         setBookForm({
             id: book.id,
             title: book.title || '',
@@ -113,7 +113,7 @@ const Admin: React.FC = () => {
                 const params = new URLSearchParams(location.search);
                 const editId = params.get('edit');
                 if (editId && data.data) {
-                    const bookToEdit = data.data.find((b: any) => b.id === parseInt(editId));
+                    const bookToEdit = data.data.find((b: Book) => b.id === parseInt(editId));
                     if (bookToEdit) {
                         handleEdit(bookToEdit);
                         // Clean up URL
@@ -189,9 +189,9 @@ const Admin: React.FC = () => {
                 setBookForm(prev => ({
                     ...prev,
                     title: info.title || prev.title,
-                    author: info.authors ? info.authors.map((a: any) => a.name).join(", ") : prev.author,
+                    author: info.authors ? info.authors.map((a: { name: string }) => a.name).join(", ") : prev.author,
                     publication_year: info.publish_date || prev.publication_year,
-                    publisher: info.publishers ? info.publishers.map((p: any) => p.name).join(", ") : prev.publisher,
+                    publisher: info.publishers ? info.publishers.map((p: { name: string }) => p.name).join(", ") : prev.publisher,
                     description: info.notes || (info.subtitle ? info.subtitle : prev.description)
                 }));
                 setMessage(t("admin.books.lookup_success"));
@@ -293,7 +293,7 @@ const Admin: React.FC = () => {
         }
     };
 
-    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: any) => {
+    const handlePreviewBookChange = (tempId: string, field: keyof PreviewBook, value: PreviewBook[keyof PreviewBook]) => {
         setPreviewBooks(prev => prev.map(b => b.tempId === tempId ? { ...b, [field]: value } : b));
     };
 
