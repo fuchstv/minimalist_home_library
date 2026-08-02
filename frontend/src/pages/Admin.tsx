@@ -659,9 +659,9 @@ const Admin: React.FC = () => {
                                                     </span>
                                                 </td>
                                                 <td className="p-2 font-body-sm text-right whitespace-nowrap">
-                                                    <button onClick={() => handleShowHistory(b.id, b.title)} className="text-secondary font-label-sm hover:underline mr-3">{t('admin.users.loans.title')}</button>
+                                                    <button onClick={() => b.id != null && handleShowHistory(b.id, b.title)} className="text-secondary font-label-sm hover:underline mr-3">{t('admin.users.loans.title')}</button>
                                                     <button onClick={() => handleEdit(b)} className="text-primary font-label-sm hover:underline mr-3">{t('admin.books.edit')}</button>
-                                                    <button onClick={() => handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.books.delete')}</button>
+                                                    <button onClick={() => b.id != null && handleDelete(b.id)} className="text-error font-label-sm hover:underline">{t('admin.books.delete')}</button>
                                                 </td>
                                             </tr>
                                         ))
