@@ -21,7 +21,7 @@ if (count($parts) >= 2 && $parts[0] === 'admin' && $parts[1] === 'pages') {
                 $stmt = $pdo->query("SELECT * FROM pages");
                 echo json_encode($stmt->fetchAll());
             }
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             handleException($e, "Failed to fetch pages");
         }
         return;
@@ -42,7 +42,7 @@ if (count($parts) >= 2 && $parts[0] === 'admin' && $parts[1] === 'pages') {
             ]);
 
             echo json_encode(["message" => "Page updated successfully"]);
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             handleException($e, "Failed to update page");
         }
         return;

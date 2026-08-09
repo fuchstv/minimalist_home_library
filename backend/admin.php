@@ -69,7 +69,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                     "count" => $importedCount,
                     "skipped" => $skippedCount
                 ]);
-            } catch (\Exception $e) {
+            } catch (\PDOException $e) {
                 if ($pdo->inTransaction()) {
                     $pdo->rollBack();
                 }
@@ -167,7 +167,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 $pdo->commit();
                 echo json_encode(["message" => "Book created successfully", "id" => $newId, "signature" => $signature]);
             }
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
@@ -187,7 +187,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 $stmt->execute([$book_id]);
                 $loans = $stmt->fetchAll();
                 echo json_encode(["data" => $loans]);
-            } catch (\Exception $e) {
+            } catch (\PDOException $e) {
                 handleException($e, "Failed to fetch book loans");
             }
             die();
@@ -199,7 +199,7 @@ if (strpos($request_uri, '/admin/pages') !== false) {
                 $stmt = $pdo->prepare("DELETE FROM books WHERE id = ?");
                 $stmt->execute([$id]);
                 echo json_encode(["message" => "Book deleted"]);
-            } catch (\Exception $e) {
+            } catch (\PDOException $e) {
                 handleException($e, "Failed to delete book");
             }
         } else {

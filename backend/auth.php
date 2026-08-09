@@ -43,7 +43,7 @@ if ($method == 'POST') {
                 http_response_code(401);
                 echo json_encode(["message" => "Invalid credentials"]);
             }
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             handleException($e, "Login failed");
         }
     } elseif (strpos($path, '/auth/change-password') !== false) {
@@ -63,7 +63,7 @@ if ($method == 'POST') {
             $stmt = $pdo->prepare("UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?");
             $stmt->execute([$hash, $_SESSION['user_id']]);
             echo json_encode(["message" => "Password changed successfully"]);
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             handleException($e, "Failed to change password");
         }
     } elseif (strpos($path, '/auth/register') !== false) {
@@ -98,7 +98,7 @@ if ($method == 'POST') {
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, phone, data_consent, rules_consent, role) VALUES (?, ?, ?, ?, ?, ?, 'member')");
             $stmt->execute([$name, $email, $hash, $phone, $acceptData ? 1 : 0, $acceptRules ? 1 : 0]);
             echo json_encode(["message" => "User registered successfully"]);
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             if ($e instanceof PDOException && $e->getCode() == 23000) {
                  http_response_code(400);
                  echo json_encode(["message" => "Email already exists"]);
@@ -129,7 +129,7 @@ if ($method == 'POST') {
                 http_response_code(401);
                 echo json_encode(["message" => "Not authenticated"]);
             }
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             handleException($e, "Failed to fetch user info");
         }
     } else {

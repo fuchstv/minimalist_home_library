@@ -24,7 +24,7 @@ if (count($parts) >= 2 && $parts[0] === 'pages') {
                 http_response_code(404);
                 echo json_encode(["message" => "Page not found"]);
             }
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             handleException($e, "Failed to fetch page");
         }
         return;

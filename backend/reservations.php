@@ -26,7 +26,7 @@ if ($method === 'GET') {
         $stmt->execute([$user_id]);
         $reservations = $stmt->fetchAll();
         echo json_encode(["data" => $reservations]);
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         handleException($e, "Failed to fetch reservations");
     }
 } elseif ($method === 'POST') {
@@ -81,7 +81,7 @@ if ($method === 'GET') {
 
         $pdo->commit();
         echo json_encode(["message" => "Book successfully reserved."]);
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
@@ -102,7 +102,7 @@ if ($method === 'GET') {
         $stmt = $pdo->prepare("UPDATE reservations SET status = 'cancelled' WHERE id = ? AND user_id = ?");
         $stmt->execute([$reservation_id, $user_id]);
         echo json_encode(["message" => "Reservation cancelled."]);
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         handleException($e, "Failed to cancel reservation");
     }
 } else {

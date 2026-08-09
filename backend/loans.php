@@ -34,7 +34,7 @@ if ($method == 'GET') {
         $stmt->execute([$user_id]);
         $loans = $stmt->fetchAll();
         echo json_encode(["data" => $loans]);
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         handleException($e, "Failed to fetch loans");
     }
 
@@ -93,7 +93,7 @@ if ($method == 'GET') {
             $pdo->commit();
             echo json_encode(["message" => "Book successfully borrowed.", "due_date" => $due_date]);
 
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
@@ -144,7 +144,7 @@ if ($method == 'GET') {
             $pdo->commit();
             echo json_encode(["message" => $message]);
 
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
