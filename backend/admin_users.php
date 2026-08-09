@@ -24,7 +24,7 @@ if (isset($parts[1]) && $parts[1] === 'loans') {
                 ");
                 $loans = $stmt->fetchAll();
                 echo json_encode(["data" => $loans]);
-            } catch (\Exception $e) {
+            } catch (\PDOException $e) {
                 handleException($e, "Failed to fetch loans");
             }
             return;
@@ -41,7 +41,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                 $stmt = $pdo->query("SELECT id, name, email, phone, fee_paid, is_blocked, must_change_password, data_consent, rules_consent, role, created_at FROM users ORDER BY name ASC");
                 $users = $stmt->fetchAll();
                 echo json_encode(["data" => $users]);
-            } catch (\Exception $e) {
+            } catch (\PDOException $e) {
                 handleException($e, "Failed to fetch users");
             }
             return;
@@ -67,7 +67,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         "message" => "Password reset successfully",
                         "temp_password" => $tempPassword
                     ]);
-                } catch (\Exception $e) {
+                } catch (\PDOException $e) {
                     handleException($e, "Failed to reset password");
                 }
                 return;
@@ -94,7 +94,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         $stmt->execute([$user_id]);
                         $loans = $stmt->fetchAll();
                         echo json_encode(["data" => $loans]);
-                    } catch (\Exception $e) {
+                    } catch (\PDOException $e) {
                         handleException($e, "Failed to fetch user loans");
                     }
                     return;
@@ -137,7 +137,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         
                         $pdo->commit();
                         echo json_encode(["message" => "Book successfully borrowed.", "due_date" => $due_date]);
-                    } catch (\Exception $e) {
+                    } catch (\PDOException $e) {
                         if ($pdo->inTransaction()) {
                             $pdo->rollBack();
                         }
@@ -190,7 +190,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         
                         $pdo->commit();
                         echo json_encode(["message" => $message]);
-                    } catch (\Exception $e) {
+                    } catch (\PDOException $e) {
                         if ($pdo->inTransaction()) {
                             $pdo->rollBack();
                         }
@@ -214,7 +214,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         http_response_code(404);
                         echo json_encode(["message" => "User not found."]);
                     }
-                } catch (\Exception $e) {
+                } catch (\PDOException $e) {
                     handleException($e, "Failed to fetch user");
                 }
                 return;
@@ -240,7 +240,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                     $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, phone = ?, role = ?, fee_paid = ?, is_blocked = ?, data_consent = ?, rules_consent = ? WHERE id = ?");
                     $stmt->execute([$name, $email, $phone, $role, $fee_paid, $is_blocked, $data_consent, $rules_consent, $user_id]);
                     echo json_encode(["message" => "User updated successfully."]);
-                } catch (\Exception $e) {
+                } catch (\PDOException $e) {
                     handleException($e, "Failed to update user");
                 }
                 return;

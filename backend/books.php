@@ -85,7 +85,7 @@ if ($method == 'GET') {
                 ]
             ]);
         }
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         handleException($e, "Failed to fetch books");
     }
 } else {

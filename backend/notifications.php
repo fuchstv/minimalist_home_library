@@ -46,7 +46,7 @@ if ($method === 'GET') {
             "unread_count" => $unread_notifications_count,
             "data" => $notifications
         ]);
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         sendGenericError($e, "Internal Server Error");
     }
 } elseif ($method === 'PUT' || $method === 'DELETE') {
@@ -64,7 +64,7 @@ if ($method === 'GET') {
             $stmt->execute([$user_id]);
         }
         echo json_encode(["message" => "Notifications deleted"]);
-    } catch (\Exception $e) {
+    } catch (\PDOException $e) {
         sendGenericError($e, "Internal Server Error");
     }
 } else {
