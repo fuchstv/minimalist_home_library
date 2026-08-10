@@ -26,13 +26,30 @@ function notifyBookAvailable($pdo, $book_id) {
     $stmt->execute([$book_id]);
     $reservations = $stmt->fetchAll();
 
-    foreach ($reservations as $res) {
+    if (!empty($reservations)) {
         $msg = "Das Buch '$bookTitle' ($signature) ist wieder verfügbar.";
-        createNotification($pdo, $res['user_id'], $msg);
+        $placeholders = [];
+        $values = [];
+        $userIds = [];
 
-        // Mark reservation as completed
-        $upd = $pdo->prepare("UPDATE reservations SET status = 'completed' WHERE book_id = ? AND user_id = ? AND status = 'pending'");
-        $upd->execute([$book_id, $res['user_id']]);
+        foreach ($reservations as $res) {
+            $placeholders[] = "(?, ?)";
+            $values[] = $res['user_id'];
+            $values[] = $msg;
+            $userIds[] = $res['user_id'];
+        }
+
+        // Batch insert notifications
+        $sql = "INSERT INTO notifications (user_id, message) VALUES " . implode(", ", $placeholders);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($values);
+
+        // Batch update reservations for these specific users
+        $inQuery = implode(',', array_fill(0, count($userIds), '?'));
+        $updateSql = "UPDATE reservations SET status = 'completed' WHERE book_id = ? AND status = 'pending' AND user_id IN ($inQuery)";
+        $updateValues = array_merge([$book_id], $userIds);
+        $upd = $pdo->prepare($updateSql);
+        $upd->execute($updateValues);
     }
 
     // 3. Notify all admins if there were reservations
