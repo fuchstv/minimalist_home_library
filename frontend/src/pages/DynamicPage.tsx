@@ -13,6 +13,7 @@ interface PageData {
     title_pl: string;
     content_de: string;
     content_pl: string;
+    source?: string;
 }
 
 const DynamicPage: React.FC = () => {
@@ -88,7 +89,7 @@ const DynamicPage: React.FC = () => {
                 content_pl: editContentPl
             });
 
-            setMessage('Seite erfolgreich gespeichert!');
+            setMessage('Seite lokal gespeichert.');
             setIsEditing(false);
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
@@ -123,7 +124,7 @@ const DynamicPage: React.FC = () => {
             <div className="flex-grow flex items-center justify-center p-8">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-error mb-2">404</h1>
-                    <p className="text-on-surface-variant">Page not found</p>
+                    <p className="text-on-surface-variant">Seite nicht gefunden</p>
                 </div>
             </div>
         );
@@ -132,6 +133,7 @@ const DynamicPage: React.FC = () => {
     const currentLang = i18n.language.split('-')[0]; // 'de' or 'pl'
     const title = currentLang === 'pl' ? page.title_pl : page.title_de;
     const content = currentLang === 'pl' ? page.content_pl : page.content_de;
+    const isCmsManaged = Boolean(page.source);
 
     if (isEditing) {
         return (
@@ -154,10 +156,16 @@ const DynamicPage: React.FC = () => {
                                 disabled={isSaving}
                                 className="bg-primary text-on-primary py-2.5 px-6 rounded-full hover:bg-primary/95 disabled:opacity-50 transition-colors font-label-md shadow-sm cursor-pointer"
                             >
-                                {isSaving ? 'Speichert...' : 'Speichern'}
+                                {isSaving ? 'Speichert...' : 'Lokaler Fallback Speichern'}
                             </button>
                         </div>
                     </div>
+
+                    {isCmsManaged && (
+                        <div className="p-4 rounded-md text-body-sm shadow-sm bg-primary-container/20 text-on-surface border border-primary/30">
+                            <strong>📌 Hinweis zur Datenpflege:</strong> Diese Seite ({slug}) wird zentral über das Astro Headless-CMS (Content Collections <code className="bg-surface px-1.5 py-0.5 rounded border text-xs">pages/</code>) gesteuert, um Doppelpflege zu vermeiden.
+                        </div>
+                    )}
 
                     {message && (
                         <div className={`p-4 rounded-md text-body-sm shadow-sm ${message.includes('Fehler') ? 'bg-error-container text-on-error-container border border-error/20' : 'bg-secondary-container text-on-secondary-container border border-secondary/20'}`}>
@@ -225,6 +233,12 @@ const DynamicPage: React.FC = () => {
                 {message && (
                     <div className="mb-6 p-4 rounded-md text-body-sm shadow-sm bg-secondary-container text-on-secondary-container border border-secondary/20">
                         {message}
+                    </div>
+                )}
+
+                {isCmsManaged && (
+                    <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
+                        <span>✨ Synchrone Inhalte aus Headless-CMS (Content Collections)</span>
                     </div>
                 )}
 
