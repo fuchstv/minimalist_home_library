@@ -1,41 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+/* Phase D Design Tokens Aligned with SprachCafé Relaunch Design System */
 :root {
-  --surface: #fdf9f6;
-  --on-surface: #1c1b1a;
-  --surface-container-low: #f7f3f0;
-  --surface-container-lowest: #ffffff;
-  --surface-container: #f1edea;
-  --surface-container-high: #ebe7e4;
-  --surface-container-highest: #e5e2df;
-  --on-surface-variant: #5e3f3a;
-  --outline: #926e69;
-  --outline-variant: #e8bdb6;
-  --inverse-surface: #31302f;
-  --inverse-on-surface: #f4f0ed;
-  --background: #fdf9f6;
-  --on-background: #1c1b1a;
+  --surface: #0f172a;
+  --on-surface: #f8fafc;
+  --surface-container-low: #1e293b;
+  --surface-container-lowest: #020617;
+  --surface-container: #1e293b;
+  --surface-container-high: #334155;
+  --surface-container-highest: #475569;
+  --on-surface-variant: #cbd5e1;
+  --outline: #334155;
+  --outline-variant: #1e293b;
+  --inverse-surface: #f8fafc;
+  --inverse-on-surface: #0f172a;
+  --background: #0f172a;
+  --on-background: #f8fafc;
 }
 
 .dark {
-  --surface: #0a0a0a;
-  --on-surface: #f4f0ed;
-  --surface-container-low: #111111;
-  --surface-container-lowest: #050505;
-  --surface-container: #161616;
-  --surface-container-high: #1c1c1c;
-  --surface-container-highest: #222222;
-  --on-surface-variant: #a8908c;
-  --outline: #6d4c41;
-  --outline-variant: #3e2723;
-  --inverse-surface: #fdf9f6;
-  --inverse-on-surface: #1c1b1a;
-  --background: #0a0a0a;
-  --on-background: #f4f0ed;
+  --surface: #0f172a;
+  --on-surface: #f8fafc;
+  --surface-container-low: #1e293b;
+  --surface-container-lowest: #020617;
+  --surface-container: #1e293b;
+  --surface-container-high: #334155;
+  --surface-container-highest: #475569;
+  --on-surface-variant: #cbd5e1;
+  --outline: #334155;
+  --outline-variant: #1e293b;
+  --inverse-surface: #f8fafc;
+  --inverse-on-surface: #0f172a;
+  --background: #0f172a;
+  --on-background: #f8fafc;
 }
 
 @layer utilities {
@@ -45,12 +46,17 @@
 }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d8dada; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #c2c7ca; }
+::-webkit-scrollbar-track { background: #020617; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
 
 body {
     @apply bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
 }
 
 /* Interactive elements default to pointer cursor */
@@ -76,4 +82,3 @@ textarea:disabled,
 [role="button"][aria-disabled="true"] {
     cursor: not-allowed;
 }
-
