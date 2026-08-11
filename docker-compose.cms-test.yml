@@ -1,0 +1,76 @@
+services:
+  test_postgres:
+    image: postgres:16-alpine
+    container_name: test_cms_postgres
+    restart: "no"
+    environment:
+      POSTGRES_DB: test_cms_db
+      POSTGRES_USER: test_cms_user
+      POSTGRES_PASSWORD: test_cms_password
+    command: ["postgres", "-c", "shared_buffers=32MB", "-c", "max_connections=20"]
+    ports:
+      - "9432:5432"
+    networks:
+      - cms_test_net
+    mem_limit: 192m
+    cpus: 0.25
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 192M
+
+  test_headless_cms:
+    image: directus/directus:10
+    container_name: test_headless_cms
+    restart: "no"
+    ports:
+      - "9055:8055"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8055"
+      KEY: "test-cms-key"
+      SECRET: "test-cms-secret"
+      DB_CLIENT: "pg"
+      DB_HOST: "test_postgres"
+      DB_PORT: "5432"
+      DB_DATABASE: "test_cms_db"
+      DB_USER: "test_cms_user"
+      DB_PASSWORD: "test_cms_password"
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "TestPassword123!"
+    networks:
+      - cms_test_net
+    depends_on:
+      - test_postgres
+    mem_limit: 300m
+    cpus: 0.35
+    deploy:
+      resources:
+        limits:
+          cpus: '0.35'
+          memory: 300M
+
+  test_caddy:
+    image: caddy:2-alpine
+    container_name: test_library_proxy
+    restart: "no"
+    ports:
+      - "9080:80"
+      - "9443:443"
+    networks:
+      - cms_test_net
+    depends_on:
+      - test_headless_cms
+    mem_limit: 64m
+    cpus: 0.10
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 64M
+
+networks:
+  cms_test_net:
+    name: cms_test_net
+    driver: bridge

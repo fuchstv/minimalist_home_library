@@ -13,6 +13,17 @@ services:
       - ./database:/docker-entrypoint-initdb.d
     networks:
       - library_net
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.60
+    deploy:
+      resources:
+        limits:
+          cpus: '0.60'
+          memory: 512M
+        reservations:
+          cpus: '0.20'
+          memory: 256M
 
   backend:
     build: ./backend
@@ -30,6 +41,17 @@ services:
       - library_net
     depends_on:
       - database
+    mem_limit: 128m
+    mem_reservation: 32m
+    cpus: 0.30
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 128M
+        reservations:
+          cpus: '0.10'
+          memory: 32M
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -43,6 +65,17 @@ services:
       - library_net
     depends_on:
       - database
+    mem_limit: 96m
+    mem_reservation: 32m
+    cpus: 0.20
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 96M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
 
   caddy:
     image: caddy:2-alpine
@@ -60,6 +93,17 @@ services:
       - library_net
     depends_on:
       - backend
+    mem_limit: 64m
+    mem_reservation: 16m
+    cpus: 0.15
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 16M
 
 volumes:
   db_data:

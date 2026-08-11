@@ -1,0 +1,28 @@
+{
+  "baseline": {
+    "avg_cpu": 13.58,
+    "max_cpu": 55.0,
+    "avg_mem": 1153.63,
+    "max_mem": 1161.1,
+    "sample_count": 30
+  },
+  "github_actions_rsync": {
+    "avg_cpu": 19.55,
+    "max_cpu": 94.74,
+    "avg_mem": 1142.9,
+    "max_mem": 1156.34,
+    "sample_count": 26,
+    "duration_sec": 2.602
+  },
+  "onhost_build": {
+    "avg_cpu": 91.21,
+    "max_cpu": 100.0,
+    "avg_mem": 1360.46,
+    "max_mem": 1512.33,
+    "sample_count": 191,
+    "duration_sec": 19.313,
+    "exit_code": 0
+  },
+  "net_rsync_cpu_pct": 5.97,
+  "net_build_cpu_pct": 77.63
+}

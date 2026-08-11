@@ -201,7 +201,63 @@ if (isset($parts[1]) && $parts[1] === 'users') {
             }
         }
         
-        // Single user operations: GET / PUT
+        // /admin/users/cleanup-inactive
+        if (isset($parts[2]) && $parts[2] === 'cleanup-inactive') {
+            if ($method === 'POST') {
+                $dryRun = isset($_GET['dry_run']) ? filter_var($_GET['dry_run'], FILTER_VALIDATE_BOOLEAN) : true;
+                
+                try {
+                    $sql = "
+                        SELECT u.id, u.name, u.email, u.created_at
+                        FROM users u
+                        WHERE u.role != 'admin'
+                          AND u.created_at <= DATE_SUB(NOW(), INTERVAL 24 MONTH)
+                          AND NOT EXISTS (
+                              SELECT 1 FROM loans l 
+                              WHERE l.user_id = u.id AND (l.status != 'returned' OR l.loan_date >= DATE_SUB(NOW(), INTERVAL 24 MONTH))
+                          )
+                    ";
+                    $stmt = $pdo->query($sql);
+                    $candidates = $stmt->fetchAll();
+
+                    if ($dryRun) {
+                        echo json_encode([
+                            "dry_run" => true,
+                            "count" => count($candidates),
+                            "candidates" => $candidates,
+                            "message" => "Found " . count($candidates) . " inactive accounts eligible for DSGVO deletion (24+ months inactivity)."
+                        ]);
+                        return;
+                    }
+
+                    $purgedCount = 0;
+                    $pdo->beginTransaction();
+                    foreach ($candidates as $cand) {
+                        $uid = $cand['id'];
+                        $pdo->prepare("UPDATE loans SET user_id = NULL WHERE user_id = ?")->execute([$uid]);
+                        $pdo->prepare("DELETE FROM reservations WHERE user_id = ?")->execute([$uid]);
+                        $pdo->prepare("DELETE FROM notifications WHERE user_id = ?")->execute([$uid]);
+                        $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$uid]);
+                        $purgedCount++;
+                    }
+                    $pdo->commit();
+
+                    echo json_encode([
+                        "dry_run" => false,
+                        "purged_count" => $purgedCount,
+                        "message" => "Successfully purged $purgedCount inactive accounts (24+ months inactivity) and anonymized loan histories."
+                    ]);
+                } catch (\PDOException $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    handleException($e, "Failed to purge inactive users");
+                }
+                return;
+            }
+        }
+
+        // Single user operations: GET / PUT / DELETE
         if (count($parts) === 3) {
             if ($method === 'GET') {
                 try {
@@ -244,7 +300,45 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                     handleException($e, "Failed to update user");
                 }
                 return;
+            } elseif ($method === 'DELETE') {
+                // DSGVO Art. 17 User Deletion with Loan History Anonymization
+                try {
+                    // Check for active loans
+                    $stmtActive = $pdo->prepare("SELECT COUNT(*) FROM loans WHERE user_id = ? AND status != 'returned'");
+                    $stmtActive->execute([$user_id]);
+                    if ($stmtActive->fetchColumn() > 0) {
+                        http_response_code(400);
+                        echo json_encode(["message" => "Cannot delete user with active loans. All items must be returned first."]);
+                        return;
+                    }
+
+                    $pdo->beginTransaction();
+                    // Anonymize historical loan records
+                    $stmtAnon = $pdo->prepare("UPDATE loans SET user_id = NULL WHERE user_id = ?");
+                    $stmtAnon.execute([$user_id]);
+
+                    // Delete notifications and reservations
+                    $stmtRes = $pdo->prepare("DELETE FROM reservations WHERE user_id = ?");
+                    $stmtRes->execute([$user_id]);
+
+                    $stmtNotif = $pdo->prepare("DELETE FROM notifications WHERE user_id = ?");
+                    $stmtNotif->execute([$user_id]);
+
+                    // Delete user record
+                    $stmtDel = $pdo->prepare("DELETE FROM users WHERE id = ?");
+                    $stmtDel->execute([$user_id]);
+
+                    $pdo->commit();
+                    echo json_encode(["message" => "User account deleted and loan history anonymized successfully according to DSGVO Art. 17."]);
+                } catch (\PDOException $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    handleException($e, "Failed to delete user");
+                }
+                return;
             }
         }
     }
 }
+

@@ -1,6 +1,10 @@
 services:
+  # -------------------------------------------------------------
+  # HAUSBIBLIOTHEK CONTAINERS (Port 8080 & Stack)
+  # -------------------------------------------------------------
   backend:
     image: php:8.4-apache
+    container_name: library_backend
     volumes:
       - ./backend:/var/www/html
     ports:
@@ -12,14 +16,23 @@ services:
       - DB_NAME=library_db
     depends_on:
       - db
-    # We will need PDO extension for MySQL.
-    # The default php:apache image doesn't have pdo_mysql enabled. 
-    # We will build a custom image or run docker-php-ext-install
     command: >
       bash -c "docker-php-ext-install pdo pdo_mysql && a2enmod rewrite && apache2-foreground"
+    mem_limit: 128m
+    mem_reservation: 32m
+    cpus: 0.30
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 128M
+        reservations:
+          cpus: '0.10'
+          memory: 32M
 
   db:
     image: mysql:8.0
+    container_name: library_db
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
     environment:
@@ -32,9 +45,21 @@ services:
       - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.60
+    deploy:
+      resources:
+        limits:
+          cpus: '0.60'
+          memory: 512M
+        reservations:
+          cpus: '0.20'
+          memory: 256M
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: library_admin
     ports:
       - "8081:80"
     environment:
@@ -42,6 +67,53 @@ services:
       MYSQL_ROOT_PASSWORD: root
     depends_on:
       - db
+    mem_limit: 96m
+    mem_reservation: 32m
+    cpus: 0.20
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 96M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+
+  # -------------------------------------------------------------
+  # REVERSE PROXY (Capacity Budget Allocation)
+  # -------------------------------------------------------------
+  caddy:
+    image: caddy:2-alpine
+    container_name: library_proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./frontend/dist:/usr/share/caddy
+      - /var/www/beta:/var/www/beta:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+    mem_limit: 64m
+    mem_reservation: 16m
+    cpus: 0.15
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 16M
 
 volumes:
   db_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  default:
+    name: minimalist_home_library_library_net
