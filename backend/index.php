@@ -69,7 +69,9 @@ function matchPath($path, $endpoint) {
 }
 
 // Route incoming requests
-if (matchPath($request_uri, '/pages')) {
+if (matchPath($request_uri, '/export/books')) {
+    require 'export_books.php';
+} elseif (matchPath($request_uri, '/pages')) {
     require 'pages.php';
 } elseif (matchPath($request_uri, '/books')) {
     require 'books.php';
