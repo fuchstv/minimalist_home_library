@@ -23,20 +23,20 @@
 }
 
 .dark {
-  --surface: #FDFBF7;
-  --on-surface: #1d1b1a;
-  --surface-container-low: #f8f2f0;
-  --surface-container-lowest: #ffffff;
-  --surface-container: #f2edeb;
-  --surface-container-high: #ece7e5;
-  --surface-container-highest: #e7e1df;
-  --on-surface-variant: #5b403d;
-  --outline: #906f6c;
-  --outline-variant: #e4beba;
-  --inverse-surface: #32302f;
-  --inverse-on-surface: #f5f0ee;
-  --background: #FDFBF7;
-  --on-background: #1d1b1a;
+  --surface: #181615;
+  --on-surface: #f5f0ee;
+  --surface-container-low: #22201e;
+  --surface-container-lowest: #12100f;
+  --surface-container: #2a2725;
+  --surface-container-high: #363230;
+  --surface-container-highest: #423e3b;
+  --on-surface-variant: #d4c5c2;
+  --outline: #8c7774;
+  --outline-variant: #4a3d3b;
+  --inverse-surface: #FDFBF7;
+  --inverse-on-surface: #1d1b1a;
+  --background: #181615;
+  --on-background: #f5f0ee;
 }
 
 @layer utilities {
@@ -49,6 +49,10 @@
 ::-webkit-scrollbar-track { background: #f8f2f0; }
 ::-webkit-scrollbar-thumb { background: #e7e1df; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #906f6c; }
+
+.dark ::-webkit-scrollbar-track { background: #181615; }
+.dark ::-webkit-scrollbar-thumb { background: #363230; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #423e3b; }
 
 body {
     @apply bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300;
