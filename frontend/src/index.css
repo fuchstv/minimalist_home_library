@@ -1,42 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..800;1,7..72,400..800&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-/* Phase D Design Tokens Aligned with SprachCafé Relaunch Design System */
+/* Warm Community Narrative Design System Tokens */
 :root {
-  --surface: #0f172a;
-  --on-surface: #f8fafc;
-  --surface-container-low: #1e293b;
-  --surface-container-lowest: #020617;
-  --surface-container: #1e293b;
-  --surface-container-high: #334155;
-  --surface-container-highest: #475569;
-  --on-surface-variant: #cbd5e1;
-  --outline: #334155;
-  --outline-variant: #1e293b;
-  --inverse-surface: #f8fafc;
-  --inverse-on-surface: #0f172a;
-  --background: #0f172a;
-  --on-background: #f8fafc;
+  --surface: #FDFBF7;
+  --on-surface: #1d1b1a;
+  --surface-container-low: #f8f2f0;
+  --surface-container-lowest: #ffffff;
+  --surface-container: #f2edeb;
+  --surface-container-high: #ece7e5;
+  --surface-container-highest: #e7e1df;
+  --on-surface-variant: #5b403d;
+  --outline: #906f6c;
+  --outline-variant: #e4beba;
+  --inverse-surface: #32302f;
+  --inverse-on-surface: #f5f0ee;
+  --background: #FDFBF7;
+  --on-background: #1d1b1a;
 }
 
 .dark {
-  --surface: #0f172a;
-  --on-surface: #f8fafc;
-  --surface-container-low: #1e293b;
-  --surface-container-lowest: #020617;
-  --surface-container: #1e293b;
-  --surface-container-high: #334155;
-  --surface-container-highest: #475569;
-  --on-surface-variant: #cbd5e1;
-  --outline: #334155;
-  --outline-variant: #1e293b;
-  --inverse-surface: #f8fafc;
-  --inverse-on-surface: #0f172a;
-  --background: #0f172a;
-  --on-background: #f8fafc;
+  --surface: #FDFBF7;
+  --on-surface: #1d1b1a;
+  --surface-container-low: #f8f2f0;
+  --surface-container-lowest: #ffffff;
+  --surface-container: #f2edeb;
+  --surface-container-high: #ece7e5;
+  --surface-container-highest: #e7e1df;
+  --on-surface-variant: #5b403d;
+  --outline: #906f6c;
+  --outline-variant: #e4beba;
+  --inverse-surface: #32302f;
+  --inverse-on-surface: #f5f0ee;
+  --background: #FDFBF7;
+  --on-background: #1d1b1a;
 }
 
 @layer utilities {
@@ -46,17 +46,17 @@
 }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #020617; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar-track { background: #f8f2f0; }
+::-webkit-scrollbar-thumb { background: #e7e1df; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #906f6c; }
 
 body {
     @apply bg-surface text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    font-family: 'Literata', Georgia, serif;
 }
 
 /* Interactive elements default to pointer cursor */
