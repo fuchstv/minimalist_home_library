@@ -92,6 +92,7 @@ services:
     volumes:
       - ./frontend/dist:/usr/share/caddy
       - /var/www/beta:/var/www/beta:ro
+      - /var/www/production:/var/www/production:ro
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config

@@ -85,6 +85,8 @@ if (matchPath($request_uri, '/export/books')) {
     require 'notifications.php';
 } elseif (matchPath($request_uri, '/admin')) {
     require 'admin.php';
+} elseif (matchPath($request_uri, '/payments')) {
+    require 'payments.php';
 } elseif (matchPath($request_uri, '/health')) {
     require 'health.php';
 } else {

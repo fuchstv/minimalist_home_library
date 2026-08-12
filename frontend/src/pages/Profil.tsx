@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from "../config";
 import { logger } from '../utils/logger';
+import { PaymentModal } from '../components/PaymentModal';
 
 
 interface Loan {
@@ -116,39 +117,82 @@ const Profil: React.FC = () => {
         }
     };
 
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [paymentFeedback, setPaymentFeedback] = useState<string | null>(null);
+
+    const handlePaymentSuccess = (msg: string, feePaid: boolean) => {
+        setPaymentFeedback(msg);
+        fetchNotifications();
+        if (feePaid && user) {
+            user.fee_paid = 1;
+        }
+    };
+
     if (!user) return null;
 
     return (
         <div className="flex-grow flex flex-col p-margin-mobile md:p-margin-desktop bg-surface max-w-container-max-width mx-auto w-full gap-8">
             <h1 className="font-display-lg text-display-lg text-on-surface">{t('nav.profile')} - {user.name}</h1>
+
+            {paymentFeedback && (
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-sm font-bold flex items-center justify-between">
+                    <span>{paymentFeedback}</span>
+                    <button onClick={() => setPaymentFeedback(null)} className="text-xs hover:underline">Schließen</button>
+                </div>
+            )}
             
-            <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col md:flex-row gap-8">
-                <div className="flex-1">
+            <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-6">
+                <div>
                     <h2 className="font-headline-sm text-headline-sm mb-4">{t('profile.status')}</h2>
                     <div className="flex flex-wrap gap-4">
-                        <div className="bg-surface p-4 rounded-lg border border-outline-variant flex-1 min-w-[200px]">
+                        <div className="bg-surface p-5 rounded-xl border border-outline-variant flex-1 min-w-[240px]">
                             <p className="text-body-sm text-on-surface-variant uppercase font-bold mb-1">{t('profile.fee_status')}</p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 mb-2">
                                 <span className={`material-symbols-outlined ${user.fee_paid ? 'text-green-600' : 'text-amber-600'}`}>
                                     {user.fee_paid ? 'check_circle' : 'error'}
                                 </span>
-                                <span className="font-title-md">{user.fee_paid ? t('profile.paid') : t('profile.unpaid')}</span>
+                                <span className="font-title-md font-bold">{user.fee_paid ? t('profile.paid') : 'Mitgliedsgebühr Offen (10 €)'}</span>
                             </div>
-                            {!user.fee_paid && <p className="text-body-sm text-on-surface-variant mt-2">{t('rules.section1_content')}</p>}
+
+                            {!user.fee_paid ? (
+                                <div className="mt-3 space-y-3 pt-3 border-t border-outline-variant/60">
+                                    <p className="text-xs text-on-surface-variant leading-relaxed">
+                                        Für die Nutzung der Bibliothek ist eine einmalige Registrierung / Jahresbeitrag von <strong>10 Euro</strong> erforderlich.
+                                    </p>
+                                    <button
+                                        onClick={() => setIsPaymentModalOpen(true)}
+                                        className="w-full py-3 px-4 rounded-xl bg-primary text-on-primary font-bold text-sm hover:bg-primary/90 transition-all shadow-md flex items-center justify-center gap-2"
+                                    >
+                                        <span className="material-symbols-outlined text-lg">payments</span>
+                                        <span>Bezahlen / 10 € Beitrag entrichten</span>
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className="text-xs text-green-700 dark:text-green-400 mt-1 font-medium">
+                                    Vielen Dank! Ihr Bibliothekskonto ist aktiviert und Sie können Bücher ausleihen.
+                                </p>
+                            )}
                         </div>
-                        <div className="bg-surface p-4 rounded-lg border border-outline-variant flex-1 min-w-[200px]">
-                            <p className="text-body-sm text-on-surface-variant uppercase font-bold mb-1">Account</p>
+
+                        <div className="bg-surface p-5 rounded-xl border border-outline-variant flex-1 min-w-[240px]">
+                            <p className="text-body-sm text-on-surface-variant uppercase font-bold mb-1">Account-Status</p>
                             <div className="flex items-center gap-2">
                                 <span className={`material-symbols-outlined ${user.is_blocked ? 'text-red-600' : 'text-green-600'}`}>
                                     {user.is_blocked ? 'block' : 'check_circle'}
                                 </span>
-                                <span className="font-title-md">{user.is_blocked ? t('profile.account_blocked') : t('profile.account_active')}</span>
+                                <span className="font-title-md font-bold">{user.is_blocked ? t('profile.account_blocked') : t('profile.account_active')}</span>
                             </div>
                             {user.is_blocked === 1 && <p className="text-body-sm text-red-600 mt-2">{t('admin.users.errors.blocked')}</p>}
                         </div>
                     </div>
                 </div>
             </div>
+
+            <PaymentModal
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                onPaymentSuccess={handlePaymentSuccess}
+            />
 
             {/* Notifications Section */}
             <div className="bg-surface-container-low p-6 rounded-lg border border-outline-variant shadow-sm">

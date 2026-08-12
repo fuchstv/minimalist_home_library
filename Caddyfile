@@ -1,11 +1,47 @@
 # Caddyfile - Central Reverse Proxy & Automatic TLS Configuration
+{
+    email admin@sprachcafe-polnisch.org
+}
+
+# ==============================================================================
+# 1. Haupt-Website (Production): sprachcafe-polnisch.org & www.sprachcafe-polnisch.org & xn--sprachcaf-j4a.org (sprachcafé.org)
+# -> Statische Dateien aus /var/www/production
+# ==============================================================================
+sprachcafe-polnisch.org, www.sprachcafe-polnisch.org, xn--sprachcaf-j4a.org, www.xn--sprachcaf-j4a.org {
+    root * /var/www/production
+    encode zstd gzip
+
+    # 301 Redirects & Mappings
+    redir /erfolgreicher-relaunch/ /posts/erfolgreicher-relaunch-webportal 301
+    redir /erfolgreicher-relaunch /posts/erfolgreicher-relaunch-webportal 301
+    redir /neue-buchbestaende-koepenick/ /posts/neue-buchbestaende-koepenick 301
+    redir /neue-buchbestaende-koepenick /posts/neue-buchbestaende-koepenick 301
+    redir /ueber-uns/ /de/ 301
+    redir /ueber-uns /de/ 301
+    redir /veranstaltungen/ /events/ 301
+    redir /veranstaltungen /events/ 301
+    redir /bibliothek/ /hausbibliothek/ 301
+    redir /bibliothek /hausbibliothek/ 301
+
+    handle {
+        file_server
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# ==============================================================================
+# 2. Beta / Staging Environment: beta.sprachcafe-polnisch.org
+# -> Staging / Beta Statische Dateien aus /var/www/beta
+# ==============================================================================
 beta.sprachcafe-polnisch.org, http://3.66.205.213 {
     root * /var/www/beta
     encode zstd gzip
-
-    handle /api/* {
-        reverse_proxy cms_api:3001
-    }
 
     handle {
         file_server
@@ -19,45 +55,8 @@ beta.sprachcafe-polnisch.org, http://3.66.205.213 {
 }
 
 # ==============================================================================
-# CMS / Admin Interface: admin.sprachcafe-polnisch.org
-# -> Forced HTTPS, Token Auth Passthrough & Optional IP-Whitelist Directive
+# 3. Hausbibliothek (Proxy): hausbibliothek.org
 # ==============================================================================
-admin.sprachcafe-polnisch.org {
-    encode zstd gzip
-
-    # --------------------------------------------------------------------------
-    # OPTIONALE IP-WHITELIST DIREKTIVE (Auskommentierte Option für den produktiven Einsatz)
-    # Schränkt den CMS-Adminzugriff auf autorisierte IPs/Vereinsbüro/VPN ein.
-    # Zum Aktivieren der IP-Sperre einfach die nachfolgenden Zeilen einkommentieren:
-    # --------------------------------------------------------------------------
-    # @admin_whitelist {
-    # 	not client_ip 192.168.1.0/24 203.0.113.50 127.0.0.1
-    # }
-    # respond @admin_whitelist "403 Forbidden - CMS Admin Access Restricted by IP Whitelist" 403
-
-    # --------------------------------------------------------------------------
-    # Token-Authentifizierung-Passthrough & Dynamic Header Forwarding zum CMS Backend
-    # Transparente Weiterleitung aller Authorization-Header (Bearer Tokens & JWTs)
-    # --------------------------------------------------------------------------
-    reverse_proxy cms_api:3001 127.0.0.1:3000 {
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-Host {host}
-        # Token Auth Passthrough (Authorization Header with Bearer Token)
-        header_up Authorization {http.request.header.Authorization}
-    }
-
-    # Forced HTTPS Security Headers (HSTS Preload, No-Sniff, Frame Deny)
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        Referrer-Policy "strict-origin-when-cross-origin"
-    }
-}
-
 hausbibliothek.org, www.hausbibliothek.org {
     root * /usr/share/caddy
     encode zstd gzip

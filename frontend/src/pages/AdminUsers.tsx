@@ -301,6 +301,30 @@ const AdminUsers: React.FC = () => {
                                 </p>
                             </div>
                             <div className="flex flex-wrap gap-2.5">
+                                {selectedUser.fee_paid === 0 && (
+                                    <button 
+                                        onClick={async () => {
+                                            try {
+                                                await axios.put(`${API_BASE_URL}/api/admin/users/${selectedUser.id}`, {
+                                                    ...selectedUser,
+                                                    fee_paid: 1
+                                                }, { withCredentials: true });
+                                                setMessage('Mitgliedsgebühr (10 €) erfolgreich verbucht & Konto aktiviert!');
+                                                fetchUsers();
+                                                setSelectedUser(prev => prev ? { ...prev, fee_paid: 1 } : null);
+                                                setTimeout(() => setMessage(''), 3000);
+                                            } catch (err) {
+                                                logger.error('Error confirming fee:', err);
+                                                setErrorMsg('Fehler beim Bestätigen der Mitgliedsgebühr.');
+                                            }
+                                        }}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                                        title="Mitgliedsgebühr verbuchen & Status auf Bezahlt setzen"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">payments</span>
+                                        10 € Gebühr verbuchen
+                                    </button>
+                                )}
                                 <button 
                                     onClick={handleResetPassword}
                                     className="border border-amber-500/50 hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 py-2 px-4 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer"
