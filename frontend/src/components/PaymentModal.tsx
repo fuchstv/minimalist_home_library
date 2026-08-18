@@ -56,8 +56,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onP
     };
 
     const handlePayPalRedirect = () => {
-        // Official SprachCafé PayPal Donation URL (Hosted Button ID: B66STKJGQQUK8)
-        window.open('https://www.paypal.com/donate/?hosted_button_id=B66STKJGQQUK8', '_blank');
+        // Official SprachCafé PayPal.Me Direct Payment (10 EUR prefilled)
+        window.open('https://paypal.me/sprachcafepolnisch/10', '_blank');
     };
 
     return (
@@ -167,16 +167,33 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onP
                     </div>
 
                     {paymentMethod === 'paypal' && (
-                        <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-between gap-3 text-xs text-blue-900 dark:text-blue-200">
-                            <span>Direkter SprachCafé PayPal-Spendenlink für 10 Euro:</span>
-                            <button
-                                type="button"
-                                onClick={handlePayPalRedirect}
-                                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center gap-1 shrink-0"
-                            >
-                                <span>PayPal öffnen</span>
-                                <span className="material-symbols-outlined text-sm">open_in_new</span>
-                            </button>
+                        <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl space-y-3 text-xs text-blue-900 dark:text-blue-200">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="font-bold">Direkte PayPal.Me Zahlung (10 € vorausgewählt):</p>
+                                    <p className="text-[11px] opacity-80">Empfänger: SprachCafé Polnisch e.V.</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handlePayPalRedirect}
+                                    className="px-3.5 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center gap-1 shrink-0 shadow-sm"
+                                >
+                                    <span>PayPal.Me öffnen</span>
+                                    <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                </button>
+                            </div>
+                            <div className="pt-2 border-t border-blue-500/20 flex items-center justify-between text-[11px]">
+                                <span>Alternativ offizielles Spendenformular:</span>
+                                <a
+                                    href="https://www.paypal.com/donate/?hosted_button_id=B66STKJGQQUK8"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-700 dark:text-blue-300 font-bold hover:underline inline-flex items-center gap-1"
+                                >
+                                    <span>Spendenkonto öffnen</span>
+                                    <span className="material-symbols-outlined text-xs">open_in_new</span>
+                                </a>
+                            </div>
                         </div>
                     )}
 

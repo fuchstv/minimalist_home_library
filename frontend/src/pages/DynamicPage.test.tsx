@@ -117,7 +117,7 @@ describe('DynamicPage Component inline editing', () => {
         fireEvent.change(screen.getByLabelText('Titel (DE)'), { target: { value: 'New Rules Title' } });
         fireEvent.change(screen.getByLabelText('Inhalt (DE)'), { target: { value: 'New content for German' } });
 
-        fireEvent.click(screen.getByText('Speichern'));
+        fireEvent.click(screen.getByText(/speichern/i));
 
         await waitFor(() => {
             expect(axios.post).toHaveBeenCalledWith(
