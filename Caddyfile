@@ -16,6 +16,8 @@ sprachcafe-polnisch.org, www.sprachcafe-polnisch.org, xn--sprachcaf-j4a.org, www
     redir /erfolgreicher-relaunch /posts/erfolgreicher-relaunch-webportal 301
     redir /neue-buchbestaende-koepenick/ /posts/neue-buchbestaende-koepenick 301
     redir /neue-buchbestaende-koepenick /posts/neue-buchbestaende-koepenick 301
+    redir /de/ / 301
+    redir /de / 301
     redir /veranstaltungen/ /events/ 301
     redir /veranstaltungen /events/ 301
     redir /bibliothek/ /hausbibliothek/ 301
