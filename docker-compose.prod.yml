@@ -79,7 +79,7 @@ services:
 
   caddy:
     image: caddy:2-alpine
-    container_name: library_proxy
+    container_name: caddy
     restart: always
     ports:
       - "80:80"

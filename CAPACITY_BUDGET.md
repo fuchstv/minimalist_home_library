@@ -40,7 +40,7 @@ Es wurde ein automatisierter Cron-Monitoring-Dienst eingerichtet, der kontinuier
 | **MySQL 8.0 (`library_db`)** | ~0.6% | ~2.5% | ~360 MB | ~380 MB |
 | **PHP 8.4 Backend (`library_backend`)** | ~0.0% | ~8.0% | ~15 MB | ~35 MB |
 | **phpMyAdmin (`library_admin`, Port 8080)** | ~0.0% | ~51.4% (Last) | ~18 MB | ~54 MB |
-| **Caddy Proxy (`library_proxy`)** | ~0.0% | ~8.8% | ~11 MB | ~18 MB |
+| **Caddy Proxy (`caddy`)** | ~0.0% | ~8.8% | ~11 MB | ~18 MB |
 | **Host OS & Docker Engine** | ~1-3% | ~10-15% | ~450 MB | ~480 MB |
 | **Gesamtsystem** | **~2% CPU** | **~65% CPU** | **~854 MB RAM** | **~1020 MB RAM** |
 
@@ -73,7 +73,7 @@ Auf Basis eines Gesamtspeichers von **1906 MB** und **2.0 vCPUs** ergibt sich fo
 | **`library_db`** | MySQL 8.0 Datenbanksystem | **512 MB** | 256 MB | **0.60 vCPU** |
 | **`library_backend`** | PHP 8.4 REST API | **128 MB** | 32 MB | **0.30 vCPU** |
 | **`library_admin`** | phpMyAdmin (Port 8080) | **96 MB** | 32 MB | **0.20 vCPU** |
-| **`library_proxy`** | Caddy Reverse Proxy | **64 MB** | 16 MB | **0.15 vCPU** |
+| **`caddy`** | Caddy Reverse Proxy | **64 MB** | 16 MB | **0.15 vCPU** |
 | **`headless_cms`** | Headless CMS (Directus/Strapi) | **350 MB** | 192 MB | **0.45 vCPU** |
 | **`cms_postgres`** | PostgreSQL 16 (für CMS) | **224 MB** | 128 MB | **0.35 vCPU** |
 | **SUMME ALLER LIMITS** | | **1438 MB** | **656 MB** | **2.05 vCPU (shared)** |
