@@ -56,8 +56,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onP
     };
 
     const handlePayPalRedirect = () => {
-        // Official SprachCafé PayPal Donation URL or custom checkout link
-        window.open('https://www.paypal.com/donate/?hosted_button_id=SPRACHCAFE_LIBRARY', '_blank');
+        // Official SprachCafé PayPal Donation URL (Hosted Button ID: B66STKJGQQUK8)
+        window.open('https://www.paypal.com/donate/?hosted_button_id=B66STKJGQQUK8', '_blank');
     };
 
     return (
