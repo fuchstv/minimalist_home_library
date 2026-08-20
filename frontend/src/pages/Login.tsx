@@ -14,6 +14,12 @@ const Login: React.FC = () => {
     const [error, setError] = useState('');
     const [showHelpModal, setShowHelpModal] = useState(false);
 
+    // Password Reset States
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetSending, setResetSending] = useState(false);
+    const [resetMessage, setResetMessage] = useState('');
+    const [resetError, setResetError] = useState('');
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -37,6 +43,31 @@ const Login: React.FC = () => {
             }
         } catch {
             setError('Netzwerkfehler');
+        }
+    };
+
+    const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setResetSending(true);
+        setResetMessage('');
+        setResetError('');
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: resetEmail })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setResetMessage(t('auth.forgot_password_sent_success'));
+            } else {
+                setResetError(data.message || 'Fehler beim Anfordern des Links');
+            }
+        } catch {
+            setResetError('Netzwerkfehler');
+        } finally {
+            setResetSending(false);
         }
     };
 
@@ -72,7 +103,12 @@ const Login: React.FC = () => {
                         <div className="mt-1.5 flex justify-end">
                             <button
                                 type="button"
-                                onClick={() => setShowHelpModal(true)}
+                                onClick={() => {
+                                    setResetEmail(email || '');
+                                    setResetMessage('');
+                                    setResetError('');
+                                    setShowHelpModal(true);
+                                }}
                                 className="text-xs font-label-sm text-primary hover:underline transition-colors flex items-center gap-1 cursor-pointer"
                             >
                                 <span className="material-symbols-outlined text-[14px]">help_outline</span>
@@ -80,7 +116,7 @@ const Login: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                    <button type="submit" className="w-full bg-primary text-on-primary font-label-lg text-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors mt-2">
+                    <button type="submit" className="w-full bg-primary text-on-primary font-label-lg text-label-lg py-3 rounded-full hover:bg-primary/90 transition-colors mt-2 cursor-pointer">
                         {t('auth.submit_login')}
                     </button>
                 </form>
@@ -96,20 +132,69 @@ const Login: React.FC = () => {
                     <div className="bg-surface-container-low dark:bg-zinc-800 p-6 rounded-xl border border-outline-variant max-w-md w-full shadow-2xl flex flex-col gap-4">
                         <div className="flex items-center gap-2.5 text-primary font-headline-sm">
                             <span className="material-symbols-outlined text-[28px]">lock_reset</span>
-                            <h3 className="text-title-lg font-bold text-on-surface">{t('auth.forgot_password_help_title')}</h3>
+                            <h3 className="text-title-lg font-bold text-on-surface">{t('auth.forgot_password_modal_title')}</h3>
                         </div>
-                        <p className="text-body-md text-on-surface-variant leading-relaxed">
-                            {t('auth.forgot_password_help_text')}
-                        </p>
-                        <div className="flex justify-end mt-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowHelpModal(false)}
-                                className="bg-primary text-on-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
-                            >
-                                OK
-                            </button>
-                        </div>
+
+                        {resetMessage ? (
+                            <div className="flex flex-col gap-4">
+                                <div className="p-3 bg-secondary-container text-on-secondary-container rounded-md text-body-sm border border-secondary/20">
+                                    {resetMessage}
+                                </div>
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowHelpModal(false)}
+                                        className="bg-primary text-on-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
+                                    >
+                                        Schließen
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <form onSubmit={handleForgotPasswordSubmit} className="flex flex-col gap-4">
+                                <p className="text-body-sm text-on-surface-variant leading-relaxed">
+                                    {t('auth.forgot_password_modal_desc')}
+                                </p>
+
+                                {resetError && (
+                                    <div className="p-2.5 bg-error-container text-on-error-container rounded text-body-sm">
+                                        {resetError}
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label htmlFor="reset_email" className="font-label-sm block mb-1 text-on-surface-variant">
+                                        {t('auth.email')}
+                                    </label>
+                                    <input
+                                        id="reset_email"
+                                        type="email"
+                                        required
+                                        value={resetEmail}
+                                        onChange={e => setResetEmail(e.target.value)}
+                                        placeholder="ihre-email@example.com"
+                                        className="w-full border border-outline-variant rounded p-2.5 font-body-sm bg-surface focus:outline-primary"
+                                    />
+                                </div>
+
+                                <div className="flex justify-end gap-2.5 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowHelpModal(false)}
+                                        className="px-4 py-2 border border-outline-variant rounded-full text-on-surface-variant text-body-sm hover:bg-surface-container-high cursor-pointer"
+                                    >
+                                        Abbrechen
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={resetSending}
+                                        className="bg-primary text-on-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-50 cursor-pointer"
+                                    >
+                                        {resetSending ? t('auth.forgot_password_sending') : t('auth.forgot_password_send_btn')}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}

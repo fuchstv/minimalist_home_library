@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import AnnouncementBanner from './components/AnnouncementBanner';
 import TopNavBar from './components/TopNavBar';
 import ForcePasswordChangeModal from './components/ForcePasswordChangeModal';
 import Katalog from './pages/Katalog';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import DynamicPage from './pages/DynamicPage';
 import Admin from './pages/Admin';
 import Profil from './pages/Profil';
@@ -23,11 +24,14 @@ function App() {
             <Route path="/" element={<Katalog />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/page/:slug" element={<DynamicPage />} />
-            {/* Legacy route for regeln */}
+            {/* Direct legal & policy alias routes */}
             <Route path="/regeln" element={<DynamicPage />} />
+            <Route path="/impressum" element={<DynamicPage />} />
+            <Route path="/datenschutz" element={<DynamicPage />} />
             <Route path="/profil" element={<Profil />} />
-            <Route path="/ausleihen" element={<Profil />} />
+            <Route path="/ausleihen" element={<Navigate to="/profil" replace />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>

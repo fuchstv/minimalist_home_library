@@ -41,14 +41,31 @@ describe('Login Component', () => {
         expect(screen.getByText(/Passwort vergessen\?/i)).toBeInTheDocument();
     });
 
-    it('opens forgot password help modal when clicking help link', async () => {
+    it('opens forgot password modal when clicking help link and can request reset', async () => {
+        (fetch as any).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ message: 'Link sent' })
+        });
+
         renderLogin();
         const helpBtn = screen.getByText(/Passwort vergessen\?/i);
         fireEvent.click(helpBtn);
 
         await waitFor(() => {
             expect(screen.getByText(/Passwort zurücksetzen/i)).toBeInTheDocument();
-            expect(screen.getByText(/Ein Administrator kann ein neues temporäres Passwort/i)).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Link anfordern/i })).toBeInTheDocument();
+        });
+
+        const resetEmailInput = screen.getByPlaceholderText(/ihre-email@example.com/i);
+        fireEvent.change(resetEmailInput, { target: { value: 'user@example.com' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Link anfordern/i }));
+
+        await waitFor(() => {
+            expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/api/auth/forgot-password'), expect.objectContaining({
+                method: 'POST',
+                body: JSON.stringify({ email: 'user@example.com' })
+            }));
         });
     });
 

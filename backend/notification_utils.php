@@ -1,5 +1,6 @@
 <?php
 // backend/notification_utils.php
+require_once 'mail_utils.php';
 
 function createNotification($pdo, $user_id, $message) {
     $stmt = $pdo->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
@@ -18,7 +19,7 @@ function notifyBookAvailable($pdo, $book_id) {
 
     // 2. Notify users who reserved the book
     $stmt = $pdo->prepare("
-        SELECT r.user_id, u.name
+        SELECT r.user_id, u.name, u.email
         FROM reservations r
         JOIN users u ON r.user_id = u.id
         WHERE r.book_id = ? AND r.status = 'pending'
@@ -37,6 +38,15 @@ function notifyBookAvailable($pdo, $book_id) {
             $values[] = $res['user_id'];
             $values[] = $msg;
             $userIds[] = $res['user_id'];
+
+            // Send rich HTML email via Power Automate
+            if (!empty($res['email'])) {
+                try {
+                    sendBookAvailableEmail($pdo, $res['email'], $res['name'], $bookTitle, $signature);
+                } catch (\Exception $e) {
+                    error_log("[Notifications] Failed to send book available email: " . $e->getMessage());
+                }
+            }
         }
 
         // Batch insert notifications

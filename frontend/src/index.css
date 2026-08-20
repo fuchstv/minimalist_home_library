@@ -86,3 +86,49 @@ textarea:disabled,
 [role="button"][aria-disabled="true"] {
     cursor: not-allowed;
 }
+
+/* Rich Text & Markdown Page Content */
+.dynamic-page-content h1 {
+  @apply font-serif text-2xl sm:text-3xl font-bold text-primary dark:text-primary-fixed-dim mt-8 mb-4 border-b border-outline-variant/30 pb-2;
+}
+.dynamic-page-content h2 {
+  @apply font-serif text-xl sm:text-2xl font-bold text-primary dark:text-primary-fixed-dim mt-7 mb-3 border-b border-outline-variant/20 pb-1.5;
+}
+.dynamic-page-content h3 {
+  @apply font-serif text-lg sm:text-xl font-bold text-primary dark:text-primary-fixed-dim mt-6 mb-2.5;
+}
+.dynamic-page-content h4 {
+  @apply font-serif text-base sm:text-lg font-bold text-on-surface mt-5 mb-2;
+}
+.dynamic-page-content p {
+  @apply text-base text-on-surface-variant leading-relaxed mb-4;
+}
+.dynamic-page-content strong,
+.dynamic-page-content b {
+  @apply font-bold text-on-surface;
+}
+.dynamic-page-content ul {
+  @apply list-disc list-outside pl-5 space-y-1.5 mb-4 text-on-surface-variant;
+}
+.dynamic-page-content ol {
+  @apply list-decimal list-outside pl-5 space-y-1.5 mb-4 text-on-surface-variant;
+}
+.dynamic-page-content li {
+  @apply leading-relaxed;
+}
+.dynamic-page-content a {
+  @apply text-primary dark:text-primary-fixed-dim underline font-medium hover:text-primary/80 transition-colors;
+}
+.dynamic-page-content blockquote {
+  @apply border-l-4 border-primary/30 pl-4 italic text-on-surface-variant my-4;
+}
+.dynamic-page-content code {
+  @apply bg-surface-container px-1.5 py-0.5 rounded text-sm font-mono text-on-surface;
+}
+.dynamic-page-content pre {
+  @apply bg-surface-container p-4 rounded-lg overflow-x-auto text-sm font-mono text-on-surface my-4;
+}
+.dynamic-page-content hr {
+  @apply border-outline-variant/30 my-6;
+}
+

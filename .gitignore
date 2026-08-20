@@ -15,3 +15,9 @@ caddy_config/
 .idea/
 .vscode/
 *.log
+logs/
+*.jsonl
+
+# Dynamic Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep

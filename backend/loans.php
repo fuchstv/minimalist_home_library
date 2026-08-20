@@ -3,6 +3,7 @@
 
 require_once 'db.php';
 require_once 'notification_utils.php';
+require_once 'mail_utils.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -71,7 +72,7 @@ if ($method == 'GET') {
             }
 
             // Check if available
-            $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ? FOR UPDATE");
+            $stmt = $pdo->prepare("SELECT availability_status, title, signature FROM books WHERE id = ? FOR UPDATE");
             $stmt->execute([$book_id]);
             $book = $stmt->fetch();
 
@@ -79,9 +80,9 @@ if ($method == 'GET') {
                 throw new Exception("Book is not available for borrowing.");
             }
 
-            // Create loan (2 weeks default)
+            // Create loan (4 weeks standard)
             $loan_date = date('Y-m-d');
-            $due_date = date('Y-m-d', strtotime('+2 weeks'));
+            $due_date = date('Y-m-d', strtotime('+4 weeks'));
 
             $stmt = $pdo->prepare("INSERT INTO loans (book_id, user_id, loan_date, due_date) VALUES (?, ?, ?, ?)");
             $stmt->execute([$book_id, $user_id, $loan_date, $due_date]);
@@ -91,6 +92,19 @@ if ($method == 'GET') {
             $stmt->execute([$book_id]);
 
             $pdo->commit();
+
+            // Send loan confirmation email to member
+            try {
+                $stmt = $pdo->prepare("SELECT name, email FROM users WHERE id = ?");
+                $stmt->execute([$user_id]);
+                $borrower = $stmt->fetch();
+                if ($borrower && !empty($borrower['email'])) {
+                    sendLoanConfirmationEmail($pdo, $borrower['email'], $borrower['name'], $book['title'] ?? 'Buch', $book['signature'] ?? '', $due_date);
+                }
+            } catch (\Exception $mailEx) {
+                error_log("[Loans] Failed to send loan confirmation email: " . $mailEx->getMessage());
+            }
+
             echo json_encode(["message" => "Book successfully borrowed.", "due_date" => $due_date]);
 
         } catch (\PDOException $e) {

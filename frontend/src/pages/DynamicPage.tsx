@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { marked } from 'marked';
 import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
 import { AuthContext } from '../context/AuthContext';
@@ -17,7 +18,9 @@ interface PageData {
 }
 
 const DynamicPage: React.FC = () => {
-    const { slug } = useParams<{ slug: string }>();
+    const { slug: routeSlug } = useParams<{ slug: string }>();
+    const pathname = window.location.pathname.replace(/^\//, '').replace(/^page\//, '').split('/')[0];
+    const slug = routeSlug || pathname || 'regeln';
     const { i18n } = useTranslation();
     const { user } = useContext(AuthContext);
 
@@ -111,6 +114,21 @@ const DynamicPage: React.FC = () => {
         setMessage('');
     };
 
+    const currentLang = i18n.language ? i18n.language.split('-')[0] : 'de';
+    const title = currentLang === 'pl' ? (page?.title_pl || '') : (page?.title_de || '');
+    const content = currentLang === 'pl' ? (page?.content_pl || '') : (page?.content_de || '');
+    const isCmsManaged = Boolean(page?.source);
+
+    const htmlContent = useMemo(() => {
+        if (!content) return '';
+        try {
+            return marked.parse(content, { breaks: true, gfm: true }) as string;
+        } catch (e) {
+            logger.error('Error parsing markdown:', e);
+            return content;
+        }
+    }, [content]);
+
     if (loading) {
         return (
             <div className="flex-grow flex items-center justify-center">
@@ -129,11 +147,6 @@ const DynamicPage: React.FC = () => {
             </div>
         );
     }
-
-    const currentLang = i18n.language.split('-')[0]; // 'de' or 'pl'
-    const title = currentLang === 'pl' ? page.title_pl : page.title_de;
-    const content = currentLang === 'pl' ? page.content_pl : page.content_de;
-    const isCmsManaged = Boolean(page.source);
 
     if (isEditing) {
         return (
@@ -256,9 +269,10 @@ const DynamicPage: React.FC = () => {
                     )}
                 </div>
 
-                <div className="prose prose-sm md:prose-base text-on-surface-variant font-body-md whitespace-pre-wrap">
-                    {content}
-                </div>
+                <div
+                    className="dynamic-page-content leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                />
             </div>
         </div>
     );

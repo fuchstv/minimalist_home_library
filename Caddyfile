@@ -23,6 +23,21 @@ sprachcafe-polnisch.org, www.sprachcafe-polnisch.org, xn--sprachcaf-j4a.org, www
     redir /bibliothek/ /hausbibliothek/ 301
     redir /bibliothek /hausbibliothek/ 301
 
+    # Mailchimp Webhook Endpoint (GET Handshake & POST Events)
+    handle /api/webhooks/mailchimp* {
+        header Content-Type "application/json; charset=utf-8"
+        respond "{\"status\":\"ok\",\"service\":\"Mailchimp Webhook SprachCafe\",\"message\":\"Handshake verified\"}" 200
+    }
+    handle /api/mailchimp-webhook* {
+        header Content-Type "application/json; charset=utf-8"
+        respond "{\"status\":\"ok\",\"service\":\"Mailchimp Webhook SprachCafe\",\"message\":\"Handshake verified\"}" 200
+    }
+
+    # Basic Auth Protection for /reports/*
+    basic_auth /reports/* {
+        philipp $2a$14$DIRdKlU/PFEaHNqQb3FoS.9nR2sPHunOLWfctslP0O030QXWzeeiC
+    }
+
     handle {
         file_server
     }
@@ -42,6 +57,11 @@ sprachcafe-polnisch.org, www.sprachcafe-polnisch.org, xn--sprachcaf-j4a.org, www
 beta.sprachcafe-polnisch.org, http://3.66.205.213 {
     root * /var/www/beta
     encode zstd gzip
+
+    # Basic Auth Protection for /reports/*
+    basic_auth /reports/* {
+        philipp $2a$14$DIRdKlU/PFEaHNqQb3FoS.9nR2sPHunOLWfctslP0O030QXWzeeiC
+    }
 
     handle {
         file_server
@@ -74,3 +94,19 @@ hausbibliothek.org, www.hausbibliothek.org {
         file_server
     }
 }
+
+# ==============================================================================
+# 4. Intranet (Vanity URL / Redirection): intranet.sprachcafé.org
+# -> Weiterleitung auf das Microsoft 365 SharePoint Intranet Hub
+# ==============================================================================
+intranet.xn--sprachcaf-j4a.org {
+    encode zstd gzip
+    redir https://sprachcafepolnisch.sharepoint.com/sites/intranet{uri} 302
+}
+
+intranet.sprachcafe-polnisch.org {
+    encode zstd gzip
+    redir https://sprachcafepolnisch.sharepoint.com/sites/intranet{uri} 302
+}
+
+

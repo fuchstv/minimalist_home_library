@@ -47,6 +47,8 @@ const AdminUsers: React.FC = () => {
     const [userLoans, setUserLoans] = useState<Loan[]>([]);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [tempPasswordModal, setTempPasswordModal] = useState<{ show: boolean; password: string; copied: boolean }>({ show: false, password: '', copied: false });
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     
     // Lending state
     const [bookSearch, setBookSearch] = useState('');
@@ -204,6 +206,27 @@ const AdminUsers: React.FC = () => {
         }
     };
 
+    const handleDeleteUser = async () => {
+        if (!selectedUser) return;
+        setDeleteLoading(true);
+        try {
+            const res = await axios.delete(`${API_BASE_URL}/api/admin/users/${selectedUser.id}`, { withCredentials: true });
+            setMessage(res.data.message || t('admin.users.delete_success'));
+            setShowDeleteModal(false);
+            setSelectedUser(null);
+            setEditingUser(null);
+            fetchUsers();
+            setTimeout(() => setMessage(''), 4000);
+        } catch (error: any) {
+            logger.error('Error deleting user:', error);
+            setErrorMsg(error.response?.data?.message || t('admin.users.delete_error'));
+            setShowDeleteModal(false);
+            setTimeout(() => setErrorMsg(''), 5000);
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
     // Filter users
     const filteredUsers = users.filter(user => 
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -339,6 +362,14 @@ const AdminUsers: React.FC = () => {
                                 >
                                     <span className="material-symbols-outlined text-[18px]">edit</span>
                                     {t('admin.users.edit_btn')}
+                                </button>
+                                <button 
+                                    onClick={() => setShowDeleteModal(true)}
+                                    className="border border-red-500/50 hover:bg-red-500/10 text-red-700 dark:text-red-400 py-2 px-4 rounded-full font-label-md transition-colors flex items-center gap-1.5 cursor-pointer"
+                                    title={t('admin.users.delete_btn')}
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">person_remove</span>
+                                    {t('admin.users.delete_btn')}
                                 </button>
                             </div>
                         </div>
@@ -636,6 +667,55 @@ const AdminUsers: React.FC = () => {
                                 className="bg-primary text-on-primary font-label-md px-6 py-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
                             >
                                 OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteModal && selectedUser && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <div className="bg-surface-container-low dark:bg-zinc-800 p-6 rounded-xl border border-outline-variant max-w-md w-full shadow-2xl flex flex-col gap-4">
+                        <div className="flex items-center gap-2.5 text-error font-headline-sm">
+                            <span className="material-symbols-outlined text-[28px]">person_remove</span>
+                            <h3 className="text-title-lg font-bold text-on-surface">{t('admin.users.delete_confirm_title')}</h3>
+                        </div>
+
+                        <p className="text-body-md text-on-surface-variant leading-relaxed">
+                            {t('admin.users.delete_confirm_msg', { name: selectedUser.name, email: selectedUser.email })}
+                        </p>
+
+                        {userLoans.filter(l => l.status !== 'returned').length > 0 ? (
+                            <div className="p-3.5 bg-error-container text-on-error-container rounded-lg text-body-sm flex items-start gap-2 border border-error/30">
+                                <span className="material-symbols-outlined text-[20px] shrink-0">warning</span>
+                                <div>
+                                    <p className="font-bold mb-1">Achtung: Aktive Ausleihen</p>
+                                    <p>{t('admin.users.delete_active_loans_warning', { count: userLoans.filter(l => l.status !== 'returned').length })}</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="p-3 bg-secondary-container/50 text-on-secondary-container rounded-lg text-body-sm border border-secondary/20 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[18px]">verified_user</span>
+                                <p>{t('admin.users.delete_confirm_dsgVO') || t('admin.users.delete_confirm_dsgvo')}</p>
+                            </div>
+                        )}
+
+                        <div className="flex justify-end gap-2.5 mt-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowDeleteModal(false)}
+                                className="px-5 py-2 border border-outline-variant rounded-full text-on-surface-variant text-body-sm hover:bg-surface-container-high cursor-pointer"
+                            >
+                                {t('admin.users.cancel_btn')}
+                            </button>
+                            <button
+                                type="button"
+                                disabled={deleteLoading || userLoans.filter(l => l.status !== 'returned').length > 0}
+                                onClick={handleDeleteUser}
+                                className="bg-error text-on-error font-label-md px-6 py-2 rounded-full hover:bg-error/90 transition-colors disabled:opacity-50 cursor-pointer shadow-sm flex items-center gap-1.5"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">delete_forever</span>
+                                {deleteLoading ? 'Wird gelöscht...' : t('admin.users.delete_confirm_btn')}
                             </button>
                         </div>
                     </div>

@@ -44,8 +44,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // Verify CSRF token for state-changing requests
 if (in_array($method, ['POST', 'PUT', 'DELETE'])) {
-    // Exempt login and register as they set up the session/don't have a token yet
-    $isExempt = (strpos($request_uri, '/auth/login') !== false) || (strpos($request_uri, '/auth/register') !== false);
+    // Exempt public auth endpoints as they don't have a pre-existing authenticated session/token yet
+    $isExempt = (strpos($request_uri, '/auth/login') !== false) ||
+                (strpos($request_uri, '/auth/register') !== false) ||
+                (strpos($request_uri, '/auth/forgot-password') !== false) ||
+                (strpos($request_uri, '/auth/reset-password') !== false);
 
     if (!$isExempt) {
         $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;

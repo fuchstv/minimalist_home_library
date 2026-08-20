@@ -303,19 +303,36 @@ if (isset($parts[1]) && $parts[1] === 'users') {
             } elseif ($method === 'DELETE') {
                 // DSGVO Art. 17 User Deletion with Loan History Anonymization
                 try {
+                    // Prevent deleting own account
+                    if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $user_id) {
+                        http_response_code(400);
+                        echo json_encode(["message" => "Administratoren können ihr eigenes Konto nicht löschen."]);
+                        return;
+                    }
+
+                    // Check if user exists
+                    $stmtUser = $pdo->prepare("SELECT id, email FROM users WHERE id = ?");
+                    $stmtUser->execute([$user_id]);
+                    $targetUser = $stmtUser->fetch();
+                    if (!$targetUser) {
+                        http_response_code(404);
+                        echo json_encode(["message" => "User not found."]);
+                        return;
+                    }
+
                     // Check for active loans
                     $stmtActive = $pdo->prepare("SELECT COUNT(*) FROM loans WHERE user_id = ? AND status != 'returned'");
                     $stmtActive->execute([$user_id]);
                     if ($stmtActive->fetchColumn() > 0) {
                         http_response_code(400);
-                        echo json_encode(["message" => "Cannot delete user with active loans. All items must be returned first."]);
+                        echo json_encode(["message" => "Nutzer kann nicht gelöscht werden, da noch aktive Ausleihen vorliegen. Alle Medien müssen zuerst zurückgegeben werden."]);
                         return;
                     }
 
                     $pdo->beginTransaction();
-                    // Anonymize historical loan records
+                    // Anonymize historical loan records (DSGVO compliant)
                     $stmtAnon = $pdo->prepare("UPDATE loans SET user_id = NULL WHERE user_id = ?");
-                    $stmtAnon.execute([$user_id]);
+                    $stmtAnon->execute([$user_id]);
 
                     // Delete notifications and reservations
                     $stmtRes = $pdo->prepare("DELETE FROM reservations WHERE user_id = ?");
@@ -324,12 +341,18 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                     $stmtNotif = $pdo->prepare("DELETE FROM notifications WHERE user_id = ?");
                     $stmtNotif->execute([$user_id]);
 
+                    // Clean up password resets
+                    if (!empty($targetUser['email'])) {
+                        $stmtReset = $pdo->prepare("DELETE FROM password_resets WHERE email = ?");
+                        $stmtReset->execute([$targetUser['email']]);
+                    }
+
                     // Delete user record
                     $stmtDel = $pdo->prepare("DELETE FROM users WHERE id = ?");
                     $stmtDel->execute([$user_id]);
 
                     $pdo->commit();
-                    echo json_encode(["message" => "User account deleted and loan history anonymized successfully according to DSGVO Art. 17."]);
+                    echo json_encode(["message" => "Benutzerkonto erfolgreich gelöscht und Ausleihhistorie DSGVO-konform anonymisiert."]);
                 } catch (\PDOException $e) {
                     if ($pdo->inTransaction()) {
                         $pdo->rollBack();

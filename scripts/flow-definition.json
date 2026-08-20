@@ -1,0 +1,87 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "from": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "bodyHtml": {
+                "type": "string"
+              },
+              "template": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "to",
+              "subject",
+              "bodyHtml"
+            ]
+          }
+        }
+      }
+    },
+    "actions": {
+      "Send_an_email_(V2)": {
+        "type": "OpenApiConnection",
+        "inputs": {
+          "host": {
+            "connectionName": "shared_office365",
+            "operationId": "SendEmailV2",
+            "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+          },
+          "parameters": {
+            "emailMessage/To": "@triggerBody()?['to']",
+            "emailMessage/Subject": "@triggerBody()?['subject']",
+            "emailMessage/Body": "@triggerBody()?['bodyHtml']",
+            "emailMessage/From": "bibliothek@sprachcafe-polnisch.org",
+            "emailMessage/Importance": "Normal"
+          }
+        },
+        "runAfter": {}
+      },
+      "Response": {
+        "type": "Response",
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": {
+            "status": "success",
+            "message": "Email dispatched via M365 Exchange",
+            "recipient": "@triggerBody()?['to']"
+          }
+        },
+        "runAfter": {
+          "Send_an_email_(V2)": [
+            "Succeeded"
+          ]
+        }
+      }
+    },
+    "outputs": {}
+  }
+}

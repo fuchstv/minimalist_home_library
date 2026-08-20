@@ -84,7 +84,7 @@ const TopNavBar: React.FC = () => {
         setIsMenuOpen(false);
     }, [location.pathname]);
 
-    const notificationLink = user?.role === 'admin' ? '/admin?tab=loans' : '/ausleihen';
+    const notificationLink = user?.role === 'admin' ? '/admin?tab=loans' : '/profil';
 
     return (
         <nav className="bg-surface sticky top-0 w-full z-50 shadow-[0_1px_4px_rgba(0,0,0,0.03)] border-b border-outline-variant/30">
@@ -102,13 +102,8 @@ const TopNavBar: React.FC = () => {
                     {user && (
                         <>
                             <li className="h-full flex items-center">
-                                <Link to="/profil" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/profil' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
+                                <Link to="/profil" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/profil' || location.pathname === '/ausleihen' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
                                     {t('nav.profile')}
-                                </Link>
-                            </li>
-                            <li className="h-full flex items-center">
-                                <Link to="/ausleihen" className={`font-body-md text-body-md h-full flex items-center transition-colors duration-200 ${location.pathname === '/ausleihen' ? 'text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-bold' : 'text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim'}`}>
-                                    {t('nav.loans')}
                                 </Link>
                             </li>
                             {user.role === 'admin' && (
@@ -190,15 +185,8 @@ const TopNavBar: React.FC = () => {
                             <li>
                                 <Link
                                     to="/profil"
-                                    className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/profil' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
+                                    className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/profil' || location.pathname === '/ausleihen' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
                                     {t('nav.profile')}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to="/ausleihen"
-                                    className={`block py-3 px-4 rounded-lg font-body-md transition-colors ${location.pathname === '/ausleihen' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
-                                    {t('nav.loans')}
                                 </Link>
                             </li>
                             {user.role === 'admin' && (
