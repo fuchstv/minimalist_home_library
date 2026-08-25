@@ -2,6 +2,11 @@
 // backend/db.php
 require_once 'error_utils.php';
 
+if (getenv('APP_ENV') === 'testing') {
+    $pdo = null;
+    return;
+}
+
 $dbPath = getenv('DB_PATH') ?: __DIR__ . '/data/database.sqlite';
 $dsn = "sqlite:" . $dbPath;
 $options = [
