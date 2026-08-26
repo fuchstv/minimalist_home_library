@@ -336,7 +336,15 @@
         "regeln": "Regeln",
         "datenschutz": "Datenschutz",
         "impressum": "Impressum"
-      }
+      },
+      "announcement_info_title": "Globale Ankündigung (Banner oben auf allen Seiten)",
+      "announcement_info_desc": "Lassen Sie das Textfeld leer, wenn kein Ankündigungsbanner auf der Website angezeigt werden soll. Sobald Text gespeichert wird, erscheint das Banner oben auf der Seite.",
+      "announcement_content_de_label": "Banner-Text (DE) – Leer lassen = kein Banner",
+      "announcement_content_pl_label": "Banner-Text (PL) – Leer lassen = kein Banner",
+      "announcement_placeholder_de": "z. B. Unsere Bibliothek bleibt am Samstag, 30. August geschlossen...",
+      "announcement_placeholder_pl": "np. Nasza biblioteka będzie nieczynna w sobotę, 30 sierpnia...",
+      "clear_announcement": "Ankündigung leeren & ausblenden",
+      "clear_announcement_confirm": "Möchten Sie den Text der Ankündigung leeren und das Banner ausblenden?"
     }
   },
   "profile": {

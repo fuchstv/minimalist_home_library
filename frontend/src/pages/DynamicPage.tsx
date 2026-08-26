@@ -120,14 +120,19 @@ const DynamicPage: React.FC = () => {
     const isCmsManaged = Boolean(page?.source);
 
     const htmlContent = useMemo(() => {
-        if (!content) return '';
+        if (!content || content.trim() === '') {
+            if (slug === 'announcement') {
+                return `<p class="text-on-surface-variant italic">${currentLang === 'pl' ? 'Obecnie brak aktywnych ogłoszeń.' : 'Derzeit liegt keine aktive Ankündigung vor.'}</p>`;
+            }
+            return '';
+        }
         try {
             return marked.parse(content, { breaks: true, gfm: true }) as string;
         } catch (e) {
             logger.error('Error parsing markdown:', e);
             return content;
         }
-    }, [content]);
+    }, [content, slug, currentLang]);
 
     if (loading) {
         return (

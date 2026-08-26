@@ -336,7 +336,15 @@
         "regeln": "Regulamin",
         "datenschutz": "Ochrona danych",
         "impressum": "Impressum"
-      }
+      },
+      "announcement_info_title": "Ogłoszenie globalne (Baner u góry na wszystkich stronach)",
+      "announcement_info_desc": "Pozostaw pole tekstowe puste, jeśli baner z ogłoszeniem ma NIE być wyświetlany na stronie. Po zapisaniu tekstu baner pojawi się u góry strony.",
+      "announcement_content_de_label": "Treść baneru (DE) – Puste = brak baneru",
+      "announcement_content_pl_label": "Treść baneru (PL) – Puste = brak baneru",
+      "announcement_placeholder_de": "np. Nasza biblioteka będzie nieczynna w sobotę, 30 sierpnia...",
+      "announcement_placeholder_pl": "np. Nasza biblioteka będzie nieczynna w sobotę, 30 sierpnia...",
+      "clear_announcement": "Wyczyść ogłoszenie i ukryj baner",
+      "clear_announcement_confirm": "Czy na pewno chcesz wyczyścić treść ogłoszenia i ukryć baner?"
     }
   },
   "profile": {

@@ -109,4 +109,58 @@ intranet.sprachcafe-polnisch.org {
     redir https://sprachcafepolnisch.sharepoint.com/sites/intranet{uri} 302
 }
 
+# ==============================================================================
+# 5. Team- & Dienstplan Web-App: team.sprachcafé.org
+# -> Proxy auf Node.js Service (Port 3200)
+# ==============================================================================
+team.xn--sprachcaf-j4a.org {
+    encode zstd gzip
+
+    reverse_proxy 172.18.0.1:3200
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Robots-Tag "noindex, nofollow, noarchive"
+    }
+}
+
+# ==============================================================================
+# 6. Kurs- & Camp-Portal (PWA): kurse.sprachcafe-polnisch.org & kurse.sprachcafé.org
+# -> Proxy auf Fastify Service (Port 3300) mit WebSocket- & PWA-Unterstützung
+# ==============================================================================
+kurse.sprachcafe-polnisch.org, kurse.xn--sprachcaf-j4a.org {
+    encode zstd gzip
+
+    reverse_proxy 172.18.0.1:3300 {
+        flush_interval -1
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# ==============================================================================
+# 7. Newsletter & Abonnenten-Portal: newsletter.sprachcafe-polnisch.org & newsletter.sprachcafé.org
+# -> Proxy auf Listmonk Service (Port 9000)
+# ==============================================================================
+newsletter.sprachcafe-polnisch.org, newsletter.xn--sprachcaf-j4a.org {
+    encode zstd gzip
+
+    reverse_proxy 172.18.0.1:9000
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+
+
 
