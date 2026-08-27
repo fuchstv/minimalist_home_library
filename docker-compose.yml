@@ -1,23 +1,18 @@
 services:
   # -------------------------------------------------------------
-  # HAUSBIBLIOTHEK CONTAINERS (Port 8080 & Stack)
+  # HAUSBIBLIOTHEK CONTAINERS (Stack)
   # -------------------------------------------------------------
   backend:
-    image: php:8.4-apache
+    build: ./backend
     container_name: library_backend
+    restart: always
+    environment:
+      - DB_PATH=/var/www/html/data/database.sqlite
     volumes:
       - ./backend:/var/www/html
-    ports:
-      - "8080:80"
-    environment:
-      - DB_HOST=db
-      - DB_USER=library_user
-      - DB_PASS=library_pass
-      - DB_NAME=library_db
-    depends_on:
-      - db
-    command: >
-      bash -c "docker-php-ext-install pdo pdo_mysql && a2enmod rewrite && apache2-foreground"
+      - uploads_data:/var/www/html/uploads
+    networks:
+      - default
     mem_limit: 128m
     mem_reservation: 32m
     cpus: 0.30
@@ -28,55 +23,6 @@ services:
           memory: 128M
         reservations:
           cpus: '0.10'
-          memory: 32M
-
-  db:
-    image: mysql:8.0
-    container_name: library_db
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: library_db
-      MYSQL_USER: library_user
-      MYSQL_PASSWORD: library_pass
-    volumes:
-      - ./database:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.60
-    deploy:
-      resources:
-        limits:
-          cpus: '0.60'
-          memory: 512M
-        reservations:
-          cpus: '0.20'
-          memory: 256M
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: library_admin
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: root
-    depends_on:
-      - db
-    mem_limit: 96m
-    mem_reservation: 32m
-    cpus: 0.20
-    deploy:
-      resources:
-        limits:
-          cpus: '0.20'
-          memory: 96M
-        reservations:
-          cpus: '0.05'
           memory: 32M
 
   # -------------------------------------------------------------
@@ -98,6 +44,8 @@ services:
       - caddy_config:/config
     depends_on:
       - backend
+    networks:
+      - default
     mem_limit: 64m
     mem_reservation: 16m
     cpus: 0.15
@@ -111,7 +59,7 @@ services:
           memory: 16M
 
 volumes:
-  db_data:
+  uploads_data:
   caddy_data:
   caddy_config:
 

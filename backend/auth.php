@@ -113,7 +113,7 @@ if ($method == 'POST') {
         }
 
         try {
-            $stmt = $pdo->prepare("SELECT email FROM password_resets WHERE token = ? AND used = 0 AND expires_at > NOW()");
+            $stmt = $pdo->prepare("SELECT email FROM password_resets WHERE token = ? AND used = 0 AND expires_at > datetime('now')");
             $stmt->execute([$token]);
             $reset = $stmt->fetch();
 

@@ -22,7 +22,7 @@ if ($method == 'GET') {
         $query = "
             SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
                    CASE
-                       WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
+                       WHEN l.status != 'returned' AND l.due_date < date('now') THEN 'overdue'
                        ELSE l.status
                    END as status,
                    b.title, b.author, b.isbn, b.location
@@ -72,7 +72,7 @@ if ($method == 'GET') {
             }
 
             // Check if available
-            $stmt = $pdo->prepare("SELECT availability_status, title, signature FROM books WHERE id = ? FOR UPDATE");
+            $stmt = $pdo->prepare("SELECT availability_status, title, signature FROM books WHERE id = ?");
             $stmt->execute([$book_id]);
             $book = $stmt->fetch();
 
@@ -126,7 +126,7 @@ if ($method == 'GET') {
     } else {
         $pdo->beginTransaction();
         try {
-            $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? AND user_id = ? AND status != 'returned' FOR UPDATE");
+            $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? AND user_id = ? AND status != 'returned'");
             $stmt->execute([$loan_id, $user_id]);
             $loan = $stmt->fetch();
 

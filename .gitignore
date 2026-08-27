@@ -21,3 +21,13 @@ logs/
 # Dynamic Uploads
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+# SQLite Data
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+backend/data/*.sqlite
+backend/data/*.sqlite-wal
+backend/data/*.sqlite-shm
+!backend/data/.gitkeep

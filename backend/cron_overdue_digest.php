@@ -14,7 +14,7 @@ try {
         FROM loans l
         JOIN users u ON l.user_id = u.id
         JOIN books b ON l.book_id = b.id
-        WHERE l.status != 'returned' AND l.due_date = DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+        WHERE l.status != 'returned' AND l.due_date = date('now', '+3 days')
     ");
     $dueSoon = $stmt->fetchAll();
     echo "Found " . count($dueSoon) . " loan(s) due in 3 days.\n";
@@ -28,12 +28,12 @@ try {
 
     // 2. Send Overdue Reminders (Overdue by 1, 7, 14, 21, 28 days)
     $stmt = $pdo->query("
-        SELECT l.id, l.due_date, DATEDIFF(CURDATE(), l.due_date) as days_overdue,
+        SELECT l.id, l.due_date, CAST((julianday('now') - julianday(l.due_date)) AS INTEGER) as days_overdue,
                u.name as user_name, u.email as user_email, b.title as book_title, b.signature
         FROM loans l
         JOIN users u ON l.user_id = u.id
         JOIN books b ON l.book_id = b.id
-        WHERE l.status != 'returned' AND l.due_date < CURDATE()
+        WHERE l.status != 'returned' AND l.due_date < date('now')
     ");
     $allOverdue = $stmt->fetchAll();
     echo "Found " . count($allOverdue) . " total overdue loan(s).\n";
@@ -58,14 +58,14 @@ try {
         FROM loans l
         JOIN users u ON l.user_id = u.id
         JOIN books b ON l.book_id = b.id
-        WHERE l.status != 'returned' AND l.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+        WHERE l.status != 'returned' AND l.due_date BETWEEN date('now') AND date('now', '+3 days')
         ORDER BY l.due_date ASC
     ");
     $upcomingLoans = $stmt->fetchAll();
 
     // 4. New user registrations in past 24h
     $stmt = $pdo->query("
-        SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        SELECT COUNT(*) FROM users WHERE created_at >= datetime('now', '-24 hours')
     ");
     $newUsersCount = (int)$stmt->fetchColumn();
 

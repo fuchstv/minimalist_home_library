@@ -1,46 +1,15 @@
 services:
-  database:
-    image: mysql:8.0
-    container_name: library_db
-    restart: always
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./database:/docker-entrypoint-initdb.d
-    networks:
-      - library_net
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.60
-    deploy:
-      resources:
-        limits:
-          cpus: '0.60'
-          memory: 512M
-        reservations:
-          cpus: '0.20'
-          memory: 256M
-
   backend:
     build: ./backend
     container_name: library_backend
     restart: always
     environment:
-      - DB_HOST=database
-      - DB_USER=${MYSQL_USER}
-      - DB_PASS=${MYSQL_PASSWORD}
-      - DB_NAME=${MYSQL_DATABASE}
+      - DB_PATH=/var/www/html/data/database.sqlite
     volumes:
       - ./backend:/var/www/html
       - uploads_data:/var/www/html/uploads
     networks:
       - library_net
-    depends_on:
-      - database
     mem_limit: 128m
     mem_reservation: 32m
     cpus: 0.30
@@ -53,30 +22,6 @@ services:
           cpus: '0.10'
           memory: 32M
 
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: library_admin
-    restart: always
-    ports:
-      - "8080:80"
-    environment:
-      - PMA_HOST=database
-    networks:
-      - library_net
-    depends_on:
-      - database
-    mem_limit: 96m
-    mem_reservation: 32m
-    cpus: 0.20
-    deploy:
-      resources:
-        limits:
-          cpus: '0.20'
-          memory: 96M
-        reservations:
-          cpus: '0.05'
-          memory: 32M
-
   caddy:
     image: caddy:2-alpine
     container_name: caddy
@@ -87,6 +32,7 @@ services:
     volumes:
       - ./frontend/dist:/usr/share/caddy
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - /var/www:/var/www:ro
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -106,7 +52,6 @@ services:
           memory: 16M
 
 volumes:
-  db_data:
   uploads_data:
   caddy_data:
   caddy_config:

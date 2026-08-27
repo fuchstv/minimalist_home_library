@@ -123,7 +123,7 @@ if ($parts[0] === 'payments') {
 
         $pdo->beginTransaction();
         try {
-            $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? FOR UPDATE");
+            $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ?");
             $stmt->execute([$payment_id]);
             $payment = $stmt->fetch();
 

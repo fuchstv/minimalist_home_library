@@ -82,7 +82,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         $stmt = $pdo->prepare("
                             SELECT l.id, l.book_id, l.user_id, l.loan_date, l.due_date, l.return_date,
                                    CASE
-                                       WHEN l.status != 'returned' AND l.due_date < CURDATE() THEN 'overdue'
+                                       WHEN l.status != 'returned' AND l.due_date < date('now') THEN 'overdue'
                                        ELSE l.status
                                    END as status,
                                    b.title as book_title, b.author as book_author, b.signature as book_signature, b.isbn as book_isbn
@@ -113,7 +113,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                     $pdo->beginTransaction();
                     try {
                         // Check if book exists and is available
-                        $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ? FOR UPDATE");
+                        $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ?");
                         $stmt->execute([$book_id]);
                         $book = $stmt->fetch();
                         
@@ -157,7 +157,7 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                     
                     $pdo->beginTransaction();
                     try {
-                        $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? AND user_id = ? FOR UPDATE");
+                        $stmt = $pdo->prepare("SELECT * FROM loans WHERE id = ? AND user_id = ?");
                         $stmt->execute([$loan_id, $user_id]);
                         $loan = $stmt->fetch();
                         if (!$loan) {
@@ -211,10 +211,10 @@ if (isset($parts[1]) && $parts[1] === 'users') {
                         SELECT u.id, u.name, u.email, u.created_at
                         FROM users u
                         WHERE u.role != 'admin'
-                          AND u.created_at <= DATE_SUB(NOW(), INTERVAL 24 MONTH)
+                          AND u.created_at <= datetime('now', '-24 month')
                           AND NOT EXISTS (
                               SELECT 1 FROM loans l 
-                              WHERE l.user_id = u.id AND (l.status != 'returned' OR l.loan_date >= DATE_SUB(NOW(), INTERVAL 24 MONTH))
+                              WHERE l.user_id = u.id AND (l.status != 'returned' OR l.loan_date >= date('now', '-24 month'))
                           )
                     ";
                     $stmt = $pdo->query($sql);

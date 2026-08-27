@@ -56,7 +56,7 @@ if ($method === 'GET') {
         }
 
         // Check if book exists and is borrowed
-        $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ? FOR UPDATE");
+        $stmt = $pdo->prepare("SELECT availability_status FROM books WHERE id = ?");
         $stmt->execute([$book_id]);
         $book = $stmt->fetch();
 

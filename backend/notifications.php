@@ -22,10 +22,10 @@ if ($method === 'GET') {
         // Count overdue loans
         $overdue_count = 0;
         if ($user_role === 'admin') {
-            $stmt = $pdo->query("SELECT COUNT(*) FROM loans WHERE due_date < CURDATE() AND status != 'returned'");
+            $stmt = $pdo->query("SELECT COUNT(*) FROM loans WHERE due_date < date('now') AND status != 'returned'");
             $overdue_count = (int)$stmt->fetchColumn();
         } else {
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM loans WHERE user_id = ? AND due_date < CURDATE() AND status != 'returned'");
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM loans WHERE user_id = ? AND due_date < date('now') AND status != 'returned'");
             $stmt->execute([$user_id]);
             $overdue_count = (int)$stmt->fetchColumn();
         }

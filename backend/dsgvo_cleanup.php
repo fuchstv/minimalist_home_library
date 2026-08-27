@@ -27,10 +27,10 @@ try {
         SELECT u.id, u.name, u.email, u.created_at
         FROM users u
         WHERE u.role != 'admin'
-          AND u.created_at <= DATE_SUB(NOW(), INTERVAL 24 MONTH)
+          AND u.created_at <= datetime('now', '-24 month')
           AND NOT EXISTS (
               SELECT 1 FROM loans l 
-              WHERE l.user_id = u.id AND (l.status != 'returned' OR l.loan_date >= DATE_SUB(NOW(), INTERVAL 24 MONTH))
+              WHERE l.user_id = u.id AND (l.status != 'returned' OR l.loan_date >= date('now', '-24 month'))
           )
     ";
     $stmt = $pdo->query($sql);
