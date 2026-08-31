@@ -64,8 +64,24 @@ const AdminLoans: React.FC = () => {
         }
     };
 
+    // Status counts
+    const statusCounts = React.useMemo(() => {
+        let active = 0;
+        let overdue = 0;
+        let returned = 0;
+        for (let i = 0; i < loans.length; i++) {
+            if (loans[i].status === 'active') active++;
+            else if (loans[i].status === 'overdue') overdue++;
+            else if (loans[i].status === 'returned') returned++;
+        }
+        return { active, overdue, returned };
+    }, [loans]);
+
     // Filters
-    const filteredLoans = loans.filter(loan => {
+    const filteredLoans = React.useMemo(() => {
+        if (loans.length === 0) return [];
+
+        return loans.filter(loan => {
         const matchesSearch = 
             loan.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             loan.user_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,7 +93,8 @@ const AdminLoans: React.FC = () => {
             loan.status === statusFilter;
             
         return matchesSearch && matchesStatus;
-    });
+        });
+    }, [loans, searchQuery, statusFilter]);
 
     return (
         <div className="bg-surface-container-low dark:bg-white/10 p-6 rounded-xl border border-outline-variant shadow-sm flex flex-col gap-6">
@@ -125,19 +142,19 @@ const AdminLoans: React.FC = () => {
                         onClick={() => setStatusFilter('active')}
                         className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm transition-all border shrink-0 ${statusFilter === 'active' ? 'bg-blue-600 text-white border-blue-600' : 'bg-surface hover:bg-surface-variant/30 border-outline'}`}
                     >
-                        {t('admin.loans.filter_active', { count: loans.filter(l => l.status === 'active').length })}
+                        {t('admin.loans.filter_active', { count: statusCounts.active })}
                     </button>
                     <button
                         onClick={() => setStatusFilter('overdue')}
                         className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm transition-all border shrink-0 ${statusFilter === 'overdue' ? 'bg-error text-on-error border-error' : 'bg-surface hover:bg-surface-variant/30 border-outline'}`}
                     >
-                        {t('admin.loans.filter_overdue', { count: loans.filter(l => l.status === 'overdue').length })}
+                        {t('admin.loans.filter_overdue', { count: statusCounts.overdue })}
                     </button>
                     <button
                         onClick={() => setStatusFilter('returned')}
                         className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm transition-all border shrink-0 ${statusFilter === 'returned' ? 'bg-green-700 text-white border-green-700' : 'bg-surface hover:bg-surface-variant/30 border-outline'}`}
                     >
-                        {t('admin.loans.filter_returned', { count: loans.filter(l => l.status === 'returned').length })}
+                        {t('admin.loans.filter_returned', { count: statusCounts.returned })}
                     </button>
                 </div>
             </div>
