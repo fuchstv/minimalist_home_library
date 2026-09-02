@@ -22,6 +22,10 @@ sprachcafe-polnisch.org, www.sprachcafe-polnisch.org, xn--sprachcaf-j4a.org, www
     redir /veranstaltungen /events/ 301
     redir /bibliothek/ /hausbibliothek/ 301
     redir /bibliothek /hausbibliothek/ 301
+    redir /2026/02/speak-dating-3/ /speak-dating/ 301
+    redir /2026/02/speak-dating-3 /speak-dating/ 301
+    redir /2024/12/speak-dating-2/ /speak-dating/ 301
+    redir /2024/12/speak-dating-2 /speak-dating/ 301
 
     # Mailchimp Webhook Endpoint (GET Handshake & POST Events)
     handle /api/webhooks/mailchimp* {
@@ -58,9 +62,25 @@ beta.sprachcafe-polnisch.org, http://3.66.205.213 {
     root * /var/www/beta
     encode zstd gzip
 
-    # Basic Auth Protection for /reports/*
+    # Basic Auth Protection for /reports/* and /keystatic*
     basic_auth /reports/* {
         philipp $2a$14$DIRdKlU/PFEaHNqQb3FoS.9nR2sPHunOLWfctslP0O030QXWzeeiC
+    }
+    basic_auth /keystatic* {
+        philipp $2a$14$hcEWJS4qSKs1ezTyrnFukefI5qBJY8qd4TAorL.tNlY1dK5hhYiQC
+        redaktion $2a$14$hcEWJS4qSKs1ezTyrnFukefI5qBJY8qd4TAorL.tNlY1dK5hhYiQC
+    }
+    basic_auth /api/keystatic* {
+        philipp $2a$14$hcEWJS4qSKs1ezTyrnFukefI5qBJY8qd4TAorL.tNlY1dK5hhYiQC
+        redaktion $2a$14$hcEWJS4qSKs1ezTyrnFukefI5qBJY8qd4TAorL.tNlY1dK5hhYiQC
+    }
+
+    # Keystatic Headless CMS Redaktion & API
+    handle /keystatic* {
+        reverse_proxy 172.18.0.1:3000
+    }
+    handle /api/keystatic* {
+        reverse_proxy 172.18.0.1:3000
     }
 
     handle {
@@ -96,18 +116,14 @@ hausbibliothek.org, www.hausbibliothek.org {
 }
 
 # ==============================================================================
-# 4. Intranet (Vanity URL / Redirection): intranet.sprachcafé.org
-# -> Weiterleitung auf das Microsoft 365 SharePoint Intranet Hub
+# 4. Intranet (Direkte Bibliotheks-Weiterleitung): intranet.sprachcafé.org
+# -> Weiterleitung direkt in die SharePoint Dokumentenbibliothek (Freigegebene Dokumente)
 # ==============================================================================
-intranet.xn--sprachcaf-j4a.org {
+intranet.xn--sprachcaf-j4a.org, intranet.sprachcafe-polnisch.org {
     encode zstd gzip
-    redir https://sprachcafepolnisch.sharepoint.com/sites/intranet{uri} 302
+    redir https://sprachcafepolnisch.sharepoint.com/sites/intranet/Freigegebene%20Dokumente{uri} 302
 }
 
-intranet.sprachcafe-polnisch.org {
-    encode zstd gzip
-    redir https://sprachcafepolnisch.sharepoint.com/sites/intranet{uri} 302
-}
 
 # ==============================================================================
 # 5. Team- & Dienstplan Web-App: team.sprachcafé.org
@@ -160,6 +176,16 @@ newsletter.sprachcafe-polnisch.org, newsletter.xn--sprachcaf-j4a.org {
         Referrer-Policy "strict-origin-when-cross-origin"
     }
 }
+
+# ==============================================================================
+# 8. Speak-Dating Domain (Permanent 301 Redirect): speak-dating.org
+# -> Weiterleitung auf den Innovations-Hub
+# ==============================================================================
+speak-dating.org, www.speak-dating.org {
+    encode zstd gzip
+    redir https://xn--sprachcaf-j4a.org/speak-dating/ 301
+}
+
 
 
 
