@@ -12,6 +12,7 @@ describe('logger utility', () => {
     afterEach(() => {
         vi.restoreAllMocks();
         vi.unstubAllEnvs();
+        import.meta.env.PROD = false;
     });
 
     describe('in non-production environment', () => {
@@ -58,7 +59,7 @@ describe('logger utility', () => {
     describe('in production environment', () => {
         it('should suppress log output when PROD is true', async () => {
             vi.resetModules();
-            vi.stubEnv('PROD', 'true');
+            vi.stubEnv('PROD', true);
             // Also set import.meta.env.PROD directly if stubEnv affects import.meta.env
             import.meta.env.PROD = true;
 
