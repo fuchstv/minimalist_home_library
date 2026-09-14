@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import Login from './Login';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n';
@@ -8,6 +8,8 @@ import '@testing-library/jest-dom';
 import { AuthContext } from '../context/AuthContext';
 
 vi.stubGlobal('fetch', vi.fn());
+
+const mockFetch = fetch as unknown as Mock;
 
 const renderLogin = (contextValue = {}) => {
     const defaultContext = {
@@ -42,7 +44,7 @@ describe('Login Component', () => {
     });
 
     it('opens forgot password modal when clicking help link and can request reset', async () => {
-        (fetch as any).mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({ message: 'Link sent' })
         });
@@ -72,7 +74,7 @@ describe('Login Component', () => {
     it('submits login credentials successfully', async () => {
         const setUserMock = vi.fn();
         const setCsrfMock = vi.fn();
-        (fetch as any).mockResolvedValueOnce({
+        mockFetch.mockResolvedValueOnce({
             ok: true,
             json: async () => ({
                 user: { id: 1, name: 'Test User', email: 'test@example.com', role: 'member' },
@@ -90,6 +92,57 @@ describe('Login Component', () => {
         await waitFor(() => {
             expect(setUserMock).toHaveBeenCalledWith(expect.objectContaining({ email: 'test@example.com' }));
             expect(setCsrfMock).toHaveBeenCalledWith('mock-csrf');
+        });
+    });
+
+    it('displays error message when login response is not ok', async () => {
+        mockFetch.mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ message: 'Ungültiges Passwort' })
+        });
+
+        renderLogin();
+
+        fireEvent.change(screen.getByLabelText(/E-Mail Adresse/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Passwort/i), { target: { value: 'wrongpass' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Einloggen/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Ungültiges Passwort')).toBeInTheDocument();
+        });
+    });
+
+    it('displays default error message when login response is not ok without message', async () => {
+        mockFetch.mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({})
+        });
+
+        renderLogin();
+
+        fireEvent.change(screen.getByLabelText(/E-Mail Adresse/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Passwort/i), { target: { value: 'wrongpass' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Einloggen/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Login fehlgeschlagen')).toBeInTheDocument();
+        });
+    });
+
+    it('displays network error message when login request fails', async () => {
+        mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+        renderLogin();
+
+        fireEvent.change(screen.getByLabelText(/E-Mail Adresse/i), { target: { value: 'test@example.com' } });
+        fireEvent.change(screen.getByLabelText(/Passwort/i), { target: { value: 'secret123' } });
+
+        fireEvent.click(screen.getByRole('button', { name: /Einloggen/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Netzwerkfehler')).toBeInTheDocument();
         });
     });
 });
