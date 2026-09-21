@@ -12,21 +12,24 @@ try {
         $counters = [];
         $updates = [];
 
+        // Pre-fetch highest existing signature numbers for all category prefixes in a single query
+        $stmtSig = $pdo->query("SELECT signature FROM books WHERE signature IS NOT NULL AND signature != ''");
+        while ($sig = $stmtSig->fetchColumn()) {
+            $dashPos = strrpos($sig, '-');
+            if ($dashPos !== false) {
+                $prefix = substr($sig, 0, $dashPos);
+                $num = (int)substr($sig, $dashPos + 1);
+                if (!isset($counters[$prefix]) || $num > $counters[$prefix]) {
+                    $counters[$prefix] = $num;
+                }
+            }
+        }
+
         foreach ($books as $book) {
             $abbr = getCategoryAbbreviation($book['category']);
 
-            // Initialize counter for this category if not already done
             if (!isset($counters[$abbr])) {
-                $stmt2 = $pdo->prepare("SELECT signature FROM books WHERE signature LIKE ? ORDER BY LENGTH(signature) DESC, signature DESC LIMIT 1");
-                $stmt2->execute([$abbr . '-%']);
-                $lastSignature = $stmt2->fetchColumn();
-
-                if ($lastSignature) {
-                    $parts = explode('-', $lastSignature);
-                    $counters[$abbr] = (int)end($parts);
-                } else {
-                    $counters[$abbr] = 0;
-                }
+                $counters[$abbr] = 0;
             }
 
             $counters[$abbr]++;
