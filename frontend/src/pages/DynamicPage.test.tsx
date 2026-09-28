@@ -44,7 +44,7 @@ const renderDynamicPage = (user: { id: number; name: string; email: string; role
 describe('DynamicPage Component inline editing', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (axios.get as any).mockResolvedValue({ data: mockPageData });
+        vi.mocked(axios.get).mockResolvedValue({ data: mockPageData });
     });
 
     it('renders page content successfully', async () => {
@@ -104,7 +104,7 @@ describe('DynamicPage Component inline editing', () => {
     });
 
     it('saves changes successfully when save is clicked', async () => {
-        (axios.post as any).mockResolvedValue({ data: { message: 'Page updated successfully' } });
+        vi.mocked(axios.post).mockResolvedValue({ data: { message: 'Page updated successfully' } });
 
         renderDynamicPage({ id: 1, name: 'Admin User', email: 'admin@test.com', role: 'admin' });
         
@@ -137,5 +137,29 @@ describe('DynamicPage Component inline editing', () => {
             expect(screen.getByText('New Rules Title')).toBeInTheDocument();
             expect(screen.getByText('New content for German')).toBeInTheDocument();
         });
+    });
+
+    it('sanitizes malicious XSS scripts and attributes in content', async () => {
+        const xssPageData = {
+            slug: 'regeln',
+            title_de: 'XSS Test Page',
+            title_pl: 'XSS Test Page PL',
+            content_de: 'Safe content <script>alert("xss")</script><img src="invalid" onerror="alert(1)" /><a href="javascript:alert(1)">click me</a>',
+            content_pl: 'Safe PL'
+        };
+        vi.mocked(axios.get).mockResolvedValue({ data: xssPageData });
+
+        renderDynamicPage(null);
+
+        await waitFor(() => {
+            expect(screen.getByText('XSS Test Page')).toBeInTheDocument();
+        });
+
+        const container = document.querySelector('.dynamic-page-content');
+        expect(container).toBeInTheDocument();
+        expect(container?.innerHTML).not.toContain('<script>');
+        expect(container?.innerHTML).not.toContain('onerror');
+        expect(container?.innerHTML).not.toContain('javascript:');
+        expect(container?.innerHTML).toContain('Safe content');
     });
 });
