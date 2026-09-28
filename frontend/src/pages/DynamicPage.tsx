@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import axios from '../utils/api';
 import { API_BASE_URL } from '../config';
 import { AuthContext } from '../context/AuthContext';
@@ -122,15 +123,17 @@ const DynamicPage: React.FC = () => {
     const htmlContent = useMemo(() => {
         if (!content || content.trim() === '') {
             if (slug === 'announcement') {
-                return `<p class="text-on-surface-variant italic">${currentLang === 'pl' ? 'Obecnie brak aktywnych ogłoszeń.' : 'Derzeit liegt keine aktive Ankündigung vor.'}</p>`;
+                const defaultMsg = `<p class="text-on-surface-variant italic">${currentLang === 'pl' ? 'Obecnie brak aktywnych ogłoszeń.' : 'Derzeit liegt keine aktive Ankündigung vor.'}</p>`;
+                return DOMPurify.sanitize(defaultMsg);
             }
             return '';
         }
         try {
-            return marked.parse(content, { breaks: true, gfm: true }) as string;
+            const rawHtml = marked.parse(content, { breaks: true, gfm: true }) as string;
+            return DOMPurify.sanitize(rawHtml);
         } catch (e) {
             logger.error('Error parsing markdown:', e);
-            return content;
+            return DOMPurify.sanitize(content);
         }
     }, [content, slug, currentLang]);
 
