@@ -21,7 +21,6 @@ logs/
 # Dynamic Uploads
 backend/uploads/*
 !backend/uploads/.gitkeep
-
 # SQLite Data
 *.sqlite
 *.sqlite3
@@ -31,3 +30,8 @@ backend/data/*.sqlite
 backend/data/*.sqlite-wal
 backend/data/*.sqlite-shm
 !backend/data/.gitkeep
+
+# PHP & Testing
+/backend/vendor/
+backend/vendor/
+backend/.phpunit.result.cache
