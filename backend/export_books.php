@@ -1,15 +1,21 @@
 <?php
 // backend/export_books.php
-// Lightweight read-only public export endpoint for book catalog metadata
+// Read-only export endpoint for book catalog metadata requiring authentication
 require_once 'db.php';
 require_once 'error_utils.php';
+
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["message" => "Unauthorized"]);
+    return;
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method !== 'GET') {
     http_response_code(405);
     echo json_encode(["message" => "Method not allowed. Only GET is supported."]);
-    exit;
+    return;
 }
 
 try {
