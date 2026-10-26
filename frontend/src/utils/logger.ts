@@ -7,28 +7,24 @@
 const isProduction = import.meta.env.PROD;
 
 export const logger = {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    info: (...args: any[]) => {
+    info: (...args: unknown[]) => {
         if (!isProduction) {
             console.info(...args);
         }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    warn: (...args: any[]) => {
+    warn: (...args: unknown[]) => {
         if (!isProduction) {
             console.warn(...args);
         }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    error: (...args: any[]) => {
+    error: (...args: unknown[]) => {
         // Errors might still be logged in production, or sent to a tracking service
         // For now, just log them if not in prod to clean up production console
         if (!isProduction) {
             console.error(...args);
         }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    debug: (...args: any[]) => {
+    debug: (...args: unknown[]) => {
         if (!isProduction) {
             console.debug(...args);
         }
